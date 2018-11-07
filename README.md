@@ -6,7 +6,7 @@ I find this tool useful for managing a large number of workspaces in i3.
 
 ## Overview
 
-The main operations that the CLI tool `i3_workspace_groups_tool` supports are:
+The main operations that the CLI tool `i3-workspace-groups` supports are:
 
 - Assign the focused workspace to a group with a given name (and creating the
   group if it doesn't exist).
@@ -177,7 +177,7 @@ pip install i3ipc
 ```
 
 Then you should be able to run the command line tool
-[`i3_workspace_groups_tool.py`](iswsgroups/i3_workspace_groups_tool.py).
+[`i3-workspace-groups`](scripts/i3-workspace-groups).
 The scripts in the [`scripts`](scripts) directory also require that you install
 [rofi](https://github.com/DaveDavenport/rofi).
 

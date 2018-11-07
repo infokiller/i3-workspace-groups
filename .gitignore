@@ -24,6 +24,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+i3wsgroups/wrappers/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

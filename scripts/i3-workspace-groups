@@ -7,16 +7,11 @@ import sys
 
 import i3ipc
 
-# TODO(infokiller): Figure out how to import correctly so that it works in pip
+# TODO(infokiller): Figure out how to correctly import so that it works in pip
 # installations and in local dev.
-try:
-    from i3wsgroups import i3_workspace_groups
-except:
-    pass
-try:
-    import i3_workspace_groups
-except:
-    pass
+import os.path
+sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
+from i3wsgroups import i3_workspace_groups
 
 def _create_args_parser():
     parser = argparse.ArgumentParser(description='Control i3 workspace groups.')

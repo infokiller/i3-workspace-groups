@@ -14,8 +14,8 @@ function command_exists() {
 }
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-TOOL="i3_workspace_groups_tool.py"
-command_exists "$TOOL" || TOOL="$DIR/../i3wsgroups/$TOOL"
+TOOL="$DIR/i3-workspace-groups"
+command_exists "$TOOL" || TOOL="i3-workspace-groups"
 if group="$(rofi -dmenu -p 'Enter workspace group name' -lines 0 -width 30)"; then
   [[ -n "$group" ]] || group=default
   "$TOOL" assign-workspace-to-group "$group"

@@ -9,8 +9,13 @@ set -o nounset
 # Catch the error in case mysqldump fails (but gzip succeeds) in `mysqldump |gzip`
 set -o pipefail
 
+function command_exists() {
+  type "$1" &> /dev/null
+}
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-TOOL="$DIR/wrappers/i3_workspace_groups_tool.py"
+TOOL="i3_workspace_groups_tool.py"
+command_exists "$TOOL" || TOOL="$DIR/../i3wsgroups/$TOOL"
 if selected_group="$("$TOOL" list-groups | rofi -dmenu -p 'Switch to workspace group' -no-custom -lines 5 -width 30 )"; then
   "$TOOL" switch-active-group "$selected_group"
 else

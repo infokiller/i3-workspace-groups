@@ -4,6 +4,25 @@ A Python library and command line tool for managing i3wm workspaces in groups
 that you define.
 I find this tool useful for managing a large number of workspaces in i3.
 
+## Background
+
+I often find myself working with many i3 workspaces at once (7-8+), usually
+related to multiple projects/contexts (personal/work etc). This has caused me a
+few issues, for example:
+
+- Working with a set of workspaces of a given project/context, without being
+  distracted by unrelated workspaces.
+- Reusing the same workspace number in multiple projects/contexts. For example,
+  I have two different emails for personal and work stuff, and I want `Super+1`
+  to always switch to the workspace with the email client relevant to my current
+  context.
+- Finding a free workspace for a new window (that can also be reached with my
+  keybindings)
+
+This has lead me to create the https://github.com/infokiller/i3-workspace-groups
+project, which enables you to define and manage groups of workspaces, each with
+their own "namespace", and switch between them.
+
 ## Overview
 
 The main operations that the CLI tool `i3-workspace-groups` supports are:

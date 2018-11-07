@@ -188,17 +188,16 @@ group is usually displayed as "Ɗ".
 
 ## Installation
 
-I plan to upload this to PyPI soon, but until then you can install the only
-dependency, [i3ipc](https://github.com/acrisci/i3ipc-python), using:
+The scripts can be installed using pip:
 
 ```shell
-pip install i3ipc
+pip install i3-workspace-groups
 ```
 
-Then you should be able to run the command line tool
-[`i3-workspace-groups`](scripts/i3-workspace-groups).
-The scripts in the [`scripts`](scripts) directory also require that you install
-[rofi](https://github.com/DaveDavenport/rofi).
+Then you should be able to run the command line tool [`i3-workspace-groups`](scripts/i3-workspace-groups).
+There are also two scripts provided that require [rofi](https://github.com/DaveDavenport/rofi):
+- [`i3-assign-workspace-to-group`](scripts/i3-assign-workspace-to-group)
+- [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
 
 ### Sway compatibility note
 

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import collections
 import logging
-import os
 import re
-import sys
 
 logger = logging.getLogger(__name__)
 

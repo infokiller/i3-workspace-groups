@@ -101,9 +101,9 @@ strip_workspace_numbers yes
 set $exec_i3_groups_tool exec --no-startup-id i3-workspace-groups
 
 # Switch active workspace group
-bindcode $mod+g exec --no-startup-id switch-active-workspace-group
+bindcode $mod+g exec --no-startup-id i3-switch-active-workspace-group
 # Move workspace to another group
-bindcode $mod+Shift+g exec --no-startup-id assign-workspace-to-group
+bindcode $mod+Shift+g exec --no-startup-id i3-assign-workspace-to-group
 
 bindsym $mod+1 $exec_i3_groups_tool workspace-number 1
 bindsym $mod+2 $exec_i3_groups_tool workspace-number 2

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import collections
 import logging
 import re
@@ -92,7 +93,7 @@ def max_local_workspace_number(workspaces):
     for workspace in workspaces:
         local_number = get_local_workspace_number(workspace)
         logger.debug('Workspace %s, local number %s', workspace.name,
-                    local_number)
+                     local_number)
         if local_number is not None:
             result = max(result, local_number)
     return result
@@ -338,8 +339,8 @@ class WorkspaceGroupsController:
         return (group_workspaces[next_workspace_index], is_current_workspace)
 
     def focus_workspace_relative(self, offset_from_current):
-        next_workspace, is_current_workspace = self._relative_workspace_in_group(
-            offset_from_current)
+        next_workspace, is_current_workspace = \
+            self._relative_workspace_in_group(offset_from_current)
         # Because of the `workspace_auto_back_and_forth` setting, we must not
         # execute the focus command if the target workspace is the same as the
         # current one, since then the focus will actually change to the
@@ -351,8 +352,8 @@ class WorkspaceGroupsController:
         self.send_i3_command('workspace "{}"'.format(next_workspace.name))
 
     def move_workspace_relative(self, offset_from_current):
-        next_workspace, is_current_workspace = self._relative_workspace_in_group(
-            offset_from_current)
+        next_workspace, is_current_workspace = \
+            self._relative_workspace_in_group(offset_from_current)
         # Because of the `workspace_auto_back_and_forth` setting, we must not
         # execute the move command if the target workspace is the same as the
         # current one, since then the container will actually move to the

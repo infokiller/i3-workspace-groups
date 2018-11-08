@@ -20,6 +20,11 @@ def _create_args_parser():
         action='store_true',
         default=False,
         help='If true, will not actually do any changes to i3 workspaces.')
+    parser.add_argument(
+        '--log-level',
+        choices=('debug', 'info', 'warning', 'error', 'critical'),
+        default='warning',
+        help='Logging level for stderr and syslog.')
     # The argparse argument group of the workspace group arguments.
     group_arg_group = parser.add_mutually_exclusive_group()
     group_arg_group.add_argument(
@@ -88,8 +93,22 @@ def _create_context_group_finder(args):
         return i3_workspace_groups.NamedGroupContext(args['group_name'])
 
 
+def _init_logger(logger):
+    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
+    stdout_handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    syslog_handler.setFormatter(formatter)
+    stdout_handler.setFormatter(formatter)
+    logger.addHandler(syslog_handler)
+    logger.addHandler(stdout_handler)
+    return logger
+
+
 def main():
     args = _create_args_parser().parse_args()
+    logger = i3_workspace_groups.logger
+    _init_logger(logger)
+    logger.setLevel(getattr(logging, args.log_level.upper(), None))
     group_context = _create_context_group_finder(args)
     controller = i3_workspace_groups.WorkspaceGroupsController(
         i3ipc.Connection(), group_context, args.dry_run)

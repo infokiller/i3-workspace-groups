@@ -13,6 +13,7 @@ import os.path
 sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
 from i3wsgroups import i3_workspace_groups
 
+
 def _create_args_parser():
     parser = argparse.ArgumentParser(description='Control i3 workspace groups.')
     parser.add_argument(

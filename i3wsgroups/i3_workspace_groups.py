@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
+
 import collections
 import logging
-import os
 import re
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +93,7 @@ def max_local_workspace_number(workspaces):
     for workspace in workspaces:
         local_number = get_local_workspace_number(workspace)
         logger.debug('Workspace %s, local number %s', workspace.name,
-                    local_number)
+                     local_number)
         if local_number is not None:
             result = max(result, local_number)
     return result
@@ -146,7 +145,7 @@ class WorkspaceGroupsError(Exception):
     pass
 
 
-class ActiveGroupContext(object):
+class ActiveGroupContext:
 
     def get_group_name(self, tree):
         group_to_workspaces = get_group_to_workspaces(tree)
@@ -164,7 +163,7 @@ class ActiveGroupContext(object):
         return active_group_workspaces[0]
 
 
-class FocusedGroupContext(object):
+class FocusedGroupContext:
 
     def get_group_name(self, tree):
         focused_workspace = tree.find_focused().workspace()
@@ -174,7 +173,7 @@ class FocusedGroupContext(object):
         return tree.find_focused().workspace()
 
 
-class NamedGroupContext(object):
+class NamedGroupContext:
 
     def __init__(self, group_name):
         self.group_name = group_name
@@ -193,7 +192,7 @@ class NamedGroupContext(object):
         return group_to_workspace[self.group_name][0]
 
 
-class WorkspaceGroupsController(object):
+class WorkspaceGroupsController:
 
     def __init__(self, i3_connection, group_context, dry_run=True):
         self.i3_connection = i3_connection
@@ -340,8 +339,8 @@ class WorkspaceGroupsController(object):
         return (group_workspaces[next_workspace_index], is_current_workspace)
 
     def focus_workspace_relative(self, offset_from_current):
-        next_workspace, is_current_workspace = self._relative_workspace_in_group(
-            offset_from_current)
+        next_workspace, is_current_workspace = \
+            self._relative_workspace_in_group(offset_from_current)
         # Because of the `workspace_auto_back_and_forth` setting, we must not
         # execute the focus command if the target workspace is the same as the
         # current one, since then the focus will actually change to the
@@ -353,8 +352,8 @@ class WorkspaceGroupsController(object):
         self.send_i3_command('workspace "{}"'.format(next_workspace.name))
 
     def move_workspace_relative(self, offset_from_current):
-        next_workspace, is_current_workspace = self._relative_workspace_in_group(
-            offset_from_current)
+        next_workspace, is_current_workspace = \
+            self._relative_workspace_in_group(offset_from_current)
         # Because of the `workspace_auto_back_and_forth` setting, we must not
         # execute the move command if the target workspace is the same as the
         # current one, since then the container will actually move to the

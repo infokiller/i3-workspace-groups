@@ -25,21 +25,21 @@ WORKSPACE_NAME_REGEXES = [
     r'(?P<global_number>\d+):(?P<group>{}):(?P<local_name>{}):(?P<local_number>\d+)$'
     .format(GROUP_NAME_PATTERN, WORKSPACE_LOCAL_NAME_PATTERN),
     # Non default group, group is inactive, no user configured name.
-    r'(?P<global_number>\d+):(?P<group>{}):(?P<local_number>\d+)$'
-    .format(GROUP_NAME_PATTERN),
+    r'(?P<global_number>\d+):(?P<group>{}):(?P<local_number>\d+)$'.format(
+        GROUP_NAME_PATTERN),
     # Non default group, group is active, has user configured name.
     r'(?P<global_number>\d+):(?P<group>{}):(?P<local_name>{})$'.format(
         GROUP_NAME_PATTERN, WORKSPACE_LOCAL_NAME_PATTERN),
     # Non default group, group is active, no user configured name.
     r'(?P<global_number>\d+):(?P<group>{})$'.format(GROUP_NAME_PATTERN),
     # Default group, group is inactive, has user configured name.
-    r'(?P<global_number>\d+):(?P<local_name>{}):(?P<local_number>\d+)$'
-    .format(WORKSPACE_LOCAL_NAME_PATTERN),
+    r'(?P<global_number>\d+):(?P<local_name>{}):(?P<local_number>\d+)$'.format(
+        WORKSPACE_LOCAL_NAME_PATTERN),
     # Default group, group is inactive, no user configured name.
     r'(?P<global_number>\d+):(?P<local_number>\d+)$',
     # Default group, group is active, has user configured name.
-    r'(?P<global_number>\d+):(?P<local_name>{})$'
-    .format(WORKSPACE_LOCAL_NAME_PATTERN),
+    r'(?P<global_number>\d+):(?P<local_name>{})$'.format(
+        WORKSPACE_LOCAL_NAME_PATTERN),
     # Default group, group is active, no user configured name.
     r'(?P<global_number>\d+)$',
 ]
@@ -129,9 +129,9 @@ def global_number_to_local_number(global_number):
     return global_number % MAX_WORKSPACES_PER_GROUP
 
 
-def get_group_to_workspaces(tree):
+def get_group_to_workspaces(workspaces):
     group_to_workspaces = collections.OrderedDict()
-    for workspace in tree.workspaces():
+    for workspace in workspaces:
         parsed_name = parse_workspace_name(workspace.name)
         group = parsed_name['group']
         logger.debug('Workspace %s parsed as: %s', workspace.name, parsed_name)
@@ -148,7 +148,7 @@ class WorkspaceGroupsError(Exception):
 class ActiveGroupContext:
 
     def get_group_name(self, tree):
-        group_to_workspaces = get_group_to_workspaces(tree)
+        group_to_workspaces = get_group_to_workspaces(tree.workspaces())
         # Return the first group which is defined as the active one.
         return next(iter(group_to_workspaces))
 
@@ -157,7 +157,7 @@ class ActiveGroupContext:
         focused_workspace = tree.find_focused().workspace()
         if get_workspace_group(focused_workspace) == active_group_name:
             return focused_workspace
-        group_to_workspaces = get_group_to_workspaces(tree)
+        group_to_workspaces = get_group_to_workspaces(tree.workspaces())
         active_group_workspaces = next(group_to_workspaces.items())[1]
         # Return the first group which is defined as the active one.
         return active_group_workspaces[0]
@@ -180,7 +180,7 @@ class NamedGroupContext:
 
     def get_group_name(self, tree):
         # Verify that the group exists
-        group_to_workspaces = get_group_to_workspaces(tree)
+        group_to_workspaces = get_group_to_workspaces(tree.workspaces())
         if self.group_name not in group_to_workspaces:
             raise WorkspaceGroupsError(
                 'Unknown group \'{}\', known groups: {}'.format(
@@ -188,7 +188,7 @@ class NamedGroupContext:
         return self.group_name
 
     def get_workspace(self, tree):
-        group_to_workspaces = get_group_to_workspaces(tree)
+        group_to_workspaces = get_group_to_workspaces(tree.workspaces())
         return group_to_workspace[self.group_name][0]
 
 
@@ -198,7 +198,12 @@ class WorkspaceGroupsController:
         self.i3_connection = i3_connection
         self.group_context = group_context
         self.dry_run = dry_run
-        # i3 tree is cached for performance.
+        # i3 tree is cached for performance. Timing the i3ipc get_tree function
+        # using `%timeit` in ipython shows about 1-2ms in my high performance
+        # desktop. For lower performance machines, multiple calls to get_tree
+        # may be noticable, so this is cached.
+        # Other operations like get_workspaces and get_outputs were about 50µs
+        # using the same method, which is more negligible.
         self.tree = None
 
     def get_tree(self, cached=True):
@@ -206,6 +211,28 @@ class WorkspaceGroupsController:
             return self.tree
         self.tree = self.i3_connection.get_tree()
         return self.tree
+
+    def get_ordered_group_to_workspaces(self):
+        outputs = self.i3_connection.get_outputs()
+        primary_outputs = [o['name'] for o in outputs if o['primary']]
+        if len(primary_outputs) != 1:
+            logger.warning('Detected multiple primary outputs: %s',
+                           primary_outputs)
+        primary_output = primary_outputs[0] if primary_outputs else None
+        workspaces_metadata = self.i3_connection.get_workspaces()
+        workspace_to_output = {}
+        for workspace_metadata in workspaces_metadata:
+            workspace_to_output[workspace_metadata.name] = (
+                workspace_metadata.output)
+        primary_output_workspaces = []
+        other_workspaces = []
+        for workspace in self.get_tree().workspaces():
+            if workspace_to_output[workspace.name] == primary_output:
+                primary_output_workspaces.append(workspace)
+            else:
+                other_workspaces.append(workspace)
+        ordered_workspaces = primary_output_workspaces + other_workspaces
+        return get_group_to_workspaces(ordered_workspaces)
 
     def send_i3_command(self, command):
         if self.dry_run:
@@ -239,11 +266,11 @@ class WorkspaceGroupsController:
     def list_groups(self):
         # If no context group specified, list all groups.
         if not self.group_context:
-            return get_group_to_workspaces(self.get_tree()).keys()
+            return self.get_ordered_group_to_workspaces().keys()
         return [self.group_context.get_group_name(self.get_tree())]
 
     def switch_active_group(self, target_group):
-        group_to_workspaces = get_group_to_workspaces(self.get_tree())
+        group_to_workspaces = self.get_ordered_group_to_workspaces()
         if target_group not in group_to_workspaces:
             raise WorkspaceGroupsError(
                 'Unknown target group \'{}\', known groups: {}'.format(
@@ -273,8 +300,7 @@ class WorkspaceGroupsController:
         if get_workspace_group(current_workspace) == target_group:
             return
         new_group_to_workspaces = collections.OrderedDict()
-        for group, workspaces in get_group_to_workspaces(
-                self.get_tree()).items():
+        for group, workspaces in self.get_ordered_group_to_workspaces().items():
             new_workspaces = []
             for ws in workspaces:
                 if ws.id != current_workspace.id:
@@ -292,7 +318,7 @@ class WorkspaceGroupsController:
         group_context = self.group_context or FocusedGroupContext()
         context_group = group_context.get_group_name(self.get_tree())
         logger.info('Context group: "{}"'.format(context_group))
-        group_to_workspaces = get_group_to_workspaces(self.get_tree())
+        group_to_workspaces = self.get_ordered_group_to_workspaces()
         assert context_group in group_to_workspaces
         # Organize the workspaces so that we can make more assumptions about the
         # input. For example, we are guaranteed that we can generate a workspace
@@ -330,7 +356,8 @@ class WorkspaceGroupsController:
         current_workspace = group_context.get_workspace(self.get_tree())
         logger.info('Context group: "{}", workspace: "{}"'.format(
             group, current_workspace.name))
-        group_workspaces = get_group_to_workspaces(self.get_tree())[group]
+        group_workspaces = get_group_to_workspaces(
+            self.get_tree().workspaces())[group]
         for (i, workspace) in enumerate(group_workspaces):
             if workspace.id == current_workspace.id:
                 break

@@ -168,7 +168,8 @@ bindsym $mod+Control+0 workspace number 10
 #### Active group
 
 The active workspace is the one that appears first in the workspace list in
-i3bar (by default the leftmost one), regardless of whether its focused or not.
+i3bar (by default the leftmost one) in the primary output monitor, regardless of
+whether its focused or not.
 The **active group** is the group of the active workspace.
 This group will normally contain workspaces related to the task you're doing at
 the time it's active. When you want to work on another task, you can switch the

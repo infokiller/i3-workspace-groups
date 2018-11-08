@@ -146,7 +146,7 @@ class WorkspaceGroupsError(Exception):
     pass
 
 
-class ActiveGroupContext(object):
+class ActiveGroupContext:
 
     def get_group_name(self, tree):
         group_to_workspaces = get_group_to_workspaces(tree)
@@ -164,7 +164,7 @@ class ActiveGroupContext(object):
         return active_group_workspaces[0]
 
 
-class FocusedGroupContext(object):
+class FocusedGroupContext:
 
     def get_group_name(self, tree):
         focused_workspace = tree.find_focused().workspace()
@@ -174,7 +174,7 @@ class FocusedGroupContext(object):
         return tree.find_focused().workspace()
 
 
-class NamedGroupContext(object):
+class NamedGroupContext:
 
     def __init__(self, group_name):
         self.group_name = group_name
@@ -193,7 +193,7 @@ class NamedGroupContext(object):
         return group_to_workspace[self.group_name][0]
 
 
-class WorkspaceGroupsController(object):
+class WorkspaceGroupsController:
 
     def __init__(self, i3_connection, group_context, dry_run=True):
         self.i3_connection = i3_connection

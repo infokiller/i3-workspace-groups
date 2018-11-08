@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import collections
 import logging
-import logging.handlers
 import os
 import re
 import sys
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_GROUP_NAME = 'Ɗ'
 GROUP_NAME_PATTERN = r'[^:\d][^:]*'
@@ -44,23 +45,6 @@ WORKSPACE_NAME_REGEXES = [
     r'(?P<global_number>\d+)$',
 ]
 WORKSPACE_NAME_REGEXES = [re.compile(regex) for regex in WORKSPACE_NAME_REGEXES]
-
-
-def _init_logger():
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
-    stdout_handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    syslog_handler.setFormatter(formatter)
-    stdout_handler.setFormatter(formatter)
-    logger.addHandler(syslog_handler)
-    logger.addHandler(stdout_handler)
-    logger.info('Starting script %s', __file__)
-    return logger
-
-
-_logger = _init_logger()
 
 
 def sanitize_local_name(name):
@@ -109,8 +93,8 @@ def max_local_workspace_number(workspaces):
     result = 0
     for workspace in workspaces:
         local_number = get_local_workspace_number(workspace)
-        _logger.info('Workspace %s, local number %s', workspace.name,
-                     local_number)
+        logger.debug('Workspace %s, local number %s', workspace.name,
+                    local_number)
         if local_number is not None:
             result = max(result, local_number)
     return result
@@ -151,7 +135,7 @@ def get_group_to_workspaces(tree):
     for workspace in tree.workspaces():
         parsed_name = parse_workspace_name(workspace.name)
         group = parsed_name['group']
-        _logger.info('Workspace %s parsed as: %s', workspace.name, parsed_name)
+        logger.debug('Workspace %s parsed as: %s', workspace.name, parsed_name)
         if group not in group_to_workspaces:
             group_to_workspaces[group] = []
         group_to_workspaces[group].append(workspace)
@@ -229,13 +213,13 @@ class WorkspaceGroupsController(object):
             log_prefix = '[dry-run] would send'
         else:
             log_prefix = 'Sending'
-        _logger.info("%s i3 command: '[%s]'", log_prefix, command)
+        logger.info("%s i3 command: '[%s]'", log_prefix, command)
         if not self.dry_run:
             self.i3_connection.command(command)
 
     def organize_workspace_groups(self, groups_workspaces):
         for group_index, (group, workspaces) in enumerate(groups_workspaces):
-            _logger.info('Organizing workspace group: %s', group)
+            logger.debug('Organizing workspace group: %s', group)
             last_used_workspace_number = max_local_workspace_number(workspaces)
             local_numbers_used = set()
             for workspace in workspaces:
@@ -299,7 +283,7 @@ class WorkspaceGroupsController(object):
             if new_workspaces:
                 new_group_to_workspaces[group] = new_workspaces
             else:
-                _logger.info('No remaining workspaces in group %s', group)
+                logger.debug('No remaining workspaces in group %s', group)
         if target_group not in new_group_to_workspaces:
             new_group_to_workspaces[target_group] = []
         new_group_to_workspaces[target_group].append(current_workspace)
@@ -308,7 +292,7 @@ class WorkspaceGroupsController(object):
     def _get_workspace_name_from_context(self, target_local_number):
         group_context = self.group_context or FocusedGroupContext()
         context_group = group_context.get_group_name(self.get_tree())
-        _logger.info('Context group: "{}"'.format(context_group))
+        logger.info('Context group: "{}"'.format(context_group))
         group_to_workspaces = get_group_to_workspaces(self.get_tree())
         assert context_group in group_to_workspaces
         # Organize the workspaces so that we can make more assumptions about the
@@ -333,13 +317,11 @@ class WorkspaceGroupsController(object):
     def focus_workspace_number(self, target_local_number):
         target_workspace_name = self._get_workspace_name_from_context(
             target_local_number)
-        _logger.info('Focusing on workspace: %s', target_workspace_name)
         self.send_i3_command('workspace "{}"'.format(target_workspace_name))
 
     def move_to_workspace_number(self, target_local_number):
         target_workspace_name = self._get_workspace_name_from_context(
             target_local_number)
-        _logger.info('Moving  workspace: %s', target_workspace_name)
         self.send_i3_command(
             'move container to workspace "{}"'.format(target_workspace_name))
 
@@ -347,7 +329,7 @@ class WorkspaceGroupsController(object):
         group_context = self.group_context or FocusedGroupContext()
         group = group_context.get_group_name(self.get_tree())
         current_workspace = group_context.get_workspace(self.get_tree())
-        _logger.info('Context group: "{}", workspace: "{}"'.format(
+        logger.info('Context group: "{}", workspace: "{}"'.format(
             group, current_workspace.name))
         group_workspaces = get_group_to_workspaces(self.get_tree())[group]
         for (i, workspace) in enumerate(group_workspaces):
@@ -365,10 +347,9 @@ class WorkspaceGroupsController(object):
         # current one, since then the focus will actually change to the
         # last focused workspace.
         if is_current_workspace:
-            _logger.info(
+            logger.info(
                 'Next workspace is the same as current one, not doing anything')
             return
-        _logger.info('Focusing on workspace: %s', next_workspace.name)
         self.send_i3_command('workspace "{}"'.format(next_workspace.name))
 
     def move_workspace_relative(self, offset_from_current):
@@ -379,10 +360,8 @@ class WorkspaceGroupsController(object):
         # current one, since then the container will actually move to the
         # last focused workspace.
         if is_current_workspace:
-            _logger.info(
+            logger.info(
                 'Next workspace is the same as current one, not doing anything')
             return
-        _logger.info('Moving focused container to workspace: %s',
-                     next_workspace.name)
         self.send_i3_command('move container to workspace "{}"'.format(
             next_workspace.name))

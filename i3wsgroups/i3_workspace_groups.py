@@ -322,7 +322,7 @@ class WorkspaceGroupsController(object):
         for workspace in group_to_workspaces[context_group]:
             if get_local_workspace_number(workspace) == target_local_number:
                 return workspace.name
-        group_index = group_to_workspaces.keys().index(context_group)
+        group_index = list(group_to_workspaces.keys()).index(context_group)
         global_number = compute_global_number(group_index, target_local_number)
         return create_workspace_name(
             global_number,

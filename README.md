@@ -156,6 +156,7 @@ bindsym $mod+Control+0 workspace number 10
 
 ### Limitations
 
+- Multi monitor support is not well supported yet, but planned (see issue #7).
 - Workspace names are used for storing the group, so if another tool changes a
   workspace name without preserving the format that this project uses, the tool
   can make a mistake about the group assignment.
@@ -165,12 +166,17 @@ bindsym $mod+Control+0 workspace number 10
 
 ### Definitions
 
+#### Active workspace
+
+The active workspace is the workspace with the lowest number in i3. Typically,
+before you use the provided scripts to manage you workspaces, this will be the
+one that appears first in the workspace list in i3bar (by default the leftmost
+one) in the primary output monitor,
+Note that the primary workspace is not affected by whether its focused or not.
+
 #### Active group
 
-The active workspace is the one that appears first in the workspace list in
-i3bar (by default the leftmost one) in the primary output monitor, regardless of
-whether its focused or not.
-The **active group** is the group of the active workspace.
+The active group is the group of the [active workspace](#active-workspace).
 This group will normally contain workspaces related to the task you're doing at
 the time it's active. When you want to work on another task, you can switch the
 active group.

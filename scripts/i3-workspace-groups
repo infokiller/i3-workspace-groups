@@ -88,12 +88,11 @@ def _create_args_parser():
 
 
 def _create_context_group_finder(args):
+    if args.group_name:
+        return i3_workspace_groups.NamedGroupContext(args['group_name'])
     if args.group_active:
         return i3_workspace_groups.ActiveGroupContext()
-    if args.group_focused:
-        return i3_workspace_groups.FocusedGroupContext()
-    assert args.group_name
-    return i3_workspace_groups.NamedGroupContext(args['group_name'])
+    return i3_workspace_groups.FocusedGroupContext()
 
 
 def _init_logger(logger):

@@ -1,4 +1,4 @@
-name: base_i3
+name: i3_workspace_groups
 channels:
   - conda-forge
   - defaults

@@ -92,7 +92,9 @@ def _create_context_group_finder(args):
         return i3_workspace_groups.NamedGroupContext(args['group_name'])
     if args.group_active:
         return i3_workspace_groups.ActiveGroupContext()
-    return i3_workspace_groups.FocusedGroupContext()
+    if args.group_focused:
+        return i3_workspace_groups.FocusedGroupContext()
+    return None
 
 
 def _init_logger(logger):

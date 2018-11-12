@@ -22,6 +22,7 @@ MAX_WORKSPACES_PER_GROUP = 100
 # decode the metadata from the workspace names.
 WORKSPACE_NAME_REGEXES = [
     # Non default group, group is inactive, has user configured name.
+    # pylint: disable=line-too-long
     r'(?P<global_number>\d+):(?P<group>{}):(?P<local_name>{}):(?P<local_number>\d+)$'
     .format(GROUP_NAME_PATTERN, WORKSPACE_LOCAL_NAME_PATTERN),
     # Non default group, group is inactive, no user configured name.
@@ -61,9 +62,9 @@ def parse_workspace_name(workspace_name):
     }
     match = False
     for regex in WORKSPACE_NAME_REGEXES:
-        m = regex.match(workspace_name)
-        if m:
-            result.update(m.groupdict())
+        match = regex.match(workspace_name)
+        if match:
+            result.update(match.groupdict())
             match = True
             break
     if not match:
@@ -147,13 +148,14 @@ class WorkspaceGroupsError(Exception):
 
 class ActiveGroupContext:
 
-    def get_group_name(self, tree):
+    @staticmethod
+    def get_group_name(tree):
         group_to_workspaces = get_group_to_workspaces(tree.workspaces())
         # Return the first group which is defined as the active one.
         return next(iter(group_to_workspaces))
 
     def get_workspace(self, tree):
-        active_group_name = self.get_group_name()
+        active_group_name = self.get_group_name(tree)
         focused_workspace = tree.find_focused().workspace()
         if get_workspace_group(focused_workspace) == active_group_name:
             return focused_workspace
@@ -165,11 +167,13 @@ class ActiveGroupContext:
 
 class FocusedGroupContext:
 
-    def get_group_name(self, tree):
+    @staticmethod
+    def get_group_name(tree):
         focused_workspace = tree.find_focused().workspace()
         return get_workspace_group(focused_workspace)
 
-    def get_workspace(self, tree):
+    @staticmethod
+    def get_workspace(tree):
         return tree.find_focused().workspace()
 
 
@@ -189,7 +193,7 @@ class NamedGroupContext:
 
     def get_workspace(self, tree):
         group_to_workspaces = get_group_to_workspaces(tree.workspaces())
-        return group_to_workspace[self.group_name][0]
+        return group_to_workspaces[self.group_name][0]
 
 
 class WorkspaceGroupsController:
@@ -302,9 +306,9 @@ class WorkspaceGroupsController:
         new_group_to_workspaces = collections.OrderedDict()
         for group, workspaces in self.get_ordered_group_to_workspaces().items():
             new_workspaces = []
-            for ws in workspaces:
-                if ws.id != current_workspace.id:
-                    new_workspaces.append(ws)
+            for workspace in workspaces:
+                if workspace.id != current_workspace.id:
+                    new_workspaces.append(workspace)
             if new_workspaces:
                 new_group_to_workspaces[group] = new_workspaces
             else:
@@ -317,7 +321,7 @@ class WorkspaceGroupsController:
     def _get_workspace_name_from_context(self, target_local_number):
         group_context = self.group_context or FocusedGroupContext()
         context_group = group_context.get_group_name(self.get_tree())
-        logger.info('Context group: "{}"'.format(context_group))
+        logger.info('Context group: "%s"', context_group)
         group_to_workspaces = self.get_ordered_group_to_workspaces()
         assert context_group in group_to_workspaces
         # Organize the workspaces so that we can make more assumptions about the
@@ -354,15 +358,17 @@ class WorkspaceGroupsController:
         group_context = self.group_context or FocusedGroupContext()
         group = group_context.get_group_name(self.get_tree())
         current_workspace = group_context.get_workspace(self.get_tree())
-        logger.info('Context group: "{}", workspace: "{}"'.format(
-            group, current_workspace.name))
+        logger.info('Context group: "%s", workspace: "%s"', group,
+                    current_workspace.name)
         group_workspaces = get_group_to_workspaces(
             self.get_tree().workspaces())[group]
-        for (i, workspace) in enumerate(group_workspaces):
+        current_workspace_index = 0
+        for (current_workspace_index, workspace) in enumerate(group_workspaces):
             if workspace.id == current_workspace.id:
                 break
-        next_workspace_index = (i + offset_from_current) % len(group_workspaces)
-        is_current_workspace = (next_workspace_index == i)
+        next_workspace_index = (current_workspace_index +
+                                offset_from_current) % len(group_workspaces)
+        is_current_workspace = (next_workspace_index == current_workspace_index)
         return (group_workspaces[next_workspace_index], is_current_workspace)
 
     def focus_workspace_relative(self, offset_from_current):

@@ -1,17 +1,17 @@
-import setuptools
 import os
-from setuptools import setup
 
-readme_path = os.path.join(
+import setuptools
+
+README_PATH = os.path.join(
     os.path.abspath(os.path.dirname(__file__)), 'README.md')
-with open(readme_path) as f:
-    long_description = f.read()
+with open(README_PATH) as f:
+    LONG_DESCRIPTION = f.read()
 
 setuptools.setup(
     name='i3-workspace-groups',
     version='0.1.7',
     description='Manage i3wm workspaces in groups you control',
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url='https://github.com/infokiller/i3-workspace-groups',
     author='infokiller',
@@ -23,7 +23,6 @@ setuptools.setup(
         'Operating System :: POSIX :: Linux',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],

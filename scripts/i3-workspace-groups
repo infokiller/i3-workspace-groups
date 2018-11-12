@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
+# pylint: disable=invalid-name
 
 import argparse
 import logging
 import logging.handlers
+import os.path
 import sys
 
 import i3ipc
 
 # TODO(infokiller): Figure out how to correctly import so that it works in pip
 # installations and in local dev.
-import os.path
 sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
+# pylint: disable=import-error
+# pylint: disable=wrong-import-position
 from i3wsgroups import i3_workspace_groups
 
 
@@ -39,9 +42,8 @@ def _create_args_parser():
         '--group-focused',
         action='store_true',
         default=None,
-        help=
-        'Use the focused group for any commands that implicitly assume a group, '
-        'such as workspace-next.')
+        help='Use the focused group for any commands that implicitly assume a '
+        'group, such as workspace-next.')
     group_arg_group.add_argument('--group-name')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
@@ -88,10 +90,10 @@ def _create_args_parser():
 def _create_context_group_finder(args):
     if args.group_active:
         return i3_workspace_groups.ActiveGroupContext()
-    elif args.group_focused:
+    if args.group_focused:
         return i3_workspace_groups.FocusedGroupContext()
-    elif args.group_name:
-        return i3_workspace_groups.NamedGroupContext(args['group_name'])
+    assert args.group_name
+    return i3_workspace_groups.NamedGroupContext(args['group_name'])
 
 
 def _init_logger(logger):
@@ -133,8 +135,8 @@ def main():
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':
             controller.move_workspace_relative(-1)
-    except i3_workspace_groups.WorkspaceGroupsError as e:
-        sys.exit(e)
+    except i3_workspace_groups.WorkspaceGroupsError as ex:
+        sys.exit(ex)
 
 
 if __name__ == '__main__':

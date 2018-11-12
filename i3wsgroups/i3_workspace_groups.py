@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 import collections
 import logging
 import re
@@ -284,6 +284,12 @@ class WorkspaceGroupsController:
             return self.get_ordered_group_to_workspaces().keys()
         return [self.group_context.get_group_name(self.get_tree())]
 
+    def list_workspaces(self) -> List[str]:
+        # If no context group specified, list all groups.
+        if not self.group_context:
+            return self.get_ordered_group_to_workspaces().keys()
+        return [self.group_context.get_group_name(self.get_tree())]
+
     def switch_active_group(self, target_group: str) -> None:
         group_to_workspaces = self.get_ordered_group_to_workspaces()
         if target_group not in group_to_workspaces:
@@ -365,8 +371,8 @@ class WorkspaceGroupsController:
         self.send_i3_command(
             'move container to workspace "{}"'.format(target_workspace_name))
 
-    def _relative_workspace_in_group(
-            self, offset_from_current: int = 1) -> Tuple[i3ipc.Con, bool]:
+    def _relative_workspace_in_group(self,
+                                     offset_from_current: int = 1) -> i3ipc.Con:
         group_context = self.group_context or FocusedGroupContext()
         group = group_context.get_group_name(self.get_tree())
         current_workspace = group_context.get_workspace(self.get_tree())
@@ -380,32 +386,15 @@ class WorkspaceGroupsController:
                 break
         next_workspace_index = (current_workspace_index +
                                 offset_from_current) % len(group_workspaces)
-        is_current_workspace = (next_workspace_index == current_workspace_index)
-        return (group_workspaces[next_workspace_index], is_current_workspace)
+        return group_workspaces[next_workspace_index]
 
     def focus_workspace_relative(self, offset_from_current: int) -> None:
-        next_workspace, is_current_workspace = \
-            self._relative_workspace_in_group(offset_from_current)
-        # Because of the `workspace_auto_back_and_forth` setting, we must not
-        # execute the focus command if the target workspace is the same as the
-        # current one, since then the focus will actually change to the
-        # last focused workspace.
-        if is_current_workspace:
-            logger.info(
-                'Next workspace is the same as current one, not doing anything')
-            return
-        self.send_i3_command('workspace "{}"'.format(next_workspace.name))
+        next_workspace = self._relative_workspace_in_group(offset_from_current)
+        self.send_i3_command('workspace --no-auto-back-and-forth "{}"'.format(
+            next_workspace.name))
 
     def move_workspace_relative(self, offset_from_current: int) -> None:
-        next_workspace, is_current_workspace = \
-            self._relative_workspace_in_group(offset_from_current)
-        # Because of the `workspace_auto_back_and_forth` setting, we must not
-        # execute the move command if the target workspace is the same as the
-        # current one, since then the container will actually move to the
-        # last focused workspace.
-        if is_current_workspace:
-            logger.info(
-                'Next workspace is the same as current one, not doing anything')
-            return
-        self.send_i3_command('move container to workspace "{}"'.format(
-            next_workspace.name))
+        next_workspace = self._relative_workspace_in_group(offset_from_current)
+        self.send_i3_command(
+            'move --no-auto-back-and-forth container to workspace "{}"'.format(
+                next_workspace.name))

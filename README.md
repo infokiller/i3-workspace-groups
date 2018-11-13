@@ -98,44 +98,44 @@ set $mod Mod4
 
 strip_workspace_numbers yes
 
-set $exec_i3_groups_tool exec --no-startup-id i3-workspace-groups
+set $exec_i3_groups exec --no-startup-id i3-workspace-groups
 
 # Switch active workspace group
 bindcode $mod+g exec --no-startup-id i3-switch-active-workspace-group
 # Move workspace to another group
 bindcode $mod+Shift+g exec --no-startup-id i3-assign-workspace-to-group
 
-bindsym $mod+1 $exec_i3_groups_tool workspace-number 1
-bindsym $mod+2 $exec_i3_groups_tool workspace-number 2
-bindsym $mod+3 $exec_i3_groups_tool workspace-number 3
-bindsym $mod+4 $exec_i3_groups_tool workspace-number 4
-bindsym $mod+5 $exec_i3_groups_tool workspace-number 5
-bindsym $mod+6 $exec_i3_groups_tool workspace-number 6
-bindsym $mod+7 $exec_i3_groups_tool workspace-number 7
-bindsym $mod+8 $exec_i3_groups_tool workspace-number 8
-bindsym $mod+9 $exec_i3_groups_tool workspace-number 9
-bindsym $mod+0 $exec_i3_groups_tool workspace-number 10
+bindsym $mod+1 $exec_i3_groups workspace-number 1
+bindsym $mod+2 $exec_i3_groups workspace-number 2
+bindsym $mod+3 $exec_i3_groups workspace-number 3
+bindsym $mod+4 $exec_i3_groups workspace-number 4
+bindsym $mod+5 $exec_i3_groups workspace-number 5
+bindsym $mod+6 $exec_i3_groups workspace-number 6
+bindsym $mod+7 $exec_i3_groups workspace-number 7
+bindsym $mod+8 $exec_i3_groups workspace-number 8
+bindsym $mod+9 $exec_i3_groups workspace-number 9
+bindsym $mod+0 $exec_i3_groups workspace-number 10
 
-bindsym $mod+Shift+1 $exec_i3_groups_tool move-to-number 1
-bindsym $mod+Shift+2 $exec_i3_groups_tool move-to-number 2
-bindsym $mod+Shift+3 $exec_i3_groups_tool move-to-number 3
-bindsym $mod+Shift+4 $exec_i3_groups_tool move-to-number 4
-bindsym $mod+Shift+5 $exec_i3_groups_tool move-to-number 5
-bindsym $mod+Shift+6 $exec_i3_groups_tool move-to-number 6
-bindsym $mod+Shift+7 $exec_i3_groups_tool move-to-number 7
-bindsym $mod+Shift+8 $exec_i3_groups_tool move-to-number 8
-bindsym $mod+Shift+9 $exec_i3_groups_tool move-to-number 9
-bindsym $mod+Shift+0 $exec_i3_groups_tool move-to-number 10
+bindsym $mod+Shift+1 $exec_i3_groups move-to-number 1
+bindsym $mod+Shift+2 $exec_i3_groups move-to-number 2
+bindsym $mod+Shift+3 $exec_i3_groups move-to-number 3
+bindsym $mod+Shift+4 $exec_i3_groups move-to-number 4
+bindsym $mod+Shift+5 $exec_i3_groups move-to-number 5
+bindsym $mod+Shift+6 $exec_i3_groups move-to-number 6
+bindsym $mod+Shift+7 $exec_i3_groups move-to-number 7
+bindsym $mod+Shift+8 $exec_i3_groups move-to-number 8
+bindsym $mod+Shift+9 $exec_i3_groups move-to-number 9
+bindsym $mod+Shift+0 $exec_i3_groups move-to-number 10
 
 # Switch to previous workspace in group.
-bindcode $mod+p $exec_i3_groups_tool workspace-prev
+bindcode $mod+p $exec_i3_groups workspace-prev
 # Switch to next workspace in group.
-bindcode $mod+n $exec_i3_groups_tool workspace-next
+bindcode $mod+n $exec_i3_groups workspace-next
 
 # Move to previous workspace in group.
-bindcode $mod+Shift+p $exec_i3_groups_tool move-to-prev
+bindcode $mod+Shift+p $exec_i3_groups move-to-prev
 # Move to next workspace in group.
-bindcode $mod+Shift+n $exec_i3_groups_tool move-to-next
+bindcode $mod+Shift+n $exec_i3_groups move-to-next
 ```
 
 I also recommend keeping keybindings for the i3 built in workspace navigation
@@ -201,10 +201,17 @@ The scripts can be installed using pip:
 pip install i3-workspace-groups
 ```
 
-Then you should be able to run the command line tool [`i3-workspace-groups`](scripts/i3-workspace-groups).
-There are also two scripts provided that require [rofi](https://github.com/DaveDavenport/rofi):
+Then you should be able to run the command line tool
+[`i3-workspace-groups`](scripts/i3-workspace-groups).
+There are also a few utility scripts provided that require
+[rofi](https://github.com/DaveDavenport/rofi) and which are useful for
+interactively managing the groups, using rofi as the UI. They include:
 - [`i3-assign-workspace-to-group`](scripts/i3-assign-workspace-to-group)
+- [`i3-focus-on-workspace`](scripts/i3-focus-on-workspace)
+- [`i3-move-to-workspace`](scripts/i3-move-to-workspace)
+- [`i3-rename-workspace`](scripts/i3-rename-workspace)
 - [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
+- [`i3-workspace-groups`](scripts/i3-workspace-groups)
 
 ### Sway compatibility note
 

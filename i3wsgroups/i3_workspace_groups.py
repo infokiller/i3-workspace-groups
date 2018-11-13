@@ -49,6 +49,8 @@ WORKSPACE_NAME_REGEXES = [
 ]
 WORKSPACE_NAME_REGEXES = [re.compile(regex) for regex in WORKSPACE_NAME_REGEXES]
 
+GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
+
 
 def sanitize_local_name(name: str) -> str:
     sanitized_name = name.replace(':', '%')
@@ -135,8 +137,7 @@ def global_number_to_local_number(global_number: int) -> int:
     return global_number % MAX_WORKSPACES_PER_GROUP
 
 
-def get_group_to_workspaces(
-        workspaces: List[i3ipc.Con]) -> Dict[str, List[i3ipc.Con]]:
+def get_group_to_workspaces(workspaces: List[i3ipc.Con]) -> GroupToWorkspaces:
     group_to_workspaces = collections.OrderedDict()
     for workspace in workspaces:
         parsed_name = parse_workspace_name(workspace.name)
@@ -148,20 +149,44 @@ def get_group_to_workspaces(
     return group_to_workspaces
 
 
+def _get_focused_monitor_workspaces(i3_connection) -> List[i3ipc.Con]:
+    name_to_workspace = {}
+    for workspace in i3_connection.get_tree().workspaces():
+        name_to_workspace[workspace.name] = workspace
+    focused_outputs = set()
+    output_to_workspaces = collections.defaultdict(list)
+    for workspace_metadata in i3_connection.get_workspaces():
+        workspace = name_to_workspace[workspace_metadata.name]
+        output_to_workspaces[workspace_metadata.output].append(workspace)
+        if workspace_metadata.focused:
+            focused_outputs.add(workspace_metadata.output)
+    if not focused_outputs:
+        raise WorkspaceGroupsError('No focused workspaces')
+    if len(focused_outputs) > 1:
+        logger.warning('Focused workspaces detected in multiple outputs')
+    logger.debug('Focused outputs: %s', focused_outputs)
+    focused_output = next(iter(focused_outputs))
+    return output_to_workspaces[focused_output]
+
+
 class WorkspaceGroupsError(Exception):
     pass
 
 
 class ActiveGroupContext:
 
+    def __init__(self, i3_connection: i3ipc.Connection):
+        self.i3_connection = i3_connection
+
     @staticmethod
-    def get_group_name(tree: i3ipc.Con) -> str:
-        group_to_workspaces = get_group_to_workspaces(tree.workspaces())
+    def get_group_name(_: i3ipc.Con,
+                       group_to_workspaces: GroupToWorkspaces) -> str:
         # Return the first group which is defined as the active one.
         return next(iter(group_to_workspaces))
 
-    def get_workspace(self, tree: i3ipc.Con) -> i3ipc.Con:
-        active_group_name = self.get_group_name(tree)
+    def get_workspace(self, tree: i3ipc.Con,
+                      group_to_workspaces: GroupToWorkspaces) -> i3ipc.Con:
+        active_group_name = self.get_group_name(tree, group_to_workspaces)
         focused_workspace = tree.find_focused().workspace()
         if get_workspace_group(focused_workspace) == active_group_name:
             return focused_workspace
@@ -174,12 +199,12 @@ class ActiveGroupContext:
 class FocusedGroupContext:
 
     @staticmethod
-    def get_group_name(tree: i3ipc.Con) -> str:
+    def get_group_name(tree: i3ipc.Con, _: GroupToWorkspaces) -> str:
         focused_workspace = tree.find_focused().workspace()
         return get_workspace_group(focused_workspace)
 
     @staticmethod
-    def get_workspace(tree: i3ipc.Con) -> i3ipc.Con:
+    def get_workspace(tree: i3ipc.Con, _: GroupToWorkspaces) -> i3ipc.Con:
         return tree.find_focused().workspace()
 
 
@@ -188,17 +213,16 @@ class NamedGroupContext:
     def __init__(self, group_name: str):
         self.group_name = group_name
 
-    def get_group_name(self, tree: i3ipc.Con) -> str:
-        # Verify that the group exists
-        group_to_workspaces = get_group_to_workspaces(tree.workspaces())
+    def get_group_name(self, _: i3ipc.Con,
+                       group_to_workspaces: GroupToWorkspaces) -> str:
         if self.group_name not in group_to_workspaces:
             raise WorkspaceGroupsError(
                 'Unknown group \'{}\', known groups: {}'.format(
                     self.group_name, group_to_workspaces.keys()))
         return self.group_name
 
-    def get_workspace(self, tree: i3ipc.Con) -> i3ipc.Con:
-        group_to_workspaces = get_group_to_workspaces(tree.workspaces())
+    def get_workspace(self, _: i3ipc.Con,
+                      group_to_workspaces: GroupToWorkspaces) -> i3ipc.Con:
         return group_to_workspaces[self.group_name][0]
 
 
@@ -225,27 +249,27 @@ class WorkspaceGroupsController:
         self.tree = self.i3_connection.get_tree()
         return self.tree
 
-    def get_ordered_group_to_workspaces(self) -> Dict[str, List[i3ipc.Con]]:
-        outputs = self.i3_connection.get_outputs()
-        primary_outputs = [o['name'] for o in outputs if o['primary']]
-        if len(primary_outputs) != 1:
-            logger.warning('Detected multiple primary outputs: %s',
-                           primary_outputs)
-        primary_output = primary_outputs[0] if primary_outputs else None
-        workspaces_metadata = self.i3_connection.get_workspaces()
-        workspace_to_output = {}
-        for workspace_metadata in workspaces_metadata:
-            workspace_to_output[workspace_metadata.name] = (
-                workspace_metadata.output)
-        primary_output_workspaces = []
-        other_workspaces = []
+    def _get_focused_monitor_workspaces(self) -> List[i3ipc.Con]:
+        name_to_workspace = {}
         for workspace in self.get_tree().workspaces():
-            if workspace_to_output[workspace.name] == primary_output:
-                primary_output_workspaces.append(workspace)
-            else:
-                other_workspaces.append(workspace)
-        ordered_workspaces = primary_output_workspaces + other_workspaces
-        return get_group_to_workspaces(ordered_workspaces)
+            name_to_workspace[workspace.name] = workspace
+        focused_outputs = set()
+        output_to_workspaces = collections.defaultdict(list)
+        for workspace_metadata in self.i3_connection.get_workspaces():
+            workspace = name_to_workspace[workspace_metadata.name]
+            output_to_workspaces[workspace_metadata.output].append(workspace)
+            if workspace_metadata.focused:
+                focused_outputs.add(workspace_metadata.output)
+        if not focused_outputs:
+            raise WorkspaceGroupsError('No focused workspaces')
+        if len(focused_outputs) > 1:
+            logger.warning('Focused workspaces detected in multiple outputs')
+        logger.debug('Focused outputs: %s', focused_outputs)
+        focused_output = next(iter(focused_outputs))
+        return output_to_workspaces[focused_output]
+
+    def get_group_to_workspaces(self) -> GroupToWorkspaces:
+        return get_group_to_workspaces(self._get_focused_monitor_workspaces())
 
     def send_i3_command(self, command: str) -> None:
         if self.dry_run:
@@ -257,7 +281,7 @@ class WorkspaceGroupsController:
             self.i3_connection.command(command)
 
     def organize_workspace_groups(
-            self, group_to_workspaces: Dict[str, List[i3ipc.Con]]) -> None:
+            self, group_to_workspaces: GroupToWorkspaces) -> None:
         for i, (group, workspaces) in enumerate(group_to_workspaces.items()):
             logger.debug('Organizing workspace group: %s', group)
             last_used_workspace_number = max_local_workspace_number(workspaces)
@@ -281,17 +305,23 @@ class WorkspaceGroupsController:
     def list_groups(self) -> List[str]:
         # If no context group specified, list all groups.
         if not self.group_context:
-            return self.get_ordered_group_to_workspaces().keys()
-        return [self.group_context.get_group_name(self.get_tree())]
+            return list(self.get_group_to_workspaces().keys())
+        return [
+            self.group_context.get_group_name(self.get_tree(),
+                                              self.get_group_to_workspaces())
+        ]
 
-    def list_workspaces(self) -> List[str]:
-        # If no context group specified, list all groups.
+    def list_workspaces(self) -> GroupToWorkspaces:
+        group_to_workspaces = self.get_group_to_workspaces()
+        # If no context group specified, return workspaces from all groups.
         if not self.group_context:
-            return self.get_ordered_group_to_workspaces().keys()
-        return [self.group_context.get_group_name(self.get_tree())]
+            return group_to_workspaces
+        group_name = self.group_context.get_group_name(
+            self.get_tree(), self.get_group_to_workspaces())
+        return {group_name: group_to_workspaces[group_name]}
 
     def switch_active_group(self, target_group: str) -> None:
-        group_to_workspaces = self.get_ordered_group_to_workspaces()
+        group_to_workspaces = self.get_group_to_workspaces()
         if target_group not in group_to_workspaces:
             raise WorkspaceGroupsError(
                 'Unknown target group \'{}\', known groups: {}'.format(
@@ -321,7 +351,7 @@ class WorkspaceGroupsController:
         if get_workspace_group(current_workspace) == target_group:
             return
         new_group_to_workspaces = collections.OrderedDict()
-        for group, workspaces in self.get_ordered_group_to_workspaces().items():
+        for group, workspaces in self.get_group_to_workspaces().items():
             new_workspaces = []
             for workspace in workspaces:
                 if workspace.id != current_workspace.id:
@@ -337,9 +367,10 @@ class WorkspaceGroupsController:
 
     def _get_workspace_name_from_context(self, target_local_number: int) -> str:
         group_context = self.group_context or FocusedGroupContext()
-        context_group = group_context.get_group_name(self.get_tree())
+        context_group = group_context.get_group_name(
+            self.get_tree(), self.get_group_to_workspaces())
         logger.info('Context group: "%s"', context_group)
-        group_to_workspaces = self.get_ordered_group_to_workspaces()
+        group_to_workspaces = self.get_group_to_workspaces()
         assert context_group in group_to_workspaces
         # Organize the workspaces so that we can make more assumptions about the
         # input. For example, we are guaranteed that we can generate a workspace
@@ -374,12 +405,13 @@ class WorkspaceGroupsController:
     def _relative_workspace_in_group(self,
                                      offset_from_current: int = 1) -> i3ipc.Con:
         group_context = self.group_context or FocusedGroupContext()
-        group = group_context.get_group_name(self.get_tree())
-        current_workspace = group_context.get_workspace(self.get_tree())
+        group = group_context.get_group_name(self.get_tree(),
+                                             self.get_group_to_workspaces())
+        current_workspace = group_context.get_workspace(
+            self.get_tree(), self.get_group_to_workspaces())
         logger.info('Context group: "%s", workspace: "%s"', group,
                     current_workspace.name)
-        group_workspaces = get_group_to_workspaces(
-            self.get_tree().workspaces())[group]
+        group_workspaces = self.get_group_to_workspaces()[group]
         current_workspace_index = 0
         for (current_workspace_index, workspace) in enumerate(group_workspaces):
             if workspace.id == current_workspace.id:

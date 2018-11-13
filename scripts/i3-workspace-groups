@@ -63,6 +63,17 @@ def _create_args_parser() -> argparse.Namespace:
             default=_LIST_WORKSPACES_FIELDS,
             help=_LIST_WORKSPACES_FIELDS_HELP)
     subparsers.add_parser(
+        'workspace-number',
+        help='Focus on the workspace with the provided number in the focused '
+        'group, similar to i3\'s "workspace number" command').add_argument(
+            'workspace_relative_number', type=int)
+    subparsers.add_parser(
+        'move-to-number',
+        help='Move the focused container to the workspace with the provided '
+        'number in the focused group, similar to i3\'s "move container to '
+        'workspace" command').add_argument(
+            'workspace_relative_number', type=int)
+    subparsers.add_parser(
         'workspace-next',
         help='Focus on the next workspace in the focused group, similar to '
         'i3\'s "workspace next" command')
@@ -78,17 +89,6 @@ def _create_args_parser() -> argparse.Namespace:
         'move-to-prev',
         help='Move the focused container to the prev workspace in the focused '
         'group, similar to i3\'s "move container to workspace prev" command')
-    subparsers.add_parser(
-        'workspace-number',
-        help='Focus on the workspace with the provided number in the focused '
-        'group, similar to i3\'s "workspace number" command').add_argument(
-            'workspace_relative_number', type=int)
-    subparsers.add_parser(
-        'move-to-number',
-        help='Move the focused container to the workspace with the provided '
-        'number in the focused group, similar to i3\'s "move container to '
-        'workspace" command').add_argument(
-            'workspace_relative_number', type=int)
     subparsers.add_parser(
         'switch-active-group',
         help='Switches the active group to the one provided.').add_argument(
@@ -159,24 +159,24 @@ def main():
     try:
         if args.command == 'list-groups':
             print('\n'.join(controller.list_groups()))
-        if args.command == 'list-workspaces':
+        elif args.command == 'list-workspaces':
             _print_workspaces(controller, args)
-        elif args.command == 'switch-active-group':
-            controller.switch_active_group(args.group)
-        elif args.command == 'assign-workspace-to-group':
-            controller.move_workspace_to_group(args.group)
         elif args.command == 'workspace-number':
             controller.focus_workspace_number(args.workspace_relative_number)
+        elif args.command == 'move-to-number':
+            controller.move_to_workspace_number(args.workspace_relative_number)
         elif args.command == 'workspace-next':
             controller.focus_workspace_relative(+1)
         elif args.command == 'workspace-prev':
             controller.focus_workspace_relative(-1)
-        elif args.command == 'move-to-number':
-            controller.move_to_workspace_number(args.workspace_relative_number)
         elif args.command == 'move-to-next':
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':
             controller.move_workspace_relative(-1)
+        elif args.command == 'switch-active-group':
+            controller.switch_active_group(args.group)
+        elif args.command == 'assign-workspace-to-group':
+            controller.move_workspace_to_group(args.group)
     except i3_workspace_groups.WorkspaceGroupsError as ex:
         sys.exit(ex)
 

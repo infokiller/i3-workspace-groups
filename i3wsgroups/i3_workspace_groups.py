@@ -430,3 +430,14 @@ class WorkspaceGroupsController:
         self.send_i3_command(
             'move --no-auto-back-and-forth container to workspace "{}"'.format(
                 next_workspace.name))
+
+    def rename_workspace(self, new_local_name: str) -> None:
+        # Organize the workspace groups to ensure they are consistent and every
+        # workspace has a global number.
+        self.organize_workspace_groups(self.get_group_to_workspaces())
+        focused_workspace = self.get_tree().find_focused().workspace()
+        parsed_name = parse_workspace_name(focused_workspace.name)
+        parsed_name['local_name'] = sanitize_local_name(new_local_name)
+        new_global_name = create_workspace_name(**parsed_name)
+        self.send_i3_command('rename workspace "{}" to "{}"'.format(
+            focused_workspace.name, new_global_name))

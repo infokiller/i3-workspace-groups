@@ -90,6 +90,11 @@ def _create_args_parser() -> argparse.Namespace:
         help='Move the focused container to the prev workspace in the focused '
         'group, similar to i3\'s "move container to workspace prev" command')
     subparsers.add_parser(
+        'rename-workspace',
+        help='Similar to i3\'s "renamed workspace" command, but only changes '
+        'the name of the workspace within the group, while preserving its '
+        'group assignment').add_argument('new_name')
+    subparsers.add_parser(
         'switch-active-group',
         help='Switches the active group to the one provided.').add_argument(
             'group')
@@ -173,6 +178,8 @@ def main():
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':
             controller.move_workspace_relative(-1)
+        elif args.command == 'rename-workspace':
+            controller.rename_workspace(args.new_name)
         elif args.command == 'switch-active-group':
             controller.switch_active_group(args.group)
         elif args.command == 'assign-workspace-to-group':

@@ -358,14 +358,16 @@ class WorkspaceGroupsController:
             self.send_i3_command('workspace "{}"'.format(first_workspace_name))
 
     def switch_active_group(self, target_group: str,
-                            all_monitors: bool) -> None:
+                            focused_monitor_only: bool) -> None:
         monitor_to_workspaces = self._get_monitor_to_workspaces()
-        if all_monitors:
-            monitors_to_switch = set(monitor_to_workspaces.keys())
+        if focused_monitor_only:
+            monitors_to_switch = {self._get_focused_monitor_name()}
         else:
-            monitors_to_switch = self._get_focused_monitor_name()
+            monitors_to_switch = set(monitor_to_workspaces.keys())
+        logger.debug('Switching the active group to "%s" in monitors %s',
+                     target_group, monitors_to_switch)
         for monitor, workspaces in monitor_to_workspaces.items():
-            if not monitor in monitors_to_switch:
+            if monitor not in monitors_to_switch:
                 continue
             group_to_workspaces = get_group_to_workspaces(workspaces)
             if group_to_workspaces.get(target_group):

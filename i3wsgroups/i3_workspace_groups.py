@@ -90,7 +90,7 @@ def get_local_workspace_number(workspace: i3ipc.Con) -> int:
     return local_number
 
 
-def get_workspace_group(workspace: i3ipc.Con):
+def get_workspace_group(workspace: i3ipc.Con) -> str:
     return parse_workspace_name(workspace.name)['group']
 
 
@@ -171,7 +171,7 @@ class ActiveGroupContext:
         if get_workspace_group(focused_workspace) == active_group_name:
             return focused_workspace
         group_to_workspaces = get_group_to_workspaces(tree.workspaces())
-        active_group_workspaces = next(group_to_workspaces.items())[1]
+        active_group_workspaces = next(iter(group_to_workspaces.items()))[1]
         # Return the first group which is defined as the active one.
         return active_group_workspaces[0]
 
@@ -249,21 +249,21 @@ class WorkspaceGroupsController:
         logger.debug('Focused outputs: %s', focused_outputs)
         return next(iter(focused_outputs))
 
-    def _get_monitor_workspaces(self,
-                                focused_monitor_name: Optional[str] = None
-                               ) -> List[i3ipc.Con]:
-        if not focused_monitor_name:
-            focused_monitor_name = self._get_focused_monitor_name()
+    def _get_monitor_workspaces(
+            self, monitor_name: Optional[str] = None) -> List[i3ipc.Con]:
+        if not monitor_name:
+            monitor_name = self._get_focused_monitor_name()
+        return self._get_monitor_to_workspaces()[monitor_name]
+
+    def _get_monitor_to_workspaces(self) -> Dict[str, List[i3ipc.Con]]:
         name_to_workspace = {}
         for workspace in self.get_tree().workspaces():
             name_to_workspace[workspace.name] = workspace
-        result = []
+        monitor_to_workspaces = collections.defaultdict(list)
         for workspace_metadata in self.get_workspaces_metadata():
-            if workspace_metadata.output != focused_monitor_name:
-                continue
             workspace = name_to_workspace[workspace_metadata.name]
-            result.append(workspace)
-        return result
+            monitor_to_workspaces[workspace_metadata.output].append(workspace)
+        return monitor_to_workspaces
 
     def send_i3_command(self, command: str) -> None:
         if self.dry_run:
@@ -335,9 +335,9 @@ class WorkspaceGroupsController:
                                                        group_to_workspaces)
         return {group_name: group_to_workspaces[group_name]}
 
-    def switch_active_group(self, target_group: str) -> None:
-        group_to_workspaces = get_group_to_workspaces(
-            self._get_monitor_workspaces())
+    def switch_monitor_active_group(self,
+                                    group_to_workspaces: GroupToWorkspaces,
+                                    target_group: str) -> None:
         if target_group not in group_to_workspaces:
             raise WorkspaceGroupsError(
                 'Unknown target group \'{}\', known groups: {}'.format(
@@ -356,6 +356,21 @@ class WorkspaceGroupsController:
             first_workspace_name = reordered_group_to_workspaces[target_group][
                 0].name
             self.send_i3_command('workspace "{}"'.format(first_workspace_name))
+
+    def switch_active_group(self, target_group: str,
+                            all_monitors: bool) -> None:
+        monitor_to_workspaces = self._get_monitor_to_workspaces()
+        if all_monitors:
+            monitors_to_switch = set(monitor_to_workspaces.keys())
+        else:
+            monitors_to_switch = self._get_focused_monitor_name()
+        for monitor, workspaces in monitor_to_workspaces.items():
+            if not monitor in monitors_to_switch:
+                continue
+            group_to_workspaces = get_group_to_workspaces(workspaces)
+            if group_to_workspaces.get(target_group):
+                self.switch_monitor_active_group(
+                    get_group_to_workspaces(workspaces), target_group)
 
     def assign_workspace_to_group(self, target_group: str) -> None:
         if not re.match(GROUP_NAME_PATTERN, target_group):

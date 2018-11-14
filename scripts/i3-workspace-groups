@@ -94,10 +94,12 @@ def _create_args_parser() -> argparse.Namespace:
         help='Similar to i3\'s "renamed workspace" command, but only changes '
         'the name of the workspace within the group, while preserving its '
         'group assignment').add_argument('new_name')
-    subparsers.add_parser(
+    switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
-        help='Switches the active group to the one provided.').add_argument(
-            'group')
+        help='Switches the active group to the one provided.')
+    switch_active_group_parser.add_argument('group')
+    switch_active_group_parser.add_argument(
+        '--all-monitors', action='store_true')
     subparsers.add_parser(
         'assign-workspace-to-group',
         help='Assigns the focused workspace to the provided group.'
@@ -181,7 +183,7 @@ def main():
         elif args.command == 'rename-workspace':
             controller.rename_workspace(args.new_name)
         elif args.command == 'switch-active-group':
-            controller.switch_active_group(args.group)
+            controller.switch_active_group(args.group, args.all_monitors)
         elif args.command == 'assign-workspace-to-group':
             controller.assign_workspace_to_group(args.group)
     except i3_workspace_groups.WorkspaceGroupsError as ex:

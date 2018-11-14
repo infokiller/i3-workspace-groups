@@ -56,12 +56,16 @@ def _create_args_parser() -> argparse.Namespace:
     subparsers.required = True
     subparsers.add_parser(
         'list-groups', help='List the groups of the current workspaces.')
-    subparsers.add_parser(
-        'list-workspaces',
-        help='List workspaces and their group.').add_argument(
-            '--fields',
-            default=','.join(_LIST_WORKSPACES_FIELDS),
-            help=_LIST_WORKSPACES_FIELDS_HELP)
+    list_workspaces_parser = subparsers.add_parser(
+        'list-workspaces', help='List workspaces and their group.')
+    list_workspaces_parser.add_argument(
+        '--fields',
+        default=','.join(_LIST_WORKSPACES_FIELDS),
+        help=_LIST_WORKSPACES_FIELDS_HELP)
+    list_workspaces_parser.add_argument(
+        '--focused-only',
+        action='store_true',
+        help='List only the focused workspace in the given group context.')
     subparsers.add_parser(
         'workspace-number',
         help='Focus on the workspace with the provided number in the focused '
@@ -134,7 +138,7 @@ def _get_workspace_field(workspace, field):
     parsed_name = i3_workspace_groups.parse_workspace_name(workspace.name)
     value = parsed_name[field]
     if value is None:
-        return '<None>'
+        return ''
     return value
 
 
@@ -145,13 +149,11 @@ def _print_workspaces(controller, args):
             sys.exit('Invalid field: "{}". Valid fields: {}'.format(
                 field, _LIST_WORKSPACES_FIELDS))
     table = []
-    group_to_workspaces = controller.list_workspaces()
-    for workspaces in group_to_workspaces.values():
-        for workspace in workspaces:
-            row = []
-            for field in fields:
-                row.append(_get_workspace_field(workspace, field))
-            table.append(row)
+    for workspace in controller.list_workspaces(args.focused_only):
+        row = []
+        for field in fields:
+            row.append(_get_workspace_field(workspace, field))
+        table.append(row)
     print('\n'.join('\t'.join(str(e) for e in row) for row in table))
 
 

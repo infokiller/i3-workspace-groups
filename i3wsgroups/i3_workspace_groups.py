@@ -118,7 +118,7 @@ def create_workspace_name(global_number: int, group: str,
     if group != DEFAULT_GROUP_NAME or local_name:
         parts.append(group)
     if local_name:
-        parts.append(local_name)
+        parts.append(sanitize_local_name(local_name))
     if local_number is not None:
         parts.append(local_number)
     return ':'.join(str(p) for p in parts)
@@ -325,15 +325,22 @@ class WorkspaceGroupsController:
                                               group_to_workspaces)
         ]
 
-    def list_workspaces(self) -> GroupToWorkspaces:
+    def list_workspaces(self, focused_only: bool = False) -> List[i3ipc.Con]:
         group_to_workspaces = get_group_to_workspaces(
             self._get_monitor_workspaces())
         # If no context group specified, return workspaces from all groups.
         if not self.group_context:
-            return group_to_workspaces
-        group_name = self.group_context.get_group_name(self.get_tree(),
-                                                       group_to_workspaces)
-        return {group_name: group_to_workspaces[group_name]}
+            group_workspaces = sum(
+                (list(workspaces)
+                 for workspaces in group_to_workspaces.values()), [])
+        else:
+            group_name = self.group_context.get_group_name(
+                self.get_tree(), group_to_workspaces)
+            group_workspaces = group_to_workspaces[group_name]
+        if not focused_only:
+            return group_workspaces
+        focused_workspace = self.get_tree().find_focused().workspace()
+        return [ws for ws in group_workspaces if ws.id == focused_workspace.id]
 
     def switch_monitor_active_group(self,
                                     group_to_workspaces: GroupToWorkspaces,
@@ -463,7 +470,7 @@ class WorkspaceGroupsController:
             'move --no-auto-back-and-forth container to workspace "{}"'.format(
                 next_workspace.name))
 
-    def rename_workspace(self, new_local_name: str) -> None:
+    def rename_workspace(self, new_local_name: Optional[str]) -> None:
         group_to_workspaces = get_group_to_workspaces(
             self._get_monitor_workspaces())
         # Organize the workspace groups to ensure they are consistent and every
@@ -471,7 +478,7 @@ class WorkspaceGroupsController:
         self.organize_workspace_groups(group_to_workspaces)
         focused_workspace = self.get_tree().find_focused().workspace()
         parsed_name = parse_workspace_name(focused_workspace.name)
-        parsed_name['local_name'] = sanitize_local_name(new_local_name)
+        parsed_name['local_name'] = new_local_name
         new_global_name = create_workspace_name(**parsed_name)
         self.send_i3_command('rename workspace "{}" to "{}"'.format(
             focused_workspace.name, new_global_name))

@@ -171,8 +171,10 @@ bindsym $mod+Control+0 workspace number 10
 The active workspace is the workspace with the lowest number in i3. Typically,
 before you use the provided scripts to manage you workspaces, this will be the
 one that appears first in the workspace list in i3bar (by default the leftmost
-one) in the primary output monitor,
-Note that the primary workspace is not affected by whether its focused or not.
+one).
+
+NOTE: In a multi-monitor setup, there is an active workspace per monitor.
+NOTE: The primary workspace is not affected by whether its focused or not.
 
 #### Active group
 
@@ -183,6 +185,9 @@ active group.
 Workspaces that are not in the active group can still be interacted with, but
 some of the commands provided are designed to make it easier to interact with
 the workspaces of the active group.
+
+NOTE: In a multi-monitor setup, there is an active group per monitor (which can
+be the same, depending on the group of the active workspace in that monitor).
 
 #### Focused group
 

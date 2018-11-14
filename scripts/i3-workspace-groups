@@ -60,7 +60,7 @@ def _create_args_parser() -> argparse.Namespace:
         'list-workspaces',
         help='List workspaces and their group.').add_argument(
             '--fields',
-            default=_LIST_WORKSPACES_FIELDS,
+            default=','.join(_LIST_WORKSPACES_FIELDS),
             help=_LIST_WORKSPACES_FIELDS_HELP)
     subparsers.add_parser(
         'workspace-number',
@@ -183,7 +183,7 @@ def main():
         elif args.command == 'switch-active-group':
             controller.switch_active_group(args.group)
         elif args.command == 'assign-workspace-to-group':
-            controller.move_workspace_to_group(args.group)
+            controller.assign_workspace_to_group(args.group)
     except i3_workspace_groups.WorkspaceGroupsError as ex:
         sys.exit(ex)
 

@@ -4,16 +4,10 @@
 import argparse
 import logging
 import logging.handlers
-import os.path
 import sys
 
 import i3ipc
 
-# TODO(infokiller): Figure out how to correctly import so that it works in pip
-# installations and in local dev.
-sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
-# pylint: disable=import-error
-# pylint: disable=wrong-import-position
 from i3wsgroups import i3_workspace_groups
 
 _LIST_WORKSPACES_FIELDS = [
@@ -111,11 +105,11 @@ def _create_args_parser() -> argparse.Namespace:
     return parser
 
 
-def _create_context_group_finder(args):
+def _create_context_group_finder(args, i3_connection):
     if args.group_name:
         return i3_workspace_groups.NamedGroupContext(args['group_name'])
     if args.group_active:
-        return i3_workspace_groups.ActiveGroupContext()
+        return i3_workspace_groups.ActiveGroupContext(i3_connection)
     if args.group_focused:
         return i3_workspace_groups.FocusedGroupContext()
     return None
@@ -162,7 +156,8 @@ def main():
     logger = i3_workspace_groups.logger
     _init_logger(logger)
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
-    group_context = _create_context_group_finder(args)
+    i3_connection = i3ipc.Connection()
+    group_context = _create_context_group_finder(args, i3_connection)
     controller = i3_workspace_groups.WorkspaceGroupsController(
         i3ipc.Connection(), group_context, args.dry_run)
     try:

@@ -16,8 +16,8 @@ function command_exists() {
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
-if group="$(rofi -dmenu -p 'Assign workspace to group' -lines 0 -width 30)"; then
-  [[ -n "${group}" ]] || group=default
+if group="$(rofi -dmenu -p 'Assign workspace to group' -lines 0 -width 30 -mesg '<span alpha="50%%">Leave empty for the default group</span>')"; then
+  [[ -n "${group}" ]] || group='Ɗ'
   "${TOOL}" assign-workspace-to-group "${group}"
 else
   exit $?

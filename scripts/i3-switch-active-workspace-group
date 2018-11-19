@@ -13,13 +13,18 @@ function command_exists() {
   type "$1" &> /dev/null
 }
 
+function list_groups() {
+  groups="$("${TOOL}" list-groups)"
+  if ! echo "${groups}" | grep -q '^Ɗ$'; then
+    echo 'Ɗ'
+  fi
+  echo "${groups}"
+}
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
-if selected_group="$( (
-  echo 'Ɗ'
-  "${TOOL}" list-groups
-) | uniq | rofi -dmenu -p 'Switch to workspace group' -lines 10 -width 30)"; then
+if selected_group="$(list_groups | rofi -dmenu -p 'Switch to workspace group' -lines 10 -width 30)"; then
   "${TOOL}" switch-active-group "${selected_group}" "$@"
 else
   exit $?

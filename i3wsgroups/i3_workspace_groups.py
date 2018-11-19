@@ -342,13 +342,31 @@ class WorkspaceGroupsController:
         focused_workspace = self.get_tree().find_focused().workspace()
         return [ws for ws in group_workspaces if ws.id == focused_workspace.id]
 
+
     def switch_monitor_active_group(self,
                                     group_to_workspaces: GroupToWorkspaces,
                                     target_group: str) -> None:
         if target_group not in group_to_workspaces:
-            raise WorkspaceGroupsError(
-                'Unknown target group \'{}\', known groups: {}'.format(
-                    target_group, group_to_workspaces.keys()))
+            logger.debug(
+                'Requested active group doesn\'t exist, will create it.')
+            max_global_number = 0
+            for workspaces in group_to_workspaces.values():
+                for workspace in workspaces:
+                    global_number = parse_workspace_name(
+                        workspace.name)['global_number']
+                    if global_number:
+                        max_global_number = max(max_global_number,
+                                                global_number)
+            new_workspace_name = create_workspace_name(
+                max_global_number + 1,
+                target_group,
+                local_name=None,
+                local_number=1)
+            self.send_i3_command('workspace "{}"'.format(new_workspace_name))
+            for workspace in self.get_tree(cached=False):
+                if workspace.name == new_workspace_name:
+                    group_to_workspaces[target_group] = [workspace]
+                    break
         reordered_group_to_workspaces = collections.OrderedDict()
         reordered_group_to_workspaces[target_group] = group_to_workspaces[
             target_group]
@@ -367,19 +385,23 @@ class WorkspaceGroupsController:
     def switch_active_group(self, target_group: str,
                             focused_monitor_only: bool) -> None:
         monitor_to_workspaces = self._get_monitor_to_workspaces()
+        focused_monitor_name = self._get_focused_monitor_name()
+        self.switch_monitor_active_group(
+            get_group_to_workspaces(
+                monitor_to_workspaces[focused_monitor_name]), target_group)
         if focused_monitor_only:
-            monitors_to_switch = {self._get_focused_monitor_name()}
-        else:
-            monitors_to_switch = set(monitor_to_workspaces.keys())
-        logger.debug('Switching the active group to "%s" in monitors %s',
-                     target_group, monitors_to_switch)
+            return
         for monitor, workspaces in monitor_to_workspaces.items():
-            if monitor not in monitors_to_switch:
+            if monitor == focused_monitor_name:
                 continue
             group_to_workspaces = get_group_to_workspaces(workspaces)
-            if group_to_workspaces.get(target_group):
-                self.switch_monitor_active_group(
-                    get_group_to_workspaces(workspaces), target_group)
+            if target_group not in group_to_workspaces:
+                continue
+            logger.debug(
+                'Non focused monitor %s has workspaces in the group "%s", '
+                'switching to it.', monitor, target_group)
+            self.switch_monitor_active_group(
+                get_group_to_workspaces(workspaces), target_group)
 
     def assign_workspace_to_group(self, target_group: str) -> None:
         if not re.match(GROUP_NAME_PATTERN, target_group):

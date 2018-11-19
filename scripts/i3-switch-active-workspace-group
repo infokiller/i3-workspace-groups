@@ -16,7 +16,10 @@ function command_exists() {
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
-if selected_group="$("${TOOL}" list-groups | rofi -dmenu -p 'Switch to workspace group' -no-custom -lines 10 -width 30)"; then
+if selected_group="$( (
+  echo 'Ɗ'
+  "${TOOL}" list-groups
+) | uniq | rofi -dmenu -p 'Switch to workspace group' -lines 10 -width 30)"; then
   "${TOOL}" switch-active-group "${selected_group}" "$@"
 else
   exit $?

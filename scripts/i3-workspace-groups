@@ -17,6 +17,7 @@ _LIST_WORKSPACES_FIELDS_HELP = (
     'Comma separated list of fields to output. Options: {}').format(
         ', '.join(_LIST_WORKSPACES_FIELDS))
 
+_LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
 
 def _create_args_parser() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Control i3 workspace groups.')
@@ -114,6 +115,17 @@ def _create_context_group_finder(args, i3_connection):
         return i3_workspace_groups.FocusedGroupContext()
     return None
 
+
+def _init_logger(logger: logging.Logger):
+    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
+    stdout_handler = logging.StreamHandler()
+    stdout_formatter = logging.Formatter(_LOG_FMT)
+    stdout_handler.setFormatter(stdout_formatter)
+    syslog_formatter = logging.Formatter('i3-workspace-groups: ' + _LOG_FMT)
+    syslog_formatter.ident = 'i3-workspace-groups'
+    syslog_handler.setFormatter(syslog_formatter)
+    logger.addHandler(syslog_handler)
+    logger.addHandler(stdout_handler)
 
 def _init_logger(logger):
     syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')

@@ -149,6 +149,16 @@ def get_group_to_workspaces(workspaces: List[i3ipc.Con]) -> GroupToWorkspaces:
     return group_to_workspaces
 
 
+def is_reordered_workspace(name1, name2):
+    parsed_name1 = parse_workspace_name(name1)
+    parsed_name2 = parse_workspace_name(name2)
+    if parsed_name1['group'] != parsed_name2['group']:
+        return False
+    if parsed_name1['local_number']:
+        return parsed_name1['local_number'] == parsed_name2['local_number']
+    return parsed_name1['local_name'] == parsed_name2['local_name']
+
+
 class WorkspaceGroupsError(Exception):
     pass
 
@@ -342,11 +352,16 @@ class WorkspaceGroupsController:
         focused_workspace = self.get_tree().find_focused().workspace()
         return [ws for ws in group_workspaces if ws.id == focused_workspace.id]
 
-
+    # pylint: disable=too-many-locals
     def switch_monitor_active_group(self,
                                     group_to_workspaces: GroupToWorkspaces,
                                     target_group: str) -> None:
+        # Store the name of the originally focused workspace which is needed if
+        # the group is new (see below).
+        focused_workspace = self.get_tree().find_focused().workspace()
+        is_group_new = False
         if target_group not in group_to_workspaces:
+            is_group_new = True
             logger.debug(
                 'Requested active group doesn\'t exist, will create it.')
             max_global_number = 0
@@ -375,8 +390,21 @@ class WorkspaceGroupsController:
                 continue
             reordered_group_to_workspaces[group] = workspaces
         self.organize_workspace_groups(reordered_group_to_workspaces)
-        focused_workspace = self.get_tree().find_focused().workspace()
+        # Switch to the originally focused workspace that may have a new name
+        # following the workspace organization. Without doing this, if the user
+        # switches to the previously focused workspace ("workspace
+        # back_and_forth" command), i3 will switch to the previous name of the
+        # originally focused workspace, which will create a new empty workspace.
         focused_group = get_workspace_group(focused_workspace)
+        if is_group_new:
+            matching_workspaces = []
+            for workspace in reordered_group_to_workspaces[focused_group]:
+                if is_reordered_workspace(focused_workspace.name,
+                                          workspace.name):
+                    matching_workspaces.append(workspace)
+            assert len(matching_workspaces) == 1
+            self.send_i3_command('workspace "{}"'.format(
+                matching_workspaces[0].name))
         if focused_group != target_group:
             first_workspace_name = reordered_group_to_workspaces[target_group][
                 0].name

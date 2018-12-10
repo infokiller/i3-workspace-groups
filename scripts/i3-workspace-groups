@@ -127,16 +127,6 @@ def _init_logger(logger: logging.Logger):
     logger.addHandler(syslog_handler)
     logger.addHandler(stdout_handler)
 
-def _init_logger(logger):
-    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
-    stdout_handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    syslog_handler.setFormatter(formatter)
-    stdout_handler.setFormatter(formatter)
-    logger.addHandler(syslog_handler)
-    logger.addHandler(stdout_handler)
-    return logger
-
 
 def _get_workspace_field(workspace, field):
     if field == 'global_name':
@@ -171,7 +161,7 @@ def main():
     i3_connection = i3ipc.Connection()
     group_context = _create_context_group_finder(args, i3_connection)
     controller = i3_workspace_groups.WorkspaceGroupsController(
-        i3ipc.Connection(), group_context, args.dry_run)
+        i3_connection, group_context, args.dry_run)
     try:
         if args.command == 'list-groups':
             print('\n'.join(controller.list_groups()))
@@ -190,7 +180,7 @@ def main():
         elif args.command == 'move-to-prev':
             controller.move_workspace_relative(-1)
         elif args.command == 'rename-workspace':
-            controller.rename_workspace(args.new_name)
+            controller.rename_focused_workspace(args.new_name)
         elif args.command == 'switch-active-group':
             controller.switch_active_group(args.group,
                                            args.focused_monitor_only)

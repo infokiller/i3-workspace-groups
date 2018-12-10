@@ -31,6 +31,7 @@ setuptools.setup(
     install_requires=['i3ipc'],
     scripts=[
         'scripts/i3-assign-workspace-to-group',
+        'scripts/i3-autoname-workspaces',
         'scripts/i3-focus-on-workspace',
         'scripts/i3-move-to-workspace',
         'scripts/i3-rename-workspace',

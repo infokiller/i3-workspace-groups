@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from typing import List, Dict, Optional
 import collections
 import logging
 import re
+from typing import Dict, List, Optional
 
 import i3ipc
 
@@ -452,7 +452,8 @@ class WorkspaceGroupsController:
         self.organize_workspace_groups(group_to_workspaces)
 
     def _get_workspace_name_from_context(self, target_local_number: int) -> str:
-        group_context = self.group_context or FocusedGroupContext()
+        group_context = self.group_context or ActiveGroupContext(
+            self.i3_connection)
         group_to_workspaces = get_group_to_workspaces(
             self._get_monitor_workspaces())
         context_group = group_context.get_group_name(self.get_tree(),
@@ -491,7 +492,8 @@ class WorkspaceGroupsController:
 
     def _relative_workspace_in_group(self,
                                      offset_from_current: int = 1) -> i3ipc.Con:
-        group_context = self.group_context or FocusedGroupContext()
+        group_context = self.group_context or ActiveGroupContext(
+            self.i3_connection)
         group_to_workspaces = get_group_to_workspaces(
             self._get_monitor_workspaces())
         group = group_context.get_group_name(self.get_tree(),
@@ -520,7 +522,7 @@ class WorkspaceGroupsController:
             'move --no-auto-back-and-forth container to workspace "{}"'.format(
                 next_workspace.name))
 
-    def rename_workspace(self, new_local_name: Optional[str]) -> None:
+    def rename_focused_workspace(self, new_local_name: Optional[str]) -> None:
         group_to_workspaces = get_group_to_workspaces(
             self._get_monitor_workspaces())
         # Organize the workspace groups to ensure they are consistent and every

@@ -10,14 +10,15 @@ import i3ipc
 
 from i3wsgroups import i3_workspace_groups
 
-_LIST_WORKSPACES_FIELDS = [
-    'group', 'local_name', 'global_name', 'local_number', 'global_number'
+_LIST_WORKSPACES_FIELDS = i3_workspace_groups.WORKSPACE_NAME_SECTIONS + [
+    'global_name'
 ]
 _LIST_WORKSPACES_FIELDS_HELP = (
     'Comma separated list of fields to output. Options: {}').format(
         ', '.join(_LIST_WORKSPACES_FIELDS))
 
 _LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
+
 
 def _create_args_parser() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Control i3 workspace groups.')

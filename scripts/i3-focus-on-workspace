@@ -19,7 +19,7 @@ command_exists "${TOOL}" || TOOL="i3-workspace-groups"
 
 mesg='<span alpha="50%">Will focus on the selected workspace</span>'
 if selected_index="$("${TOOL}" list-workspaces \
-  --fields 'group,local_number,local_name' |
+  --fields 'group,local_number,static_name,dynamic_name' |
   rofi -format d -dmenu -no-custom -width 30 -p 'Workspace' \
     -mesg "${mesg}")"; then
   selected_workspace="$("${TOOL}" list-workspaces --fields 'global_name' |

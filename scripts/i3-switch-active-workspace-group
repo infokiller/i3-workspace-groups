@@ -15,19 +15,26 @@ function command_exists() {
 
 function list_groups() {
   groups="$("${TOOL}" list-groups)"
-  if ! echo "${groups}" | grep -q '^Ɗ$'; then
-    echo 'Ɗ'
+  if ! echo "${groups}" | grep -qE '^$'; then
+    echo ''
   fi
   echo "${groups}"
 }
+
+# The default group name is the empty string, so in order to make it clearer we
+# replace it with this string when presenting it to the user.
+DEFAULT_GROUP_ITEM='<span alpha="50%">(Default group)</span>'
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
 if selected_group="$(list_groups |
-  sed -r 's|Ɗ|Ɗ <span alpha="50%">(default group)</span>|g' |
-  rofi -dmenu -p 'Switch to workspace group' -lines 10 -width 30 \
-    -markup-rows | awk '{print $1}')"; then
+  sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |
+  rofi -dmenu -p 'Switch to workspace group' -lines 10 -width 30 -markup-rows
+)"; then
+  if [[ "${selected_group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
+    selected_group=''
+  fi
   "${TOOL}" switch-active-group "${selected_group}" "$@"
 else
   exit $?

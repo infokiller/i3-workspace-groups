@@ -2,82 +2,121 @@
 
 import collections
 import logging
-import re
 from typing import Dict, List, Optional
 
 import i3ipc
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_GROUP_NAME = 'Ɗ'
-GROUP_NAME_PATTERN = r'[^:\d][^:]*'
-WORKSPACE_LOCAL_NAME_PATTERN = r'[^:]+'
+WORKSPACE_NAME_SECTIONS = [
+    'global_number',
+    'group',
+    'static_name',
+    'dynamic_name',
+    'local_number',
+]
+# Unicode zero width char.
+SECTIONS_DELIM = '\u200b'
 
 MAX_WORKSPACES_PER_GROUP = 100
 
 # We use the workspace names to "store" metadata about the workspace, such as
-# the group it belongs to. Example workspace names (without quotes):
+# the group it belongs to.
+# Workspace name format:
+#
+# global_number:%%[group]%%[static_name]%%[dynamic_name]%%[local_number]
+#
+# Where:
+# - %% represents a Unicode zero width space.
+#   For info about zero width spaces see:
+#   https://www.wikiwand.com/en/Zero-width_space
+# - global_number is managed by this script and is required to order the
+#   workspaces in i3 correctly, but can be hidden using i3 config.
+# - static_name is an optional static local name of the workspace. It can be
+#   changed by the user and will be maintained till the next time it's changed
+#   or the workspace is closed.
+# - dynamic_name is an optional dynamic local name of the workspace. If it's
+#   enabled, it's managed by another script that dynamically populates it with
+#   icons of the current windows in the workspace (implemented using unicode
+#   glyhps).
+#
+# A colon is also used to separate the sections visually. Therefore, sections
+# should not have colons at their beginning or end.
+#
+# Example of how workspace names are presented in i3bar:
 #  "1"
 #  "1:mail"
 #  "1:mygroup:mail"
 #  "102:mygroup:mail:2"
-# This is a list of regexes with capture groups that define how we encode and
-# decode the metadata from the workspace names.
-WORKSPACE_NAME_REGEXES = [
-    # Non default group, group is inactive, has user configured name.
-    # pylint: disable=line-too-long
-    r'(?P<global_number>\d+):(?P<group>{}):(?P<local_name>{}):(?P<local_number>\d+)$'
-    .format(GROUP_NAME_PATTERN, WORKSPACE_LOCAL_NAME_PATTERN),
-    # Non default group, group is inactive, no user configured name.
-    r'(?P<global_number>\d+):(?P<group>{}):(?P<local_number>\d+)$'.format(
-        GROUP_NAME_PATTERN),
-    # Non default group, group is active, has user configured name.
-    r'(?P<global_number>\d+):(?P<group>{}):(?P<local_name>{})$'.format(
-        GROUP_NAME_PATTERN, WORKSPACE_LOCAL_NAME_PATTERN),
-    # Non default group, group is active, no user configured name.
-    r'(?P<global_number>\d+):(?P<group>{})$'.format(GROUP_NAME_PATTERN),
-    # Default group, group is inactive, has user configured name.
-    r'(?P<global_number>\d+):(?P<local_name>{}):(?P<local_number>\d+)$'.format(
-        WORKSPACE_LOCAL_NAME_PATTERN),
-    # Default group, group is inactive, no user configured name.
-    r'(?P<global_number>\d+):(?P<local_number>\d+)$',
-    # Default group, group is active, has user configured name.
-    r'(?P<global_number>\d+):(?P<local_name>{})$'.format(
-        WORKSPACE_LOCAL_NAME_PATTERN),
-    # Default group, group is active, no user configured name.
-    r'(?P<global_number>\d+)$',
-]
-WORKSPACE_NAME_REGEXES = [re.compile(regex) for regex in WORKSPACE_NAME_REGEXES]
 
 GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
 
 
-def sanitize_local_name(name: str) -> str:
-    sanitized_name = name.replace(':', '%')
-    assert re.match('^{}$'.format(WORKSPACE_LOCAL_NAME_PATTERN), sanitized_name)
-    return sanitized_name
+def maybe_remove_prefix_colons(section: str) -> str:
+    if section and section[0] == ':':
+        return section[1:]
+    return section
+
+
+def maybe_remove_suffix_colons(section: str) -> str:
+    if section and section[-1] == ':':
+        return section[:-1]
+    return section
+
+
+def sanitize_section_value(name: str) -> str:
+    sanitized_name = name.replace(SECTIONS_DELIM, '%')
+    assert SECTIONS_DELIM not in sanitized_name
+    return maybe_remove_prefix_colons(sanitized_name)
+
+
+def is_valid_group_name(name: str) -> str:
+    return SECTIONS_DELIM not in name
+
+
+def parse_global_number_section(
+        global_number_section: Optional[str]) -> Optional[int]:
+    if not global_number_section:
+        return None
+    return int(maybe_remove_suffix_colons(global_number_section))
+
+
+def is_recognized_name_format(workspace_name: str) -> bool:
+    sections = workspace_name.split(SECTIONS_DELIM)
+    if len(sections) != len(WORKSPACE_NAME_SECTIONS):
+        return False
+    if sections[0]:
+        try:
+            parse_global_number_section(sections[0])
+        except ValueError:
+            return False
+    return True
 
 
 def parse_workspace_name(workspace_name: str) -> dict:
     result = {
         'global_number': None,
-        'group': DEFAULT_GROUP_NAME,
+        'group': '',
+        'static_name': '',
+        'dynamic_name': '',
         'local_number': None,
-        'local_name': None,
     }
-    match = False
-    for regex in WORKSPACE_NAME_REGEXES:
-        match = regex.match(workspace_name)
-        if match:
-            result.update(match.groupdict())
-            match = True
-            break
-    if not match:
-        result['local_name'] = sanitize_local_name(workspace_name)
+    if not is_recognized_name_format(workspace_name):
+        result['static_name'] = sanitize_section_value(workspace_name)
         return result
-    for int_field in ['global_number', 'local_number']:
-        if result[int_field]:
-            result[int_field] = int(result[int_field])
+    sections = workspace_name.split(SECTIONS_DELIM)
+    result['global_number'] = parse_global_number_section(sections[0])
+    if sections[1]:
+        result['group'] = maybe_remove_suffix_colons(sections[1])
+    result['static_name'] = maybe_remove_prefix_colons(sections[2])
+    result['dynamic_name'] = maybe_remove_prefix_colons(sections[3])
+    # Don't fail on local number parsing errors, just ignore it.
+    try:
+        if sections[4]:
+            result['local_number'] = int(
+                maybe_remove_prefix_colons(sections[4]))
+    except ValueError:
+        pass
     return result
 
 
@@ -105,23 +144,20 @@ def max_local_workspace_number(workspaces: List[i3ipc.Con]):
     return result
 
 
-def create_workspace_name(global_number: int, group: str,
-                          local_name: Optional[str],
-                          local_number: Optional[int]) -> str:
-    parts = [global_number]
-    # If a workspace in the default group has a local name, we have to add the
-    # group name, or otherwise it could be recognized as a workspace in another
-    # group.
-    # For example, let's assume there are two workspaces named "1:1" and
-    # "2:ws". Is the second one in the group "ws" with no local name, or in the
-    # default group with the local name "ws"?
-    if group != DEFAULT_GROUP_NAME or local_name:
-        parts.append(group)
-    if local_name:
-        parts.append(sanitize_local_name(local_name))
-    if local_number is not None:
-        parts.append(local_number)
-    return ':'.join(str(p) for p in parts)
+def create_workspace_name(
+        global_number: int, group: str, static_name: Optional[str],
+        dynamic_name: Optional[str], local_number: Optional[int]) -> str:
+    sections = ['{}:'.format(global_number), group]
+    need_prefix_colons = bool(group)
+    for section in [static_name, dynamic_name, local_number]:
+        if not section:
+            section = ''
+        elif need_prefix_colons:
+            section = ':{}'.format(section)
+        else:
+            need_prefix_colons = True
+        sections.append(str(section))
+    return SECTIONS_DELIM.join(sections)
 
 
 def compute_global_number(group_index: int, local_number: int) -> int:
@@ -156,7 +192,7 @@ def is_reordered_workspace(name1, name2):
         return False
     if parsed_name1['local_number']:
         return parsed_name1['local_number'] == parsed_name2['local_number']
-    return parsed_name1['local_name'] == parsed_name2['local_name']
+    return parsed_name1['static_name'] == parsed_name2['static_name']
 
 
 class WorkspaceGroupsError(Exception):
@@ -375,7 +411,8 @@ class WorkspaceGroupsController:
             new_workspace_name = create_workspace_name(
                 max_global_number + 1,
                 target_group,
-                local_name=None,
+                static_name=None,
+                dynamic_name=None,
                 local_number=1)
             self.send_i3_command('workspace "{}"'.format(new_workspace_name))
             for workspace in self.get_tree(cached=False):
@@ -432,11 +469,9 @@ class WorkspaceGroupsController:
                 get_group_to_workspaces(workspaces), target_group)
 
     def assign_workspace_to_group(self, target_group: str) -> None:
-        if not re.match(GROUP_NAME_PATTERN, target_group):
+        if not is_valid_group_name(target_group):
             raise WorkspaceGroupsError(
-                'Invalid group name provided: "{}". '
-                'Group name must be in the form "{}"'.format(
-                    target_group, GROUP_NAME_PATTERN))
+                'Invalid group name provided: "{}"'.format(target_group))
         focused_workspace = self.get_tree().find_focused().workspace()
         if get_workspace_group(focused_workspace) == target_group:
             return
@@ -476,7 +511,8 @@ class WorkspaceGroupsController:
         return create_workspace_name(
             global_number,
             context_group,
-            local_name='',
+            static_name='',
+            dynamic_name='',
             local_number=target_local_number)
 
     def focus_workspace_number(self, target_local_number: int) -> None:
@@ -522,7 +558,7 @@ class WorkspaceGroupsController:
             'move --no-auto-back-and-forth container to workspace "{}"'.format(
                 next_workspace.name))
 
-    def rename_focused_workspace(self, new_local_name: Optional[str]) -> None:
+    def rename_focused_workspace(self, new_static_name: Optional[str]) -> None:
         group_to_workspaces = get_group_to_workspaces(
             self._get_monitor_workspaces())
         # Organize the workspace groups to ensure they are consistent and every
@@ -530,7 +566,7 @@ class WorkspaceGroupsController:
         self.organize_workspace_groups(group_to_workspaces)
         focused_workspace = self.get_tree().find_focused().workspace()
         parsed_name = parse_workspace_name(focused_workspace.name)
-        parsed_name['local_name'] = new_local_name
+        parsed_name['static_name'] = new_static_name
         new_global_name = create_workspace_name(**parsed_name)
         self.send_i3_command('rename workspace "{}" to "{}"'.format(
             focused_workspace.name, new_global_name))

@@ -6,12 +6,11 @@
 import argparse
 import logging
 import logging.handlers
+import os.path
 
 import i3ipc
 
 from i3wsgroups import i3_workspace_groups
-
-_LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
 
 WINDOW_INSTANCE_TO_ICON = {
     'kitty': '',
@@ -69,28 +68,16 @@ WINDOW_INSTANCE_TO_ICON = {
 
 DEFAULT_ICON = ''
 
-_logger = logging.getLogger(__name__)
-
-
-def _init_logger(logger: logging.Logger):
-    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
-    stdout_handler = logging.StreamHandler()
-    stdout_formatter = logging.Formatter(_LOG_FMT)
-    stdout_handler.setFormatter(stdout_formatter)
-    syslog_formatter = logging.Formatter('i3-autoname-workspaces: ' + _LOG_FMT)
-    syslog_formatter.ident = 'i3-autoname-workspaces'
-    syslog_handler.setFormatter(syslog_formatter)
-    logger.addHandler(syslog_handler)
-    logger.addHandler(stdout_handler)
+logger = i3_workspace_groups.logger
 
 
 def icon_for_window(window):
     if not window.window_instance:
-        _logger.warning('Window with id %s has no window instance',
-                        window.window_instance)
+        logger.warning('Window with id %s has no window instance',
+                       window.window_instance)
         return DEFAULT_ICON
     if window.window_instance not in WINDOW_INSTANCE_TO_ICON:
-        _logger.info(
+        logger.info(
             'No icon available for window with window class: "%s", instance: '
             '"%s", name: "%s"', window.window_class, window.window_instance,
             window.name)
@@ -99,7 +86,13 @@ def icon_for_window(window):
 
 
 def rename_workspaces(i3_connection):
-    for workspace in i3_connection.get_tree().workspaces():
+    controller = i3_workspace_groups.WorkspaceGroupsController(
+        i3_connection, group_context=None, dry_run=False)
+    # Organize the workspaces to make sure their names are formatted properly.
+    group_to_workspaces = i3_workspace_groups.get_group_to_workspaces(
+        controller.get_monitor_workspaces())
+    controller.organize_workspace_groups(group_to_workspaces)
+    for workspace in controller.get_tree():
         parsed_name = i3_workspace_groups.parse_workspace_name(workspace.name)
         parsed_name['dynamic_name'] = ' '.join(
             [icon_for_window(w) for w in workspace.leaves()])
@@ -107,7 +100,7 @@ def rename_workspaces(i3_connection):
             **parsed_name)
         rename_cmd = 'rename workspace "{}" to "{}"'.format(
             workspace.name, new_global_name)
-        _logger.info('Sending i3 command: %s', rename_cmd)
+        logger.info('Sending i3 command: %s', rename_cmd)
         i3_connection.command(rename_cmd)
 
 
@@ -126,8 +119,8 @@ def main():
         default='warning',
         help='Logging level for stderr and syslog.')
     args = parser.parse_args()
-    _init_logger(_logger)
-    _logger.setLevel(getattr(logging, args.log_level.upper(), None))
+    i3_workspace_groups.init_logger(os.path.basename(__file__))
+    logger.setLevel(getattr(logging, args.log_level.upper(), None))
     i3_connection = i3ipc.Connection()
     i3_connection.on('window', window_event_handler)
     rename_workspaces(i3_connection)

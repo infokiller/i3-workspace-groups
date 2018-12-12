@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 
 import i3ipc
 
-logger = logging.getLogger(__name__)
+_LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
 
 WORKSPACE_NAME_SECTIONS = [
     'global_number',
@@ -50,6 +50,20 @@ MAX_WORKSPACES_PER_GROUP = 100
 #  "102:mygroup:mail:2"
 
 GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
+
+logger = logging.getLogger(__name__)
+
+
+def init_logger(name: str) -> None:
+    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
+    stdout_handler = logging.StreamHandler()
+    stdout_formatter = logging.Formatter(_LOG_FMT)
+    stdout_handler.setFormatter(stdout_formatter)
+    syslog_formatter = logging.Formatter('{}: {}'.format(name, _LOG_FMT))
+    syslog_formatter.ident = name
+    syslog_handler.setFormatter(syslog_formatter)
+    logger.addHandler(syslog_handler)
+    logger.addHandler(stdout_handler)
 
 
 def maybe_remove_prefix_colons(section: str) -> str:
@@ -295,7 +309,7 @@ class WorkspaceGroupsController:
         logger.debug('Focused outputs: %s', focused_outputs)
         return next(iter(focused_outputs))
 
-    def _get_monitor_workspaces(
+    def get_monitor_workspaces(
             self, monitor_name: Optional[str] = None) -> List[i3ipc.Con]:
         if not monitor_name:
             monitor_name = self._get_focused_monitor_name()
@@ -362,7 +376,7 @@ class WorkspaceGroupsController:
 
     def list_groups(self) -> List[str]:
         group_to_workspaces = get_group_to_workspaces(
-            self._get_monitor_workspaces())
+            self.get_monitor_workspaces())
         # If no context group specified, list all groups.
         if not self.group_context:
             return list(group_to_workspaces.keys())
@@ -373,7 +387,7 @@ class WorkspaceGroupsController:
 
     def list_workspaces(self, focused_only: bool = False) -> List[i3ipc.Con]:
         group_to_workspaces = get_group_to_workspaces(
-            self._get_monitor_workspaces())
+            self.get_monitor_workspaces())
         # If no context group specified, return workspaces from all groups.
         if not self.group_context:
             group_workspaces = sum(
@@ -476,7 +490,7 @@ class WorkspaceGroupsController:
         if get_workspace_group(focused_workspace) == target_group:
             return
         group_to_workspaces = get_group_to_workspaces(
-            self._get_monitor_workspaces())
+            self.get_monitor_workspaces())
         for workspaces in group_to_workspaces.values():
             for to_remove in (
                     ws for ws in workspaces if ws.id == focused_workspace.id):
@@ -490,7 +504,7 @@ class WorkspaceGroupsController:
         group_context = self.group_context or ActiveGroupContext(
             self.i3_connection)
         group_to_workspaces = get_group_to_workspaces(
-            self._get_monitor_workspaces())
+            self.get_monitor_workspaces())
         context_group = group_context.get_group_name(self.get_tree(),
                                                      group_to_workspaces)
         logger.info('Context group: "%s"', context_group)
@@ -531,7 +545,7 @@ class WorkspaceGroupsController:
         group_context = self.group_context or ActiveGroupContext(
             self.i3_connection)
         group_to_workspaces = get_group_to_workspaces(
-            self._get_monitor_workspaces())
+            self.get_monitor_workspaces())
         group = group_context.get_group_name(self.get_tree(),
                                              group_to_workspaces)
         current_workspace = group_context.get_workspace(self.get_tree(),
@@ -560,7 +574,7 @@ class WorkspaceGroupsController:
 
     def rename_focused_workspace(self, new_static_name: Optional[str]) -> None:
         group_to_workspaces = get_group_to_workspaces(
-            self._get_monitor_workspaces())
+            self.get_monitor_workspaces())
         # Organize the workspace groups to ensure they are consistent and every
         # workspace has a global number.
         self.organize_workspace_groups(group_to_workspaces)

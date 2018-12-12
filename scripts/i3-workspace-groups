@@ -5,6 +5,7 @@ import argparse
 import logging
 import logging.handlers
 import sys
+import os.path
 
 import i3ipc
 
@@ -17,7 +18,7 @@ _LIST_WORKSPACES_FIELDS_HELP = (
     'Comma separated list of fields to output. Options: {}').format(
         ', '.join(_LIST_WORKSPACES_FIELDS))
 
-_LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
+logger = i3_workspace_groups.logger
 
 
 def _create_args_parser() -> argparse.Namespace:
@@ -117,18 +118,6 @@ def _create_context_group_finder(args, i3_connection):
     return None
 
 
-def _init_logger(logger: logging.Logger):
-    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
-    stdout_handler = logging.StreamHandler()
-    stdout_formatter = logging.Formatter(_LOG_FMT)
-    stdout_handler.setFormatter(stdout_formatter)
-    syslog_formatter = logging.Formatter('i3-workspace-groups: ' + _LOG_FMT)
-    syslog_formatter.ident = 'i3-workspace-groups'
-    syslog_handler.setFormatter(syslog_formatter)
-    logger.addHandler(syslog_handler)
-    logger.addHandler(stdout_handler)
-
-
 def _get_workspace_field(workspace, field):
     if field == 'global_name':
         return workspace.name
@@ -156,9 +145,9 @@ def _print_workspaces(controller, args):
 
 def main():
     args = _create_args_parser().parse_args()
-    logger = i3_workspace_groups.logger
-    _init_logger(logger)
+    i3_workspace_groups.init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
+
     i3_connection = i3ipc.Connection()
     group_context = _create_context_group_finder(args, i3_connection)
     controller = i3_workspace_groups.WorkspaceGroupsController(

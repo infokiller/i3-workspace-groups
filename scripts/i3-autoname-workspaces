@@ -7,47 +7,60 @@ import argparse
 import logging
 import logging.handlers
 import os.path
+import re
 
 import i3ipc
 
 from i3wsgroups import i3_workspace_groups
 
-WINDOW_INSTANCE_TO_ICON = {
+WINDOW_CLASS_REGEX_TO_ICON = {
     'kitty': '',
-    'termite': '',
-    'urxvt': '',
-    'urxvtc': '',
-    'chromium': '',
-    'chrome': '',
-    'firefox': '',
+    'Termite': '',
+    'URxvt': '',
+    'URxvtc': '',
+    'Chromium': '',
+    'Chrome': '',
+    'Firefox': '',
     'copyq': '',
-    'ranger': '',
-    'rofi': '',
-    'pqiv': '',
-    'pinta': '',
-    'mpv': '',
-    'vlc': '',
-    'libreoffice-writer': '',
-    'libreoffice-calc': '',
-    'peek': '',
+    'Ranger': '',
+    'Rofi': '',
+    'Pqiv': '',
+    'Pinta': '',
+    '[Mm]pv': '',
+    '[Vv]lc': '',
+    '[Ll]ibreoffice-writer': '',
+    '[Ll]ibreoffice-calc': '',
+    'Peek': '',
     'ipython': '',
     'python': '',
-    'vim': '',
-    'nvim': '',
-    'gvim': '',
+    'jupyter-qtconsole': '',
+    'Gvim': '',
     # 'emacs': '',
-    'google drive': '',
-    'calendar': '',
     'settings': '',
     'slack': '聆',
-    'zathura': '',
+    'Zathura': '',
     'chat': '',
+    'Telegram': '',
+    'Pavucontrol': '',
+}
+
+WINDOW_CLASS_REGEX_TO_ICON = {
+    re.compile(r): icon for r, icon in WINDOW_CLASS_REGEX_TO_ICON.items()
+}
+
+WINDOW_INSTANCE_REGEX_TO_ICON = {
     'trello': '',
-    'telegram': '',
     'whatsapp': '',
-    'web.whatsapp.com': '',
     'gmail': '',
-    'gmail.com': '',
+    '[gn]vim': '',
+    'file-manager': '',
+    'calendar.google.com': '',
+    'google drive': '',
+    'ticktick': '',
+}
+
+WINDOW_INSTANCE_REGEX_TO_ICON = {
+    re.compile(r): icon for r, icon in WINDOW_INSTANCE_REGEX_TO_ICON.items()
 }
 
 # Other possibly useful icons:
@@ -72,17 +85,17 @@ logger = i3_workspace_groups.logger
 
 
 def icon_for_window(window):
-    if not window.window_instance:
-        logger.warning('Window with id %s has no window instance',
-                       window.window_instance)
-        return DEFAULT_ICON
-    if window.window_instance not in WINDOW_INSTANCE_TO_ICON:
-        logger.info(
-            'No icon available for window with window class: "%s", instance: '
-            '"%s", name: "%s"', window.window_class, window.window_instance,
-            window.name)
-        return DEFAULT_ICON
-    return WINDOW_INSTANCE_TO_ICON[window.window_instance]
+    for regex, icon in WINDOW_INSTANCE_REGEX_TO_ICON.items():
+        if regex.match(window.window_instance):
+            return icon
+    for regex, icon in WINDOW_CLASS_REGEX_TO_ICON.items():
+        if regex.match(window.window_class):
+            return icon
+    logger.info(
+        'No icon specified for window with window class: "%s", instance: '
+        '"%s", name: "%s"', window.window_class, window.window_instance,
+        window.name)
+    return DEFAULT_ICON
 
 
 def rename_workspaces(i3_connection):

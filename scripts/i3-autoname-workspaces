@@ -19,7 +19,7 @@ WINDOW_CLASS_REGEX_TO_ICON = {
     'URxvt': '',
     'URxvtc': '',
     'Chromium': '',
-    'Chrome': '',
+    'Chrome': '',
     'Firefox': '',
     'copyq': '',
     'Ranger': '',
@@ -27,7 +27,7 @@ WINDOW_CLASS_REGEX_TO_ICON = {
     'Pqiv': '',
     'Pinta': '',
     '[Mm]pv': '',
-    '[Vv]lc': '',
+    '[Vv]lc': '嗢',
     '[Ll]ibreoffice-writer': '',
     '[Ll]ibreoffice-calc': '',
     'Peek': '',
@@ -35,13 +35,11 @@ WINDOW_CLASS_REGEX_TO_ICON = {
     'python': '',
     'jupyter-qtconsole': '',
     'Gvim': '',
-    # 'emacs': '',
     'settings': '',
     'slack': '聆',
     'Zathura': '',
-    'chat': '',
     'Telegram': '',
-    'Pavucontrol': '',
+    'Pavucontrol': '墳',
 }
 
 WINDOW_CLASS_REGEX_TO_ICON = {
@@ -51,7 +49,7 @@ WINDOW_CLASS_REGEX_TO_ICON = {
 WINDOW_INSTANCE_REGEX_TO_ICON = {
     'trello': '',
     'whatsapp': '',
-    'gmail': '',
+    'gmail': '',
     '[gn]vim': '',
     'file-manager': '',
     'calendar.google.com': '',
@@ -63,21 +61,15 @@ WINDOW_INSTANCE_REGEX_TO_ICON = {
     re.compile(r): icon for r, icon in WINDOW_INSTANCE_REGEX_TO_ICON.items()
 }
 
-# Other possibly useful icons:
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
+# Other relevant glyphs:
+#   
+#            樓  
+#         
+#          墳 奄 奔 婢
+#        
+#      
+#  
+#       
 
 DEFAULT_ICON = ''
 

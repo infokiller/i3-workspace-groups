@@ -92,7 +92,7 @@ def rename_workspaces(i3_connection):
     group_to_workspaces = i3_workspace_groups.get_group_to_workspaces(
         controller.get_monitor_workspaces())
     controller.organize_workspace_groups(group_to_workspaces)
-    for workspace in controller.get_tree():
+    for workspace in controller.get_tree().workspaces():
         parsed_name = i3_workspace_groups.parse_workspace_name(workspace.name)
         parsed_name['dynamic_name'] = ' '.join(
             [icon_for_window(w) for w in workspace.leaves()])

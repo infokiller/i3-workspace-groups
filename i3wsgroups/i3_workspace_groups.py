@@ -6,8 +6,6 @@ from typing import Dict, List, Optional
 
 import i3ipc
 
-_LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
-
 WORKSPACE_NAME_SECTIONS = [
     'global_number',
     'group',
@@ -18,7 +16,11 @@ WORKSPACE_NAME_SECTIONS = [
 # Unicode zero width char.
 SECTIONS_DELIM = '\u200b'
 
-MAX_WORKSPACES_PER_GROUP = 100
+_LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
+
+_MAX_WORKSPACES_PER_GROUP = 100
+
+_SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
 
 # We use the workspace names to "store" metadata about the workspace, such as
 # the group it belongs to.
@@ -175,16 +177,16 @@ def create_workspace_name(
 
 
 def compute_global_number(group_index: int, local_number: int) -> int:
-    assert local_number < MAX_WORKSPACES_PER_GROUP
-    return MAX_WORKSPACES_PER_GROUP * group_index + local_number
+    assert local_number < _MAX_WORKSPACES_PER_GROUP
+    return _MAX_WORKSPACES_PER_GROUP * group_index + local_number
 
 
 def global_number_to_group_index(global_number: int) -> int:
-    return global_number // MAX_WORKSPACES_PER_GROUP
+    return global_number // _MAX_WORKSPACES_PER_GROUP
 
 
 def global_number_to_local_number(global_number: int) -> int:
-    return global_number % MAX_WORKSPACES_PER_GROUP
+    return global_number % _MAX_WORKSPACES_PER_GROUP
 
 
 def get_group_to_workspaces(workspaces: List[i3ipc.Con]) -> GroupToWorkspaces:
@@ -321,6 +323,11 @@ class WorkspaceGroupsController:
             name_to_workspace[workspace.name] = workspace
         monitor_to_workspaces = collections.defaultdict(list)
         for workspace_metadata in self.get_workspaces_metadata():
+            if workspace_metadata.name == _SCRATCHPAD_WORKSPACE_NAME:
+                continue
+            if workspace_metadata.name not in name_to_workspace:
+                logger.warning('Unknown workspace detected: %s',
+                               workspace_metadata.name)
             workspace = name_to_workspace[workspace_metadata.name]
             monitor_to_workspaces[workspace_metadata.output].append(workspace)
         return monitor_to_workspaces

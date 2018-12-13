@@ -7,12 +7,10 @@ import argparse
 import logging
 import logging.handlers
 import os.path
-import re
 
 import i3ipc
 
-from i3wsgroups import i3_workspace_groups
-from i3wsgroups import icons
+from i3wsgroups import i3_workspace_groups, icons
 
 logger = i3_workspace_groups.logger
 
@@ -29,8 +27,8 @@ def rename_workspaces(i3_connection):
     # Show icons for the active group workspaces and the focused workspace, and
     # don't show them for all the others.
     active_workspace_ids = set()
-    active_workspace_ids.add(
-        controller.get_tree().find_focused().workspace().id)
+    # active_workspace_ids.add(
+    #     controller.get_tree().find_focused().workspace().id)
     for workspace in next(iter(group_to_workspaces.values())):
         active_workspace_ids.add(workspace.id)
     for workspace in controller.get_tree().workspaces():
@@ -41,15 +39,23 @@ def rename_workspaces(i3_connection):
         parsed_name['dynamic_name'] = dynamic_name
         new_global_name = i3_workspace_groups.create_workspace_name(
             **parsed_name)
+        if workspace.name == new_global_name:
+            continue
         rename_cmd = 'rename workspace "{}" to "{}"'.format(
             workspace.name, new_global_name)
         logger.info('Sending i3 command: %s', rename_cmd)
         i3_connection.command(rename_cmd)
 
 
-def event_handler(i3_connection, event):
-    logger.debug('Got event with change: %s', event.change)
-    if event.change in ['new', 'close', 'move', 'focus']:
+def window_event_handler(i3_connection, event):
+    logger.debug('Got window event with change: %s', event.change)
+    if event.change in ['new', 'close', 'move']:
+        rename_workspaces(i3_connection)
+
+
+def workspace_event_handler(i3_connection, event):
+    logger.debug('Got workspace event with change: %s', event.change)
+    if event.change == 'focus':
         rename_workspaces(i3_connection)
 
 
@@ -66,8 +72,8 @@ def main():
     i3_workspace_groups.init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
     i3_connection = i3ipc.Connection()
-    i3_connection.on('window', event_handler)
-    i3_connection.on('workspace', event_handler)
+    i3_connection.on('window', window_event_handler)
+    # i3_connection.on('workspace', workspace_event_handler)
     rename_workspaces(i3_connection)
     i3_connection.main()
 

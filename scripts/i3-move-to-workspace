@@ -18,7 +18,7 @@ TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
 mesg='<span alpha="50%">Focused container will move to the selected workspace</span>'
 if selected_index="$("${TOOL}" list-workspaces \
-  --fields 'group,local_number,static_name,dynamic_name' |
+  --fields 'group,local_number,window_icons,static_name' |
   rofi -format d -dmenu -no-custom -width 30 -p 'Workspace' \
     -mesg "${mesg}")"; then
   selected_workspace="$("${TOOL}" list-workspaces --fields 'global_name' |

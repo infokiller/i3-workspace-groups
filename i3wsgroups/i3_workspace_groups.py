@@ -6,6 +6,8 @@ from typing import Dict, List, Optional
 
 import i3ipc
 
+from i3wsgroups import icons
+
 WORKSPACE_NAME_SECTIONS = [
     'global_number',
     'group',
@@ -126,11 +128,11 @@ def parse_workspace_name(workspace_name: str) -> dict:
         result['group'] = maybe_remove_suffix_colons(sections[1])
     result['static_name'] = maybe_remove_prefix_colons(sections[2])
     result['dynamic_name'] = maybe_remove_prefix_colons(sections[3])
+    if not sections[4]:
+        return result
     # Don't fail on local number parsing errors, just ignore it.
     try:
-        if sections[4]:
-            result['local_number'] = int(
-                maybe_remove_prefix_colons(sections[4]))
+        result['local_number'] = int(maybe_remove_prefix_colons(sections[4]))
     except ValueError:
         pass
     return result

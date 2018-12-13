@@ -44,7 +44,7 @@ WINDOW_CLASS_REGEX_TO_ICON = {
 
 WINDOW_INSTANCE_REGEX_TO_ICON = {
     'trello': '',
-    'whatsapp': '',
+    r'.*\bwhatsapp\b.*': '',
     'gmail': '',
     '[gn]vim': '',
     'file-manager': '',

@@ -47,9 +47,9 @@ def rename_workspaces(i3_connection):
         i3_connection.command(rename_cmd)
 
 
-def window_event_handler(i3_connection, event):
-    logger.debug('Got window event: %s', event)
-    if event.change in ['new', 'close', 'move']:
+def event_handler(i3_connection, event):
+    logger.debug('Got event with change: %s', event.change)
+    if event.change in ['new', 'close', 'move', 'focus']:
         rename_workspaces(i3_connection)
 
 
@@ -66,7 +66,8 @@ def main():
     i3_workspace_groups.init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
     i3_connection = i3ipc.Connection()
-    i3_connection.on('window', window_event_handler)
+    i3_connection.on('window', event_handler)
+    i3_connection.on('workspace', event_handler)
     rename_workspaces(i3_connection)
     i3_connection.main()
 

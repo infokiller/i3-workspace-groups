@@ -30,7 +30,7 @@ TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
 if selected_group="$(list_groups |
   sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |
-  rofi -dmenu -p 'Switch to workspace group' -lines 10 -width 30 -markup-rows
+  rofi -dmenu -i -p 'Switch to workspace group' -lines 10 -width 30 -markup-rows
 )"; then
   if [[ "${selected_group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
     selected_group=''

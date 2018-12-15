@@ -1,6 +1,8 @@
 # i3 Workspace Groups
 
-A Python library and command line tool for managing i3wm workspaces in groups
+![Demo flow](./assets/demo.gif?raw=true)
+
+A Python library and set of command line tools for managing i3wm workspaces in groups
 that you define.
 I find this tool useful for managing a large number of workspaces in i3.
 

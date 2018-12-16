@@ -151,15 +151,44 @@ def get_workspace_group(workspace: i3ipc.Con) -> str:
     return parse_workspace_name(workspace.name)['group']
 
 
-def max_local_workspace_number(workspaces: List[i3ipc.Con]):
-    result = 0
-    for workspace in workspaces:
-        local_number = get_local_workspace_number(workspace)
-        logger.debug('Workspace %s, local number %s', workspace.name,
-                     local_number)
+def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
+                          all_workspaces: List[i3ipc.Con],
+                          renumber_workspaces: bool) -> List[int]:
+    monitor_workspace_names = set()
+    for workspace in monitor_workspaces:
+        monitor_workspace_names.add(workspace.name)
+    other_monitors_local_numbers = set()
+    for workspace in all_workspaces:
+        if workspace.name in monitor_workspace_names:
+            continue
+        local_number = parse_workspace_name(workspace.name)['local_number']
         if local_number is not None:
-            result = max(result, local_number)
-    return result
+            other_monitors_local_numbers.add(local_number)
+    logger.debug('Local numbers used by group in other monitors: %s',
+                 other_monitors_local_numbers)
+    local_numbers = []
+    if renumber_workspaces:
+        for local_number in range(1, 10**5):
+            if len(local_numbers) == len(monitor_workspaces):
+                break
+            if local_number in other_monitors_local_numbers:
+                continue
+            local_numbers.append(local_number)
+        assert len(local_numbers) == len(monitor_workspaces)
+        return local_numbers
+    if other_monitors_local_numbers:
+        last_used_workspace_number = max(other_monitors_local_numbers)
+    else:
+        last_used_workspace_number = 0
+    for workspace in monitor_workspaces:
+        parsed_name = parse_workspace_name(workspace.name)
+        local_number = parsed_name['local_number']
+        if local_number is None or (
+                local_number in other_monitors_local_numbers):
+            local_number = last_used_workspace_number + 1
+            last_used_workspace_number += 1
+        local_numbers.append(local_number)
+    return local_numbers
 
 
 def create_workspace_name(
@@ -275,8 +304,15 @@ class WorkspaceGroupsController:
     def __init__(self,
                  i3_connection: i3ipc.Connection,
                  group_context,
+                 add_window_icons: bool = False,
+                 add_window_icons_all_groups: bool = False,
+                 renumber_workspaces: bool = False,
                  dry_run: bool = True):
         self.i3_connection = i3_connection
+        self.group_context = group_context
+        self.add_window_icons = add_window_icons
+        self.add_window_icons_all_groups = add_window_icons_all_groups
+        self.renumber_workspaces = renumber_workspaces
         self.group_context = group_context
         self.dry_run = dry_run
         # i3 tree is cached for performance. Timing the i3ipc get_tree function
@@ -349,35 +385,24 @@ class WorkspaceGroupsController:
             self, group_to_monitor_workspaces: GroupToWorkspaces) -> None:
         group_to_all_workspaces = get_group_to_workspaces(
             self.get_tree().workspaces())
-        monitor_workspace_names = set()
-        for workspaces in group_to_monitor_workspaces.values():
-            for workspace in workspaces:
-                monitor_workspace_names.add(workspace.name)
         for group_index, (group, workspaces) in enumerate(
                 group_to_monitor_workspaces.items()):
             logger.debug('Organizing workspace group: %s', group)
-            all_group_workspaces = group_to_all_workspaces.get(group, [])
-            last_used_workspace_number = max_local_workspace_number(
-                all_group_workspaces)
-            local_numbers_used = set()
-            for workspace in all_group_workspaces:
-                if workspace.name in monitor_workspace_names:
-                    continue
-                local_number = parse_workspace_name(
-                    workspace.name)['local_number']
-                if local_number is not None:
-                    local_numbers_used.add(local_number)
-            for workspace in workspaces:
+            local_numbers = compute_local_numbers(
+                workspaces, group_to_all_workspaces.get(group, []),
+                self.renumber_workspaces)
+            for workspace, local_number in zip(workspaces, local_numbers):
                 parsed_name = parse_workspace_name(workspace.name)
                 parsed_name['group'] = group
-                local_number = parsed_name['local_number']
-                if local_number is None or (local_number in local_numbers_used):
-                    local_number = last_used_workspace_number + 1
-                    parsed_name['local_number'] = local_number
-                    last_used_workspace_number += 1
-                local_numbers_used.add(local_number)
+                parsed_name['local_number'] = local_number
                 parsed_name['global_number'] = compute_global_number(
                     group_index, local_number)
+                # Add window icons to the active group if needed.
+                if self.add_window_icons_all_groups or (self.add_window_icons
+                                                        and group_index == 0):
+                    dynamic_name = icons.get_workspace_icons_representation(
+                        workspace)
+                    parsed_name['dynamic_name'] = dynamic_name
                 new_name = create_workspace_name(**parsed_name)
                 self.send_i3_command('rename workspace "{}" to "{}"'.format(
                     workspace.name, new_name))

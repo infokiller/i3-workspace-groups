@@ -35,7 +35,7 @@ if selected_group="$(list_groups |
   if [[ "${selected_group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
     selected_group=''
   fi
-  "${TOOL}" switch-active-group "${selected_group}" "$@"
+  "${TOOL}" "$@" switch-active-group "${selected_group}"
 else
   exit $?
 fi

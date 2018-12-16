@@ -4,13 +4,12 @@
 import argparse
 import logging
 import logging.handlers
-import sys
 import os.path
+import sys
 
 import i3ipc
 
-from i3wsgroups import i3_workspace_groups
-from i3wsgroups import icons
+from i3wsgroups import cli, i3_workspace_groups, icons
 
 _LIST_WORKSPACES_FIELDS = i3_workspace_groups.WORKSPACE_NAME_SECTIONS + [
     'window_icons', 'global_name'
@@ -24,16 +23,14 @@ logger = i3_workspace_groups.logger
 
 def _create_args_parser() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Control i3 workspace groups.')
+    cli.add_common_args(parser)
+    cli.add_workspace_naming_args(parser)
     parser.add_argument(
-        '--dry-run',
+        '--window-icons',
         action='store_true',
         default=False,
-        help='If true, will not actually do any changes to i3 workspaces.')
-    parser.add_argument(
-        '--log-level',
-        choices=('debug', 'info', 'warning', 'error', 'critical'),
-        default='warning',
-        help='Logging level for stderr and syslog.')
+        help='If true, will add the icons of the open windows to the workspace'
+        ' names when organizing or renaming workspaces.')
     # The argparse argument group of the workspace group arguments.
     group_arg_group = parser.add_mutually_exclusive_group()
     group_arg_group.add_argument(
@@ -154,7 +151,8 @@ def main():
     i3_connection = i3ipc.Connection()
     group_context = _create_context_group_finder(args, i3_connection)
     controller = i3_workspace_groups.WorkspaceGroupsController(
-        i3_connection, group_context, args.dry_run)
+        i3_connection, group_context, args.window_icons,
+        args.window_icons_all_groups, args.renumber_workspaces, args.dry_run)
     try:
         if args.command == 'list-groups':
             print('\n'.join(controller.list_groups()))

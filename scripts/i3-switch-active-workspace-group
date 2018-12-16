@@ -23,14 +23,19 @@ function list_groups() {
 
 # The default group name is the empty string, so in order to make it clearer we
 # replace it with this string when presenting it to the user.
-DEFAULT_GROUP_ITEM='<span alpha="50%">(Default group)</span>'
+DEFAULT_GROUP_ITEM='<default>'
+# NOTE: This used to have a span tag for adding transparency (see commented line
+# below), but I removed it because Rofi has a bug where pango markup
+# is being matched in dmenu mode, which is confusing. See also:
+# https://github.com/DaveDavenport/rofi/issues/597
+# DEFAULT_GROUP_ITEM='<span alpha="50%">(Default group)</span>'
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
 if selected_group="$(list_groups |
   sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |
-  rofi -dmenu -i -p 'Switch to workspace group' -lines 10 -width 30 -markup-rows
+  rofi -dmenu -i -p 'Switch to workspace group' -lines 10 -width 30
 )"; then
   if [[ "${selected_group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
     selected_group=''

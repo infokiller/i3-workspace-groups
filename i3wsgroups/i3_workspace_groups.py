@@ -397,12 +397,13 @@ class WorkspaceGroupsController:
                 parsed_name['local_number'] = local_number
                 parsed_name['global_number'] = compute_global_number(
                     group_index, local_number)
+                dynamic_name = ''
                 # Add window icons to the active group if needed.
                 if self.add_window_icons_all_groups or (self.add_window_icons
                                                         and group_index == 0):
                     dynamic_name = icons.get_workspace_icons_representation(
                         workspace)
-                    parsed_name['dynamic_name'] = dynamic_name
+                parsed_name['dynamic_name'] = dynamic_name
                 new_name = create_workspace_name(**parsed_name)
                 self.send_i3_command('rename workspace "{}" to "{}"'.format(
                     workspace.name, new_name))

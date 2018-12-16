@@ -55,7 +55,6 @@ def main():
     cli.add_common_args(parser)
     cli.add_workspace_naming_args(parser)
     args = parser.parse_args()
-    print(args)
     i3_workspace_groups.init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
     autonamer = WorkspaceAutonamer(args.window_icons_all_groups,

@@ -254,6 +254,8 @@ function-naming-style=snake_case
 good-names=i,
            j,
            k,
+           e,
+           f,
            ex,
            fd,
            fp,

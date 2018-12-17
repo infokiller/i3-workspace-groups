@@ -67,11 +67,10 @@ def _create_args_parser() -> argparse.Namespace:
         'group, similar to i3\'s "workspace number" command').add_argument(
             'workspace_relative_number', type=int)
     subparsers.add_parser(
-        'move-to-number',
-        help='Move the focused container to the workspace with the provided '
-        'number in the focused group, similar to i3\'s "move container to '
-        'workspace" command').add_argument(
-            'workspace_relative_number', type=int)
+        'workspace-back-and-forth',
+        help='Focus on the last focused workspace, similar to i3\'s '
+        '"workspace back_and_forth" command. Needed to avoid some issues with '
+        'automatic renaming')
     subparsers.add_parser(
         'workspace-next',
         help='Focus on the next workspace in the focused group, similar to '
@@ -80,6 +79,16 @@ def _create_args_parser() -> argparse.Namespace:
         'workspace-prev',
         help='Focus on the prev workspace in the focused group, similar to '
         'i3\'s "workspace prev" command')
+    subparsers.add_parser(
+        'move-to-number',
+        help='Move the focused container to the workspace with the provided '
+        'number in the focused group, similar to i3\'s "move container to '
+        'workspace" command').add_argument(
+            'workspace_relative_number', type=int)
+    subparsers.add_parser(
+        'move-to-back-and-forth',
+        help='Move the focused container to the last focused workspace, '
+        'similar to i3\'s "move container to back_and_forth" command')
     subparsers.add_parser(
         'move-to-next',
         help='Move the focused container to the prev workspace in the focused '
@@ -160,12 +169,16 @@ def main():
             _print_workspaces(controller, args)
         elif args.command == 'workspace-number':
             controller.focus_workspace_number(args.workspace_relative_number)
-        elif args.command == 'move-to-number':
-            controller.move_to_workspace_number(args.workspace_relative_number)
+        elif args.command == 'workspace-back-and-forth':
+            controller.focus_workspace_back_and_forth()
         elif args.command == 'workspace-next':
             controller.focus_workspace_relative(+1)
         elif args.command == 'workspace-prev':
             controller.focus_workspace_relative(-1)
+        elif args.command == 'move-to-number':
+            controller.move_to_workspace_number(args.workspace_relative_number)
+        elif args.command == 'move-to-back-and-forth':
+            controller.move_workspace_back_and_forth()
         elif args.command == 'move-to-next':
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':

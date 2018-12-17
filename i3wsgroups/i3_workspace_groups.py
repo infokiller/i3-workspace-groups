@@ -2,6 +2,7 @@
 
 import collections
 import logging
+import os
 from typing import Dict, List, Optional
 
 import i3ipc
@@ -23,6 +24,8 @@ _LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
 _MAX_WORKSPACES_PER_GROUP = 100
 
 _SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
+
+_LAST_WORKSPACE_MARK = '_i3_groups_last_focused'
 
 # We use the workspace names to "store" metadata about the workspace, such as
 # the group it belongs to.
@@ -381,6 +384,24 @@ class WorkspaceGroupsController:
             if not reply[0]['success']:
                 logger.warning('i3 command error: %s', reply)
 
+    def focus_workspace(self, name: str) -> None:
+        focused_workspace = self.get_tree().find_focused().workspace()
+        self.send_i3_command('[con_id={}] mark "{}"'.format(
+            focused_workspace.id, _LAST_WORKSPACE_MARK))
+        self.send_i3_command(
+            'workspace --no-auto-back-and-forth  "{}"'.format(name))
+
+    def get_last_focused_workspace(self) -> Optional[i3ipc.Con]:
+        last_workspaces = self.get_tree().find_marked(_LAST_WORKSPACE_MARK)
+        if not last_workspaces:
+            logger.warning('Could not get last workspace from mark')
+            self.send_i3_command('workspace back_and_forth')
+            return None
+        if len(last_workspaces) > 1:
+            logger.warning('Multiple workspaces marked as the last one, using'
+                           'first one')
+        return last_workspaces[0]
+
     def organize_workspace_groups(
             self, group_to_monitor_workspaces: GroupToWorkspaces) -> None:
         group_to_all_workspaces = get_group_to_workspaces(
@@ -567,7 +588,7 @@ class WorkspaceGroupsController:
     def focus_workspace_number(self, target_local_number: int) -> None:
         target_workspace_name = self._get_workspace_name_from_context(
             target_local_number)
-        self.send_i3_command('workspace "{}"'.format(target_workspace_name))
+        self.focus_workspace(target_workspace_name)
 
     def move_to_workspace_number(self, target_local_number: int) -> None:
         target_workspace_name = self._get_workspace_name_from_context(
@@ -598,14 +619,33 @@ class WorkspaceGroupsController:
 
     def focus_workspace_relative(self, offset_from_current: int) -> None:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
-        self.send_i3_command('workspace --no-auto-back-and-forth "{}"'.format(
-            next_workspace.name))
+        self.focus_workspace(next_workspace.name)
+
+    def focus_workspace_back_and_forth(self) -> None:
+        last_workspace = self.get_last_focused_workspace()
+        if not last_workspace:
+            logger.warning('Falling back to i3\'s built in workspace '
+                           'back_and_forth')
+            self.send_i3_command('workspace back_and_forth')
+            return
+        self.focus_workspace(last_workspace.name)
 
     def move_workspace_relative(self, offset_from_current: int) -> None:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
         self.send_i3_command(
             'move --no-auto-back-and-forth container to workspace "{}"'.format(
                 next_workspace.name))
+
+    def move_workspace_back_and_forth(self) -> None:
+        last_workspace = self.get_last_focused_workspace()
+        if not last_workspace:
+            logger.warning('Falling back to i3\'s built in move workspace '
+                           'back_and_forth')
+            self.send_i3_command('move workspace back_and_forth')
+            return
+        self.send_i3_command(
+            'move --no-auto-back-and-forth container to workspace "{}"'.format(
+                last_workspace.name))
 
     def rename_focused_workspace(self, new_static_name: Optional[str]) -> None:
         group_to_workspaces = get_group_to_workspaces(

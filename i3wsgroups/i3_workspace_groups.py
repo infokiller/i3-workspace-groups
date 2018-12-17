@@ -25,7 +25,11 @@ _MAX_WORKSPACES_PER_GROUP = 100
 
 _SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
 
-_LAST_WORKSPACE_MARK = '_i3_groups_last_focused'
+LAST_WORKSPACE_MARK = '_i3_groups_last_focused'
+# We need to keep this as well so that we can set the last workspace when
+# subscribing to the workspace focus event of i3, which only triggers after the
+# workspace was focused.
+CURRENT_WORKSPACE_MARK = '_i3_groups_current_focused'
 
 # We use the workspace names to "store" metadata about the workspace, such as
 # the group it belongs to.
@@ -385,22 +389,31 @@ class WorkspaceGroupsController:
                 logger.warning('i3 command error: %s', reply)
 
     def focus_workspace(self, name: str) -> None:
-        focused_workspace = self.get_tree().find_focused().workspace()
-        self.send_i3_command('[con_id={}] mark "{}"'.format(
-            focused_workspace.id, _LAST_WORKSPACE_MARK))
         self.send_i3_command(
             'workspace --no-auto-back-and-forth  "{}"'.format(name))
+        updated_tree = self.get_tree(cached=False)
+        focused_workspace = updated_tree.find_focused().workspace()
+        self.set_focused_workspace(focused_workspace)
 
-    def get_last_focused_workspace(self) -> Optional[i3ipc.Con]:
-        last_workspaces = self.get_tree().find_marked(_LAST_WORKSPACE_MARK)
-        if not last_workspaces:
-            logger.warning('Could not get last workspace from mark')
-            self.send_i3_command('workspace back_and_forth')
+    def set_focused_workspace(self, workspace):
+        current_workspace = self.get_unique_marked_workspace(
+            CURRENT_WORKSPACE_MARK)
+        if current_workspace:
+            self.send_i3_command('[con_id={}] mark "{}"'.format(
+                current_workspace.id, LAST_WORKSPACE_MARK))
+        self.send_i3_command('[con_id={}] mark "{}"'.format(
+            workspace.id, CURRENT_WORKSPACE_MARK))
+
+    def get_unique_marked_workspace(self, mark) -> Optional[i3ipc.Con]:
+        workspaces = self.get_tree().find_marked(mark)
+        if not workspaces:
+            logger.warning('Didn\'t find workspaces with mark: %s', mark)
             return None
-        if len(last_workspaces) > 1:
-            logger.warning('Multiple workspaces marked as the last one, using'
-                           'first one')
-        return last_workspaces[0]
+        if len(workspaces) > 1:
+            logger.warning(
+                'Multiple workspaces marked with %s, using first '
+                'one', mark)
+        return workspaces[0]
 
     def organize_workspace_groups(
             self, group_to_monitor_workspaces: GroupToWorkspaces) -> None:
@@ -622,7 +635,7 @@ class WorkspaceGroupsController:
         self.focus_workspace(next_workspace.name)
 
     def focus_workspace_back_and_forth(self) -> None:
-        last_workspace = self.get_last_focused_workspace()
+        last_workspace = self.get_unique_marked_workspace(LAST_WORKSPACE_MARK)
         if not last_workspace:
             logger.warning('Falling back to i3\'s built in workspace '
                            'back_and_forth')
@@ -637,7 +650,7 @@ class WorkspaceGroupsController:
                 next_workspace.name))
 
     def move_workspace_back_and_forth(self) -> None:
-        last_workspace = self.get_last_focused_workspace()
+        last_workspace = self.get_unique_marked_workspace(LAST_WORKSPACE_MARK)
         if not last_workspace:
             logger.warning('Falling back to i3\'s built in move workspace '
                            'back_and_forth')

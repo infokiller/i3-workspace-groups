@@ -2,7 +2,6 @@
 
 import collections
 import logging
-import os
 from typing import Dict, List, Optional
 
 import i3ipc
@@ -399,6 +398,9 @@ class WorkspaceGroupsController:
         current_workspace = self.get_unique_marked_workspace(
             CURRENT_WORKSPACE_MARK)
         if current_workspace:
+            if current_workspace.id == workspace.id:
+                logger.info('Current workspace already set, not resetting it.')
+                return
             self.send_i3_command('[con_id={}] mark "{}"'.format(
                 current_workspace.id, LAST_WORKSPACE_MARK))
         self.send_i3_command('[con_id={}] mark "{}"'.format(

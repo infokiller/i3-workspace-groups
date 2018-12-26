@@ -2,6 +2,7 @@
 
 import collections
 import logging
+import logging.handlers
 from typing import Dict, List, Optional
 
 import i3ipc

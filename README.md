@@ -1,10 +1,26 @@
 # i3 Workspace Groups
 
-![Demo flow](./assets/demo.gif?raw=true)
-
 A Python library and set of command line tools for managing i3wm workspaces in groups
 that you define.
 I find this tool useful for managing a large number of workspaces in i3.
+
+![Demo flow](./assets/demo.gif?raw=true)
+
+## Table of Contents
+
+- [i3 Workspace Groups](#i3-workspace-groups)
+  - [Background](#background)
+  - [Overview](#overview)
+    - [Example walk through](#example-walk-through)
+    - [i3 config](#i3-config)
+    - [Limitations](#limitations)
+    - [Definitions](#definitions)
+      - [Active workspace](#active-workspace)
+      - [Active group](#active-group)
+      - [Focused group](#focused-group)
+      - [Default group](#default-group)
+  - [Installation](#installation)
+    - [Sway compatibility note](#sway-compatibility-note)
 
 ## Background
 
@@ -49,8 +65,8 @@ Say we start with the following workspaces:
 
 1. A workspace named "1" with cat videos from YouTube.
 2. A workspace named "2" with a news reader.
-2. A workspace named "3" with a photo editor.
-2. A workspace named "4" with an email client for work.
+3. A workspace named "3" with a photo editor.
+4. A workspace named "4" with an email client for work.
 
 An important thing to understand here is that every i3 workspace is always
 assigned to a single group. And since we haven't assigned any workspace to a
@@ -213,6 +229,7 @@ Then you should be able to run the command line tool
 There are also a few utility scripts provided that require
 [rofi](https://github.com/DaveDavenport/rofi) and which are useful for
 interactively managing the groups, using rofi as the UI. They include:
+
 - [`i3-assign-workspace-to-group`](scripts/i3-assign-workspace-to-group)
 - [`i3-focus-on-workspace`](scripts/i3-focus-on-workspace)
 - [`i3-move-to-workspace`](scripts/i3-move-to-workspace)

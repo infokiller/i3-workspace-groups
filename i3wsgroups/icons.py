@@ -72,10 +72,10 @@ DEFAULT_ICON = ''
 
 def get_window_icon(window: i3ipc.Con) -> str:
     for regex, icon in WINDOW_INSTANCE_REGEX_TO_ICON.items():
-        if regex.match(window.window_instance):
+        if window.window_instance and regex.match(window.window_instance):
             return icon
     for regex, icon in WINDOW_CLASS_REGEX_TO_ICON.items():
-        if regex.match(window.window_class):
+        if window.window_class and regex.match(window.window_class):
             return icon
     logger.info(
         'No icon specified for window with window class: "%s", instance: '

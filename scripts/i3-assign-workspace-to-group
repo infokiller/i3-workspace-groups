@@ -13,10 +13,33 @@ function command_exists() {
   type "$1" &> /dev/null
 }
 
+function list_groups() {
+  groups="$("${TOOL}" list-groups)"
+  if ! echo "${groups}" | grep -qE '^$'; then
+    echo ''
+  fi
+  echo "${groups}"
+}
+
+# The default group name is the empty string, so in order to make it clearer we
+# replace it with this string when presenting it to the user.
+DEFAULT_GROUP_ITEM='<default>'
+# NOTE: This used to have a span tag for adding transparency (see commented line
+# below), but I removed it because Rofi has a bug where pango markup
+# is being matched in dmenu mode, which is confusing. See also:
+# https://github.com/DaveDavenport/rofi/issues/597
+# DEFAULT_GROUP_ITEM='<span alpha="50%">(Default group)</span>'
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
-if group="$(rofi -dmenu -p 'Assign workspace to group' -lines 0 -width 30 -mesg '<span alpha="50%%">Leave empty for the default group</span>')"; then
+if group="$(list_groups |
+  sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |
+  rofi -dmenu -p 'Assign workspace to group' -lines 10 -width 30
+)"; then
+  if [[ "${group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
+    group=''
+  fi
   "${TOOL}" "$@" assign-workspace-to-group "${group}"
 else
   exit $?

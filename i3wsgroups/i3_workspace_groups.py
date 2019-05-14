@@ -410,7 +410,7 @@ class WorkspaceGroupsController:
     def get_unique_marked_workspace(self, mark) -> Optional[i3ipc.Con]:
         workspaces = self.get_tree().find_marked(mark)
         if not workspaces:
-            logger.warning('Didn\'t find workspaces with mark: %s', mark)
+            logger.info('Didn\'t find workspaces with mark: %s', mark)
             return None
         if len(workspaces) > 1:
             logger.warning(
@@ -640,8 +640,8 @@ class WorkspaceGroupsController:
     def focus_workspace_back_and_forth(self) -> None:
         last_workspace = self.get_unique_marked_workspace(LAST_WORKSPACE_MARK)
         if not last_workspace:
-            logger.warning('Falling back to i3\'s built in workspace '
-                           'back_and_forth')
+            logger.info('Falling back to i3\'s built in workspace '
+                        'back_and_forth')
             self.send_i3_command('workspace back_and_forth')
             return
         self.focus_workspace(last_workspace.name)
@@ -655,8 +655,8 @@ class WorkspaceGroupsController:
     def move_workspace_back_and_forth(self) -> None:
         last_workspace = self.get_unique_marked_workspace(LAST_WORKSPACE_MARK)
         if not last_workspace:
-            logger.warning('Falling back to i3\'s built in move workspace '
-                           'back_and_forth')
+            logger.info('Falling back to i3\'s built in move workspace '
+                        'back_and_forth')
             self.send_i3_command('move workspace back_and_forth')
             return
         self.send_i3_command(

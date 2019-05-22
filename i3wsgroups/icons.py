@@ -1,9 +1,6 @@
-import logging
-import os.path
-import re
 import collections
-
-from i3wsgroups import i3_workspace_groups
+import logging
+import re
 
 import i3ipc
 

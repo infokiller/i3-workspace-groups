@@ -65,6 +65,39 @@ GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
 logger = logging.getLogger(__name__)
 
 
+# pylint: disable=too-few-public-methods
+class WorkspaceDisplayMetadata:
+
+    def __init__(self, workspace_name: str, monitor_name: str,
+                 is_focused: bool):
+        self.workspace_name: str = workspace_name
+        self.monitor_name: str = monitor_name
+        self.is_focused: bool = is_focused
+
+    def __str__(self):
+        return str(self.__dict__)
+
+
+# pylint: disable=too-few-public-methods
+class WorkspaceGroupingMetadata:
+
+    # pylint: disable=too-many-arguments
+    def __init__(self,
+                 global_number: Optional[int] = None,
+                 group: str = '',
+                 static_name: str = '',
+                 dynamic_name: str = '',
+                 local_number: Optional[int] = None):
+        self.global_number: Optional[int] = global_number
+        self.group: str = group
+        self.static_name: str = static_name
+        self.dynamic_name: str = dynamic_name
+        self.local_number: Optional[int] = local_number
+
+    def __str__(self):
+        return str(self.__dict__)
+
+
 def init_logger(name: str) -> None:
     syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
     stdout_handler = logging.StreamHandler()
@@ -118,28 +151,8 @@ def is_recognized_name_format(workspace_name: str) -> bool:
     return True
 
 
-# pylint: disable=too-few-public-methods
-class WorkspaceMetadata:
-
-    # pylint: disable=too-many-arguments
-    def __init__(self,
-                 global_number=None,
-                 group='',
-                 static_name='',
-                 dynamic_name='',
-                 local_number=None):
-        self.global_number: Optional[int] = global_number
-        self.group: str = group
-        self.static_name: str = static_name
-        self.dynamic_name: str = dynamic_name
-        self.local_number: Optional[int] = local_number
-
-    def __str__(self):
-        return str(self.__dict__)
-
-
-def parse_workspace_name(workspace_name: str) -> WorkspaceMetadata:
-    result = WorkspaceMetadata()
+def parse_workspace_name(workspace_name: str) -> WorkspaceGroupingMetadata:
+    result = WorkspaceGroupingMetadata()
     if not is_recognized_name_format(workspace_name):
         result.static_name = sanitize_section_value(workspace_name)
         return result
@@ -211,7 +224,7 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
     return local_numbers
 
 
-def create_workspace_name(ws_metadata: WorkspaceMetadata) -> str:
+def create_workspace_name(ws_metadata: WorkspaceGroupingMetadata) -> str:
     sections = ['{}:'.format(ws_metadata.global_number), ws_metadata.group]
     need_prefix_colons = bool(ws_metadata.group)
     for section in ['static_name', 'dynamic_name', 'local_number']:
@@ -351,24 +364,28 @@ class WorkspaceGroupsController:
         self.tree = self.i3_connection.get_tree()
         return self.tree
 
-    def get_workspaces_metadata(
+    def get_workspaces_display_metadata(
             self, cached: bool = True) -> List[i3ipc.WorkspaceReply]:
         if self.workspaces_metadata and cached:
             return self.workspaces_metadata
-        self.workspaces_metadata = self.i3_connection.get_workspaces()
+        self.workspaces_metadata = []
+        for workspace in self.i3_connection.get_workspaces():
+            self.workspaces_metadata.append(
+                WorkspaceDisplayMetadata(workspace.name, workspace.output,
+                                         workspace.focused))
         return self.workspaces_metadata
 
     def _get_focused_monitor_name(self):
-        focused_outputs = set()
-        for workspace_metadata in self.get_workspaces_metadata():
-            if workspace_metadata.focused:
-                focused_outputs.add(workspace_metadata.output)
-        if not focused_outputs:
+        focused_monitors = set()
+        for ws_display_metadata in self.get_workspaces_display_metadata():
+            if ws_display_metadata.is_focused:
+                focused_monitors.add(ws_display_metadata.monitor_name)
+        if not focused_monitors:
             raise WorkspaceGroupsError('No focused workspaces')
-        if len(focused_outputs) > 1:
-            logger.warning('Focused workspaces detected in multiple outputs')
-        logger.debug('Focused outputs: %s', focused_outputs)
-        return next(iter(focused_outputs))
+        if len(focused_monitors) > 1:
+            logger.warning('Focused workspaces detected in multiple monitors')
+        logger.debug('Focused monitors: %s', focused_monitors)
+        return next(iter(focused_monitors))
 
     def get_monitor_workspaces(
             self, monitor_name: Optional[str] = None) -> List[i3ipc.Con]:
@@ -381,14 +398,15 @@ class WorkspaceGroupsController:
         for workspace in self.get_tree().workspaces():
             name_to_workspace[workspace.name] = workspace
         monitor_to_workspaces = collections.defaultdict(list)
-        for workspace_metadata in self.get_workspaces_metadata():
-            if workspace_metadata.name == _SCRATCHPAD_WORKSPACE_NAME:
+        for ws_display_metadata in self.get_workspaces_display_metadata():
+            ws_name = ws_display_metadata.workspace_name
+            if ws_name == _SCRATCHPAD_WORKSPACE_NAME:
                 continue
-            if workspace_metadata.name not in name_to_workspace:
-                logger.warning('Unknown workspace detected: %s',
-                               workspace_metadata.name)
-            workspace = name_to_workspace[workspace_metadata.name]
-            monitor_to_workspaces[workspace_metadata.output].append(workspace)
+            if ws_name not in name_to_workspace:
+                logger.warning('Unknown workspace detected: %s', ws_name)
+            workspace = name_to_workspace[ws_name]
+            monitor_to_workspaces[ws_display_metadata.monitor_name].append(
+                workspace)
         return monitor_to_workspaces
 
     def send_i3_command(self, command: str) -> None:
@@ -508,7 +526,7 @@ class WorkspaceGroupsController:
                     if global_number:
                         max_global_number = max(max_global_number,
                                                 global_number)
-            ws_metadata = WorkspaceMetadata(
+            ws_metadata = WorkspaceGroupingMetadata(
                 group=target_group, global_number=global_number, local_number=1)
             new_workspace_name = create_workspace_name(ws_metadata)
             self.send_i3_command('workspace "{}"'.format(new_workspace_name))
@@ -604,7 +622,7 @@ class WorkspaceGroupsController:
             if get_local_workspace_number(workspace) == target_local_number:
                 return workspace.name
         group_index = list(group_to_workspaces.keys()).index(context_group)
-        ws_metadata = WorkspaceMetadata(
+        ws_metadata = WorkspaceGroupingMetadata(
             group=context_group, local_number=target_local_number)
         ws_metadata.global_number = compute_global_number(
             group_index, target_local_number)

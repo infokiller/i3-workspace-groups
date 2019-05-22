@@ -179,7 +179,7 @@ bindsym $mod+Control+0 workspace number 10
   can make a mistake about the group assignment.
 - Every group can have up to a 100 workspaces by default.
 
-### Definitions
+### Concepts
 
 #### Active workspace
 

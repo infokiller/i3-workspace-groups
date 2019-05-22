@@ -8,19 +8,18 @@ I find this tool useful for managing many workspaces in i3.
 
 ## Table of Contents
 
-- [i3 Workspace Groups](#i3-workspace-groups)
-  - [Background](#background)
-  - [Overview](#overview)
-    - [Example walk through](#example-walk-through)
-    - [i3 config](#i3-config)
-    - [Limitations](#limitations)
-    - [Concepts](#concepts)
-      - [Active workspace](#active-workspace)
-      - [Active group](#active-group)
-      - [Focused group](#focused-group)
-      - [Default group](#default-group)
-  - [Installation](#installation)
-    - [Sway compatibility note](#sway-compatibility-note)
+- [Background](#background)
+- [Overview](#overview)
+  - [Example walk through](#example-walk-through)
+  - [i3 config](#i3-config)
+  - [Limitations](#limitations)
+  - [Concepts](#concepts)
+    - [Active workspace](#active-workspace)
+    - [Active group](#active-group)
+    - [Focused group](#focused-group)
+    - [Default group](#default-group)
+- [Installation](#installation)
+  - [Sway compatibility note](#sway-compatibility-note)
 
 ## Background
 

@@ -95,7 +95,7 @@ def sanitize_section_value(name: str) -> str:
     return maybe_remove_prefix_colons(sanitized_name)
 
 
-def is_valid_group_name(name: str) -> str:
+def is_valid_group_name(name: str) -> bool:
     return SECTIONS_DELIM not in name
 
 
@@ -118,44 +118,57 @@ def is_recognized_name_format(workspace_name: str) -> bool:
     return True
 
 
-def parse_workspace_name(workspace_name: str) -> dict:
-    result = {
-        'global_number': None,
-        'group': '',
-        'static_name': '',
-        'dynamic_name': '',
-        'local_number': None,
-    }
+# pylint: disable=too-few-public-methods
+class WorkspaceMetadata:
+
+    # pylint: disable=too-many-arguments
+    def __init__(self,
+                 global_number=None,
+                 group='',
+                 static_name='',
+                 dynamic_name='',
+                 local_number=None):
+        self.global_number: Optional[int] = global_number
+        self.group: str = group
+        self.static_name: str = static_name
+        self.dynamic_name: str = dynamic_name
+        self.local_number: Optional[int] = local_number
+
+    def __str__(self):
+        return str(self.__dict__)
+
+
+def parse_workspace_name(workspace_name: str) -> WorkspaceMetadata:
+    result = WorkspaceMetadata()
     if not is_recognized_name_format(workspace_name):
-        result['static_name'] = sanitize_section_value(workspace_name)
+        result.static_name = sanitize_section_value(workspace_name)
         return result
     sections = workspace_name.split(SECTIONS_DELIM)
-    result['global_number'] = parse_global_number_section(sections[0])
+    result.global_number = parse_global_number_section(sections[0])
     if sections[1]:
-        result['group'] = maybe_remove_suffix_colons(sections[1])
-    result['static_name'] = maybe_remove_prefix_colons(sections[2])
-    result['dynamic_name'] = maybe_remove_prefix_colons(sections[3])
+        result.group = maybe_remove_suffix_colons(sections[1])
+    result.static_name = maybe_remove_prefix_colons(sections[2])
+    result.dynamic_name = maybe_remove_prefix_colons(sections[3])
     if not sections[4]:
         return result
     # Don't fail on local number parsing errors, just ignore it.
     try:
-        result['local_number'] = int(maybe_remove_prefix_colons(sections[4]))
+        result.local_number = int(maybe_remove_prefix_colons(sections[4]))
     except ValueError:
         pass
     return result
 
 
 def get_local_workspace_number(workspace: i3ipc.Con) -> int:
-    parsing_result = parse_workspace_name(workspace.name)
-    local_number = parsing_result['local_number']
-    if local_number is None and parsing_result['global_number'] is not None:
-        local_number = global_number_to_local_number(
-            parsing_result['global_number'])
+    ws_metadata = parse_workspace_name(workspace.name)
+    local_number = ws_metadata.local_number
+    if local_number is None and ws_metadata.global_number is not None:
+        local_number = global_number_to_local_number(ws_metadata.global_number)
     return local_number
 
 
 def get_workspace_group(workspace: i3ipc.Con) -> str:
-    return parse_workspace_name(workspace.name)['group']
+    return parse_workspace_name(workspace.name).group
 
 
 def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
@@ -168,7 +181,7 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
     for workspace in all_workspaces:
         if workspace.name in monitor_workspace_names:
             continue
-        local_number = parse_workspace_name(workspace.name)['local_number']
+        local_number = parse_workspace_name(workspace.name).local_number
         if local_number is not None:
             other_monitors_local_numbers.add(local_number)
     logger.debug('Local numbers used by group in other monitors: %s',
@@ -188,8 +201,8 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
     else:
         last_used_workspace_number = 0
     for workspace in monitor_workspaces:
-        parsed_name = parse_workspace_name(workspace.name)
-        local_number = parsed_name['local_number']
+        ws_metadata = parse_workspace_name(workspace.name)
+        local_number = ws_metadata.local_number
         if local_number is None or (
                 local_number in other_monitors_local_numbers):
             local_number = last_used_workspace_number + 1
@@ -198,19 +211,18 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
     return local_numbers
 
 
-def create_workspace_name(
-        global_number: int, group: str, static_name: Optional[str],
-        dynamic_name: Optional[str], local_number: Optional[int]) -> str:
-    sections = ['{}:'.format(global_number), group]
-    need_prefix_colons = bool(group)
-    for section in [static_name, dynamic_name, local_number]:
-        if not section:
-            section = ''
+def create_workspace_name(ws_metadata: WorkspaceMetadata) -> str:
+    sections = ['{}:'.format(ws_metadata.global_number), ws_metadata.group]
+    need_prefix_colons = bool(ws_metadata.group)
+    for section in ['static_name', 'dynamic_name', 'local_number']:
+        value = getattr(ws_metadata, section)
+        if not value:
+            value = ''
         elif need_prefix_colons:
-            section = ':{}'.format(section)
+            value = ':{}'.format(value)
         else:
             need_prefix_colons = True
-        sections.append(str(section))
+        sections.append(str(value))
     return SECTIONS_DELIM.join(sections)
 
 
@@ -230,9 +242,9 @@ def global_number_to_local_number(global_number: int) -> int:
 def get_group_to_workspaces(workspaces: List[i3ipc.Con]) -> GroupToWorkspaces:
     group_to_workspaces = collections.OrderedDict()
     for workspace in workspaces:
-        parsed_name = parse_workspace_name(workspace.name)
-        group = parsed_name['group']
-        logger.debug('Workspace %s parsed as: %s', workspace.name, parsed_name)
+        ws_metadata = parse_workspace_name(workspace.name)
+        group = ws_metadata.group
+        logger.debug('Workspace %s parsed as: %s', workspace.name, ws_metadata)
         if group not in group_to_workspaces:
             group_to_workspaces[group] = []
         group_to_workspaces[group].append(workspace)
@@ -240,13 +252,13 @@ def get_group_to_workspaces(workspaces: List[i3ipc.Con]) -> GroupToWorkspaces:
 
 
 def is_reordered_workspace(name1, name2):
-    parsed_name1 = parse_workspace_name(name1)
-    parsed_name2 = parse_workspace_name(name2)
-    if parsed_name1['group'] != parsed_name2['group']:
+    ws1_metadata = parse_workspace_name(name1)
+    ws2_metadata = parse_workspace_name(name2)
+    if ws1_metadata.group != ws2_metadata.group:
         return False
-    if parsed_name1['local_number']:
-        return parsed_name1['local_number'] == parsed_name2['local_number']
-    return parsed_name1['static_name'] == parsed_name2['static_name']
+    if ws1_metadata.local_number:
+        return ws1_metadata.local_number == ws2_metadata.local_number
+    return ws1_metadata.static_name == ws2_metadata.static_name
 
 
 class WorkspaceGroupsError(Exception):
@@ -306,8 +318,10 @@ class NamedGroupContext:
         return group_to_workspaces[self.group_name][0]
 
 
+# pylint: disable=too-many-instance-attributes
 class WorkspaceGroupsController:
 
+    # pylint: disable=too-many-arguments
     def __init__(self,
                  i3_connection: i3ipc.Connection,
                  group_context,
@@ -429,10 +443,10 @@ class WorkspaceGroupsController:
                 workspaces, group_to_all_workspaces.get(group, []),
                 self.renumber_workspaces)
             for workspace, local_number in zip(workspaces, local_numbers):
-                parsed_name = parse_workspace_name(workspace.name)
-                parsed_name['group'] = group
-                parsed_name['local_number'] = local_number
-                parsed_name['global_number'] = compute_global_number(
+                ws_metadata = parse_workspace_name(workspace.name)
+                ws_metadata.group = group
+                ws_metadata.local_number = local_number
+                ws_metadata.global_number = compute_global_number(
                     group_index, local_number)
                 dynamic_name = ''
                 # Add window icons to the active group if needed.
@@ -440,8 +454,8 @@ class WorkspaceGroupsController:
                                                         and group_index == 0):
                     dynamic_name = icons.get_workspace_icons_representation(
                         workspace)
-                parsed_name['dynamic_name'] = dynamic_name
-                new_name = create_workspace_name(**parsed_name)
+                ws_metadata.dynamic_name = dynamic_name
+                new_name = create_workspace_name(ws_metadata)
                 self.send_i3_command('rename workspace "{}" to "{}"'.format(
                     workspace.name, new_name))
                 workspace.name = new_name
@@ -490,16 +504,13 @@ class WorkspaceGroupsController:
             for workspaces in group_to_workspaces.values():
                 for workspace in workspaces:
                     global_number = parse_workspace_name(
-                        workspace.name)['global_number']
+                        workspace.name).global_number
                     if global_number:
                         max_global_number = max(max_global_number,
                                                 global_number)
-            new_workspace_name = create_workspace_name(
-                max_global_number + 1,
-                target_group,
-                static_name=None,
-                dynamic_name=None,
-                local_number=1)
+            ws_metadata = WorkspaceMetadata(
+                group=target_group, global_number=global_number, local_number=1)
+            new_workspace_name = create_workspace_name(ws_metadata)
             self.send_i3_command('workspace "{}"'.format(new_workspace_name))
             for workspace in self.get_tree(cached=False):
                 if workspace.name == new_workspace_name:
@@ -593,13 +604,11 @@ class WorkspaceGroupsController:
             if get_local_workspace_number(workspace) == target_local_number:
                 return workspace.name
         group_index = list(group_to_workspaces.keys()).index(context_group)
-        global_number = compute_global_number(group_index, target_local_number)
-        return create_workspace_name(
-            global_number,
-            context_group,
-            static_name='',
-            dynamic_name='',
-            local_number=target_local_number)
+        ws_metadata = WorkspaceMetadata(
+            group=context_group, local_number=target_local_number)
+        ws_metadata.global_number = compute_global_number(
+            group_index, target_local_number)
+        return create_workspace_name(ws_metadata)
 
     def focus_workspace_number(self, target_local_number: int) -> None:
         target_workspace_name = self._get_workspace_name_from_context(
@@ -670,8 +679,8 @@ class WorkspaceGroupsController:
         # workspace has a global number.
         self.organize_workspace_groups(group_to_workspaces)
         focused_workspace = self.get_tree().find_focused().workspace()
-        parsed_name = parse_workspace_name(focused_workspace.name)
-        parsed_name['static_name'] = new_static_name
-        new_global_name = create_workspace_name(**parsed_name)
+        ws_metadata = parse_workspace_name(focused_workspace.name)
+        ws_metadata.static_name = new_static_name
+        new_global_name = create_workspace_name(ws_metadata)
         self.send_i3_command('rename workspace "{}" to "{}"'.format(
             focused_workspace.name, new_global_name))

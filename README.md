@@ -2,7 +2,7 @@
 
 A Python library and set of command line tools for managing i3wm workspaces in groups
 that you define.
-I find this tool useful for managing a large number of workspaces in i3.
+I find this tool useful for managing many workspaces in i3.
 
 ![Demo flow](./assets/demo.gif?raw=true)
 
@@ -14,7 +14,7 @@ I find this tool useful for managing a large number of workspaces in i3.
     - [Example walk through](#example-walk-through)
     - [i3 config](#i3-config)
     - [Limitations](#limitations)
-    - [Definitions](#definitions)
+    - [Concepts](#concepts)
       - [Active workspace](#active-workspace)
       - [Active group](#active-group)
       - [Focused group](#focused-group)
@@ -37,7 +37,7 @@ few issues, for example:
 - Finding a free workspace for a new window (that can also be reached with my
   keybindings)
 
-This has lead me to create the https://github.com/infokiller/i3-workspace-groups
+This has led me to create the https://github.com/infokiller/i3-workspace-groups
 project, which enables you to define and manage groups of workspaces, each with
 their own "namespace", and switch between them.
 
@@ -54,24 +54,24 @@ The main operations that the CLI tool `i3-workspace-groups` supports are:
 
 The tools provided use i3 workspace names to store and read the group for each
 workspace. For example, if a user assigns the workspace "mail" to the group
-"work", it will be renamed to "mail:word".
+"work", it will be renamed to "work:mail".
 
 ### Example walk through
 
 NOTE: This walk through assumes that you configured keybindings like the
 [example i3 config](#i3-config).
 
-Say we start with the following workspaces:
+Say we start with the following workspace names:
 
-1. A workspace named "1" with cat videos from YouTube.
-2. A workspace named "2" with a news reader.
-3. A workspace named "3" with a photo editor.
-4. A workspace named "4" with an email client for work.
+1. "1" with cat videos from YouTube.
+2. "2" with a news reader.
+3. "3" with a photo editor.
+4. "4" with an email client for work.
 
 An important thing to understand here is that every i3 workspace is always
 assigned to a single group. And since we haven't assigned any workspace to a
 group yet, all the workspaces are implicitly in the
-[default group](#default-group), which is labeled with the string "Ɗ".
+[default group](#default-group), which is labeled with the string "<default>".
 
 After a few hours of leisure time, you decide to do some work, which requires
 opening a few windows on a few workspaces. In order to create a new group, first
@@ -81,12 +81,12 @@ enter. You will then notice that the workspace name will change in i3bar to
 "work:4".
 Then, you press `Super+g` in order to switch the [active
 group](#active-group). You will be shown a list of existing groups, which will
-now be "work" and "Ɗ" (for the default group).
+now be "work" and "<default>".
 You should now see your workspaces in i3bar ordered as following:
-"work:4", "Ɗ:1", "Ɗ:2", "Ɗ:3".
+"work:4", "1", "2", "3".
 What happened here?
 When you switched to the "work" group, the first thing that the tool did was to
-move all the workspaces in the work group (only "work:email") to be in the
+move all the workspaces in the work group (only "work:mail") to be in the
 beginning of the workspace list. Then, it renamed the workspaces in the default
 group to include the group name, so that they can be
 differentiated from other workspaces in the "work" group with the same name.
@@ -94,7 +94,7 @@ differentiated from other workspaces in the "work" group with the same name.
 Then, you decide that you want to open a new terminal window in a new workspace.
 So you press `Super+2`, which will move you to a new workspace named "work:2".
 Note that although there is already a workspace with the name "2" in the default
-group (now shown as "Ɗ:2" in the workspace list), using `Super+2` actually takes
+group (now shown as "2" in the workspace list), using `Super+2` actually takes
 you to a new empty workspace in the group "work".
 
 After some time working, you become lazy and you want to get back to cat videos,
@@ -174,12 +174,9 @@ bindsym $mod+Control+0 workspace number 10
 
 ### Limitations
 
-- Multi monitor support is not well supported yet, but planned (see issue #7).
 - Workspace names are used for storing the group, so if another tool changes a
   workspace name without preserving the format that this project uses, the tool
   can make a mistake about the group assignment.
-- Workspace names must not include colons (`:`).
-- Group names must not include colons (`:`) or start with a digit.
 - Every group can have up to a 100 workspaces by default.
 
 ### Definitions
@@ -201,8 +198,8 @@ This group will normally contain workspaces related to the task you're doing at
 the time it's active. When you want to work on another task, you can switch the
 active group.
 Workspaces that are not in the active group can still be interacted with, but
-some of the commands provided are designed to make it easier to interact with
-the workspaces of the active group.
+some commands provided are designed to make it easier to interact with the
+workspaces of the active group.
 
 NOTE: In a multi-monitor setup, there is an active group per monitor (which can
 be the same, depending on the group of the active workspace in that monitor).
@@ -214,7 +211,7 @@ The group of the focused workspace.
 #### Default group
 
 The group of workspaces that were not assigned to a group by the user. This
-group is usually displayed as "Ɗ".
+group is usually displayed as "<default>".
 
 ## Installation
 

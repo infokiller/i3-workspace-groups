@@ -434,9 +434,9 @@ class WorkspaceGroupsController:
             if current_workspace.id == workspace.id:
                 logger.info('Current workspace already set, not resetting it.')
                 return
-            self.send_i3_command('[con_id={}] mark "{}"'.format(
+            self.send_i3_command('[con_id={}] mark --add "{}"'.format(
                 current_workspace.id, LAST_WORKSPACE_MARK))
-        self.send_i3_command('[con_id={}] mark "{}"'.format(
+        self.send_i3_command('[con_id={}] mark --add "{}"'.format(
             workspace.id, CURRENT_WORKSPACE_MARK))
 
     def get_unique_marked_workspace(self, mark) -> Optional[i3ipc.Con]:

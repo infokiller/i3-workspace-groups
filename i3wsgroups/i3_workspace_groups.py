@@ -692,7 +692,7 @@ class WorkspaceGroupsController:
             'move --no-auto-back-and-forth container to workspace "{}"'.format(
                 last_workspace.name))
 
-    def rename_focused_workspace(self, new_static_name: Optional[str]) -> None:
+    def rename_focused_workspace(self, new_static_name: str) -> None:
         group_to_workspaces = get_group_to_workspaces(
             self.get_monitor_workspaces())
         # Organize the workspace groups to ensure they are consistent and every

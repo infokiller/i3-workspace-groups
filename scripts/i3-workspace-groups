@@ -20,7 +20,7 @@ _LIST_WORKSPACES_FIELDS_HELP = (
 logger = i3_workspace_groups.logger
 
 
-def _create_args_parser() -> argparse.Namespace:
+def _create_args_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Control i3 workspace groups.')
     cli.add_common_args(parser)
     cli.add_workspace_naming_args(parser)
@@ -151,6 +151,7 @@ def _print_workspaces(controller, args):
     print('\n'.join('\t'.join(str(e) for e in row) for row in table))
 
 
+# pylint: disable=too-many-branches
 def main():
     args = _create_args_parser().parse_args()
     i3_workspace_groups.init_logger(os.path.basename(__file__))

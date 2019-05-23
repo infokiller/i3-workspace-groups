@@ -9,7 +9,7 @@ with open(README_PATH) as f:
 
 setuptools.setup(
     name='i3-workspace-groups',
-    version='0.3.1',
+    version='0.3.2',
     description='Manage i3wm workspaces in groups you control',
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",

@@ -1,12 +1,13 @@
 import collections
 import logging
 import re
+from typing import Dict
 
 import i3ipc
 
 logger = logging.getLogger(__name__)
 
-WINDOW_CLASS_REGEX_TO_ICON = {
+WINDOW_CLASS_REGEX_STR_TO_ICON = {
     'kitty': '',
     'Termite': '',
     'URxvt': '',
@@ -36,10 +37,10 @@ WINDOW_CLASS_REGEX_TO_ICON = {
 }
 
 WINDOW_CLASS_REGEX_TO_ICON = {
-    re.compile(r): icon for r, icon in WINDOW_CLASS_REGEX_TO_ICON.items()
+    re.compile(r): icon for r, icon in WINDOW_CLASS_REGEX_STR_TO_ICON.items()
 }
 
-WINDOW_INSTANCE_REGEX_TO_ICON = {
+WINDOW_INSTANCE_REGEX_STR_TO_ICON = {
     'trello': '',
     r'.*\bwhatsapp\b.*': '',
     'gmail': '',
@@ -51,7 +52,8 @@ WINDOW_INSTANCE_REGEX_TO_ICON = {
 }
 
 WINDOW_INSTANCE_REGEX_TO_ICON = {
-    re.compile(r): icon for r, icon in WINDOW_INSTANCE_REGEX_TO_ICON.items()
+    re.compile(r): icon
+    for r, icon in WINDOW_INSTANCE_REGEX_STR_TO_ICON.items()
 }
 
 # Other relevant glyphs:

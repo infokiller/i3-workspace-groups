@@ -172,7 +172,7 @@ def parse_workspace_name(workspace_name: str) -> WorkspaceGroupingMetadata:
     return result
 
 
-def get_local_workspace_number(workspace: i3ipc.Con) -> int:
+def get_local_workspace_number(workspace: i3ipc.Con) -> Optional[int]:
     ws_metadata = parse_workspace_name(workspace.name)
     local_number = ws_metadata.local_number
     if local_number is None and ws_metadata.global_number is not None:
@@ -375,7 +375,7 @@ class WorkspaceGroupsController:
                                          workspace.focused))
         return self.workspaces_metadata
 
-    def _get_focused_monitor_name(self):
+    def _get_focused_monitor_name(self) -> str:
         focused_monitors = set()
         for ws_display_metadata in self.get_workspaces_display_metadata():
             if ws_display_metadata.is_focused:
@@ -527,7 +527,9 @@ class WorkspaceGroupsController:
                         max_global_number = max(max_global_number,
                                                 global_number)
             ws_metadata = WorkspaceGroupingMetadata(
-                group=target_group, global_number=global_number, local_number=1)
+                group=target_group,
+                global_number=max_global_number + 1,
+                local_number=1)
             new_workspace_name = create_workspace_name(ws_metadata)
             self.send_i3_command('workspace "{}"'.format(new_workspace_name))
             for workspace in self.get_tree(cached=False):

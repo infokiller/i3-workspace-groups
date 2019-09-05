@@ -101,6 +101,9 @@ def _create_args_parser() -> argparse.ArgumentParser:
         help='Similar to i3\'s "renamed workspace" command, but only changes '
         'the name of the workspace within the group, while preserving its '
         'group assignment').add_argument('new_name')
+    subparsers.add_parser(
+        'renumber-workspace',
+        help='Change local number of workspace').add_argument('new_number', type=int)
     switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
         help='Switches the active group to the one provided.')
@@ -185,6 +188,8 @@ def main():
             controller.move_workspace_relative(-1)
         elif args.command == 'rename-workspace':
             controller.rename_focused_workspace(args.new_name)
+        elif args.command == 'renumber-workspace':
+            controller.renumber_focused_workspace(args.new_number)
         elif args.command == 'switch-active-group':
             controller.switch_active_group(args.group,
                                            args.focused_monitor_only)

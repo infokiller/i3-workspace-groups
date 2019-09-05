@@ -704,3 +704,16 @@ class WorkspaceGroupsController:
         new_global_name = create_workspace_name(ws_metadata)
         self.send_i3_command('rename workspace "{}" to "{}"'.format(
             focused_workspace.name, new_global_name))
+
+    def renumber_focused_workspace(self, new_local_number: int) -> None:
+        group_to_workspaces = get_group_to_workspaces(
+            self.get_monitor_workspaces())
+        # Organize the workspace groups to ensure they are consistent and every
+        # workspace has a global number.
+        self.organize_workspace_groups(group_to_workspaces)
+        focused_workspace = self.get_tree().find_focused().workspace()
+        ws_metadata = parse_workspace_name(focused_workspace.name)
+        ws_metadata.local_number = new_local_number
+        new_global_name = create_workspace_name(ws_metadata)
+        self.send_i3_command('rename workspace "{}" to "{}"'.format(
+            focused_workspace.name, new_global_name))

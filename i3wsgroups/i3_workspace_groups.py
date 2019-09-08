@@ -416,9 +416,9 @@ class WorkspaceGroupsController:
             log_prefix = 'Sending'
         logger.info("%s i3 command: '%s'", log_prefix, command)
         if not self.dry_run:
-            reply = self.i3_connection.command(command)
-            if not reply[0]['success']:
-                logger.warning('i3 command error: %s', reply)
+            reply = self.i3_connection.command(command)[0]
+            if not reply.success:
+                logger.warning('i3 command error: %s', reply.error)
 
     def focus_workspace(self, name: str) -> None:
         self.send_i3_command(

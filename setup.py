@@ -28,7 +28,7 @@ setuptools.setup(
     ],
     keywords='i3 i3wm extensions add-ons',
     packages=setuptools.find_packages(),
-    install_requires=['i3ipc < 2'],
+    install_requires=['i3ipc >= 2, < 3'],
     scripts=[
         'scripts/i3-assign-workspace-to-group',
         'scripts/i3-autoname-workspaces',

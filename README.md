@@ -118,9 +118,9 @@ strip_workspace_numbers yes
 set $exec_i3_groups exec --no-startup-id i3-workspace-groups
 
 # Switch active workspace group
-bindcode $mod+g exec --no-startup-id i3-switch-active-workspace-group
+bindsym $mod+g exec --no-startup-id i3-switch-active-workspace-group
 # Move workspace to another group
-bindcode $mod+Shift+g exec --no-startup-id i3-assign-workspace-to-group
+bindsym $mod+Shift+g exec --no-startup-id i3-assign-workspace-to-group
 
 bindsym $mod+1 $exec_i3_groups workspace-number 1
 bindsym $mod+2 $exec_i3_groups workspace-number 2
@@ -145,14 +145,14 @@ bindsym $mod+Shift+9 $exec_i3_groups move-to-number 9
 bindsym $mod+Shift+0 $exec_i3_groups move-to-number 10
 
 # Switch to previous workspace in group.
-bindcode $mod+p $exec_i3_groups workspace-prev
+bindsym $mod+p $exec_i3_groups workspace-prev
 # Switch to next workspace in group.
-bindcode $mod+n $exec_i3_groups workspace-next
+bindsym $mod+n $exec_i3_groups workspace-next
 
 # Move to previous workspace in group.
-bindcode $mod+Shift+p $exec_i3_groups move-to-prev
+bindsym $mod+Shift+p $exec_i3_groups move-to-prev
 # Move to next workspace in group.
-bindcode $mod+Shift+n $exec_i3_groups move-to-next
+bindsym $mod+Shift+n $exec_i3_groups move-to-next
 ```
 
 I also recommend keeping keybindings for the i3 built in workspace navigation

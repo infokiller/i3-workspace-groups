@@ -404,6 +404,7 @@ class WorkspaceGroupsController:
                 continue
             if ws_name not in name_to_workspace:
                 logger.warning('Unknown workspace detected: %s', ws_name)
+                continue
             workspace = name_to_workspace[ws_name]
             monitor_to_workspaces[ws_display_metadata.monitor_name].append(
                 workspace)

@@ -52,8 +52,10 @@ class WorkspaceAutonamer:
         if event.change != 'focus':
             return
         controller = self.create_controller(i3_connection)
-        focused_workspace = controller.get_tree().find_focused().workspace()
-        controller.set_focused_workspace(focused_workspace)
+        group_to_workspaces = i3_workspace_groups.get_group_to_workspaces(
+            controller.get_monitor_workspaces())
+        controller.organize_workspace_groups(group_to_workspaces)
+        controller.set_focused_workspace(event.current)
 
 
 def main():

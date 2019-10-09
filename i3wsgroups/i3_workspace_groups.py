@@ -331,7 +331,7 @@ class NamedGroupContext:
         return group_to_workspaces[self.group_name][0]
 
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes,too-many-public-methods
 class WorkspaceGroupsController:
 
     # pylint: disable=too-many-arguments
@@ -363,6 +363,22 @@ class WorkspaceGroupsController:
             return self.tree
         self.tree = self.i3_connection.get_tree()
         return self.tree
+
+    def get_workspaces(self) -> List[i3ipc.Con]:
+        name_to_workspace = {}
+        for workspace in self.get_tree().workspaces():
+            name_to_workspace[workspace.name] = workspace
+        workspaces = []
+        for ws_display_metadata in self.get_workspaces_display_metadata():
+            ws_name = ws_display_metadata.workspace_name
+            if ws_name == _SCRATCHPAD_WORKSPACE_NAME:
+                continue
+            if ws_name not in name_to_workspace:
+                logger.warning('Unknown workspace detected: %s', ws_name)
+                continue
+            workspace = name_to_workspace[ws_name]
+            workspaces.append(workspace)
+        return workspaces
 
     def get_workspaces_display_metadata(
             self, cached: bool = True) -> List[i3ipc.WorkspaceReply]:
@@ -478,9 +494,13 @@ class WorkspaceGroupsController:
                     workspace.name, new_name))
                 workspace.name = new_name
 
-    def list_groups(self) -> List[str]:
-        group_to_workspaces = get_group_to_workspaces(
-            self.get_monitor_workspaces())
+    def list_groups(self, monitor_only: bool = True) -> List[str]:
+        workspaces = []
+        if monitor_only:
+            workspaces = self.get_monitor_workspaces()
+        else:
+            workspaces = self.get_workspaces()
+        group_to_workspaces = get_group_to_workspaces(workspaces)
         # If no context group specified, list all groups.
         if not self.group_context:
             return list(group_to_workspaces.keys())
@@ -489,9 +509,15 @@ class WorkspaceGroupsController:
                                               group_to_workspaces)
         ]
 
-    def list_workspaces(self, focused_only: bool = False) -> List[i3ipc.Con]:
-        group_to_workspaces = get_group_to_workspaces(
-            self.get_monitor_workspaces())
+    def list_workspaces(self,
+                        focused_only: bool = False,
+                        monitor_only: bool = True) -> List[i3ipc.Con]:
+        workspaces = []
+        if monitor_only:
+            workspaces = self.get_monitor_workspaces()
+        else:
+            workspaces = self.get_workspaces()
+        group_to_workspaces = get_group_to_workspaces(workspaces)
         # If no context group specified, return workspaces from all groups.
         if not self.group_context:
             group_workspaces = sum(

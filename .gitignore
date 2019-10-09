@@ -105,6 +105,7 @@ venv.bak/
 .mypy_cache/
 
 # pytype
+.pytype
 pytype_output/
 
 # pyre

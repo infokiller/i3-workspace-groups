@@ -17,7 +17,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
 mesg=()
-if current_name="$("${TOOL}" list-workspaces --fields static_name --focused-only)"; then
+if current_name="$("${TOOL}" list-workspaces --monitor-only --fields static_name --focused-only)"; then
   mesg[1]='-mesg'
   mesg[2]="$(printf '<span alpha="50%%">Current name: "%s"</span>' "${current_name}")"
 fi

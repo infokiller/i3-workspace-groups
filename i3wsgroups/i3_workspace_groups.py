@@ -132,8 +132,8 @@ def is_valid_group_name(name: str) -> bool:
     return SECTIONS_DELIM not in name
 
 
-def parse_global_number_section(
-        global_number_section: Optional[str]) -> Optional[int]:
+def parse_global_number_section(global_number_section: Optional[str]
+                               ) -> Optional[int]:
     if not global_number_section:
         return None
     return int(maybe_remove_suffix_colons(global_number_section))
@@ -364,24 +364,8 @@ class WorkspaceGroupsController:
         self.tree = self.i3_connection.get_tree()
         return self.tree
 
-    def get_workspaces(self) -> List[i3ipc.Con]:
-        name_to_workspace = {}
-        for workspace in self.get_tree().workspaces():
-            name_to_workspace[workspace.name] = workspace
-        workspaces = []
-        for ws_display_metadata in self.get_workspaces_display_metadata():
-            ws_name = ws_display_metadata.workspace_name
-            if ws_name == _SCRATCHPAD_WORKSPACE_NAME:
-                continue
-            if ws_name not in name_to_workspace:
-                logger.warning('Unknown workspace detected: %s', ws_name)
-                continue
-            workspace = name_to_workspace[ws_name]
-            workspaces.append(workspace)
-        return workspaces
-
-    def get_workspaces_display_metadata(
-            self, cached: bool = True) -> List[i3ipc.WorkspaceReply]:
+    def get_workspaces_display_metadata(self, cached: bool = True
+                                       ) -> List[i3ipc.WorkspaceReply]:
         if self.workspaces_metadata and cached:
             return self.workspaces_metadata
         self.workspaces_metadata = []
@@ -403,8 +387,11 @@ class WorkspaceGroupsController:
         logger.debug('Focused monitors: %s', focused_monitors)
         return next(iter(focused_monitors))
 
-    def get_monitor_workspaces(
-            self, monitor_name: Optional[str] = None) -> List[i3ipc.Con]:
+    def get_all_workspaces(self) -> List[i3ipc.Con]:
+        return sum(list(self._get_monitor_to_workspaces().values()), [])
+
+    def get_monitor_workspaces(self, monitor_name: Optional[str] = None
+                              ) -> List[i3ipc.Con]:
         if not monitor_name:
             monitor_name = self._get_focused_monitor_name()
         return self._get_monitor_to_workspaces()[monitor_name]
@@ -467,8 +454,9 @@ class WorkspaceGroupsController:
                 'one', mark)
         return workspaces[0]
 
-    def organize_workspace_groups(
-            self, group_to_monitor_workspaces: GroupToWorkspaces) -> None:
+    def organize_workspace_groups(self,
+                                  group_to_monitor_workspaces: GroupToWorkspaces
+                                 ) -> None:
         group_to_all_workspaces = get_group_to_workspaces(
             self.get_tree().workspaces())
         for group_index, (group, workspaces) in enumerate(
@@ -500,7 +488,7 @@ class WorkspaceGroupsController:
         if monitor_only:
             workspaces = self.get_monitor_workspaces()
         else:
-            workspaces = self.get_workspaces()
+            workspaces = self.get_all_workspaces()
         group_to_workspaces = get_group_to_workspaces(workspaces)
         # If no context group specified, list all groups.
         if not self.group_context:
@@ -517,7 +505,7 @@ class WorkspaceGroupsController:
         if monitor_only:
             workspaces = self.get_monitor_workspaces()
         else:
-            workspaces = self.get_workspaces()
+            workspaces = self.get_all_workspaces()
         group_to_workspaces = get_group_to_workspaces(workspaces)
         # If no context group specified, return workspaces from all groups.
         if not self.group_context:

@@ -4,6 +4,10 @@ channels:
   - defaults
 dependencies:
   - python=3.6
+  - pylint
+  - yapf
   - pip
   - pip:
     - i3ipc
+    - pytype
+    - pyright

@@ -48,8 +48,12 @@ def _create_args_parser() -> argparse.ArgumentParser:
     group_arg_group.add_argument('--group-name')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
-    subparsers.add_parser(
+    list_groups_parser = subparsers.add_parser(
         'list-groups', help='List the groups of the current workspaces.')
+    list_groups_parser.add_argument(
+        '--monitor-only',
+        action='store_true',
+        help='List only workspaces on the current monitor.')
     list_workspaces_parser = subparsers.add_parser(
         'list-workspaces', help='List workspaces and their group.')
     list_workspaces_parser.add_argument(
@@ -60,6 +64,10 @@ def _create_args_parser() -> argparse.ArgumentParser:
         '--focused-only',
         action='store_true',
         help='List only the focused workspace in the given group context.')
+    list_workspaces_parser.add_argument(
+        '--monitor-only',
+        action='store_true',
+        help='List only workspaces on the current monitor.')
     subparsers.add_parser(
         'workspace-number',
         help='Focus on the workspace with the provided number in the focused '
@@ -146,7 +154,7 @@ def _print_workspaces(controller, args):
             sys.exit('Invalid field: "{}". Valid fields: {}'.format(
                 field, _LIST_WORKSPACES_FIELDS))
     table = []
-    for workspace in controller.list_workspaces(args.focused_only):
+    for workspace in controller.list_workspaces(args.focused_only, args.monitor_only):
         row = []
         for field in fields:
             row.append(_get_workspace_field(workspace, field))
@@ -167,7 +175,7 @@ def main():
         args.window_icons_all_groups, args.renumber_workspaces, args.dry_run)
     try:
         if args.command == 'list-groups':
-            print('\n'.join(controller.list_groups()))
+            print('\n'.join(controller.list_groups(args.monitor_only)))
         elif args.command == 'list-workspaces':
             _print_workspaces(controller, args)
         elif args.command == 'workspace-number':

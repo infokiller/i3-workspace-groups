@@ -384,7 +384,7 @@ class WorkspaceGroupsController:
 
     def get_monitor_workspaces(self, monitor_name: Optional[str] = None
                               ) -> List[i3ipc.Con]:
-        if not monitor_name:
+        if monitor_name is None:
             monitor_name = self._get_focused_monitor_name()
         return self._get_monitor_to_workspaces()[monitor_name]
 
@@ -581,8 +581,7 @@ class WorkspaceGroupsController:
             logger.debug(
                 'Non focused monitor %s has workspaces in the group "%s", '
                 'switching to it.', monitor, target_group)
-            self.switch_monitor_active_group(
-                get_group_to_workspaces(workspaces), target_group)
+            self.switch_monitor_active_group(monitor, target_group)
 
     def assign_workspace_to_group(self, target_group: str) -> None:
         if not is_valid_group_name(target_group):

@@ -56,6 +56,10 @@ class WorkspaceAutonamer:
         logger.debug('Got workspace event with change: %s', event.change)
         if event.change != 'focus':
             return
+        # We must update the workspace names because the workspace focus change
+        # may be due to navigating away from an empty workspace that was the
+        # only one in the active group. In that case, the next group becomes
+        # active, so the icons should be restored to the workspace names.
         controller = self.update_workspace_names(i3_connection)
         controller.set_focused_workspace(event.current)
 

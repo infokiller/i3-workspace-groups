@@ -145,14 +145,14 @@ bindsym $mod+Shift+9 $exec_i3_groups move-to-number 9
 bindsym $mod+Shift+0 $exec_i3_groups move-to-number 10
 
 # Switch to previous workspace in group.
-bindsym $mod+p $exec_i3_groups workspace-prev
+bindsym $mod+p workspace prev
 # Switch to next workspace in group.
-bindsym $mod+n $exec_i3_groups workspace-next
+bindsym $mod+n workspace next
 
 # Move to previous workspace in group.
-bindsym $mod+Shift+p $exec_i3_groups move-to-prev
+bindsym $mod+Shift+p move container to workspace prev
 # Move to next workspace in group.
-bindsym $mod+Shift+n $exec_i3_groups move-to-next
+bindsym $mod+Shift+n move container to workspace next
 ```
 
 I also recommend keeping keybindings for the i3 built in workspace navigation
@@ -176,7 +176,7 @@ bindsym $mod+Control+0 workspace number 10
 - Workspace names are used for storing the group, so if another tool changes a
   workspace name without preserving the format that this project uses, the tool
   can make a mistake about the group assignment.
-- Every group can have up to a 100 workspaces by default.
+- By default, every monitor can have up to 100 groups, each containing up to 100 workspaces.
 
 ### Concepts
 
@@ -188,7 +188,7 @@ one that appears first in the workspace list in i3bar (by default the leftmost
 one).
 
 NOTE: In a multi-monitor setup, there is an active workspace per monitor.
-NOTE: The primary workspace is not affected by whether its focused or not.
+NOTE: The active workspace is not affected by whether its focused or not.
 
 #### Active group
 

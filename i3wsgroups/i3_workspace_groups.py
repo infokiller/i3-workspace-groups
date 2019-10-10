@@ -3,7 +3,7 @@
 import collections
 import logging
 import logging.handlers
-from typing import Dict, List, Optional
+from typing import Set, Dict, List, Optional
 
 import i3ipc
 
@@ -185,32 +185,42 @@ def get_workspace_group(workspace: i3ipc.Con) -> str:
     return parse_workspace_name(workspace.name).group
 
 
-def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
-                          all_workspaces: List[i3ipc.Con],
-                          renumber_workspaces: bool) -> List[int]:
-    monitor_workspace_ids = set()
-    for workspace in monitor_workspaces:
-        monitor_workspace_ids.add(workspace.id)
+def get_used_local_numbers(workspaces: List[i3ipc.Con])-> Set[int]:
     used_local_numbers = set()
-    for workspace in all_workspaces:
-        if workspace.id in monitor_workspace_ids:
-            continue
+    for workspace in workspaces:
         local_number = parse_workspace_name(workspace.name).local_number
         if local_number is not None:
             used_local_numbers.add(local_number)
+    return used_local_numbers
+
+
+def get_lowest_free_local_numbers(num: int,
+                                  used_local_numbers: Set[int]) -> List[int]:
+    local_numbers = []
+    for local_number in range(1, _MAX_WORKSPACES_PER_GROUP):
+        if len(local_numbers) == num:
+            break
+        if local_number in used_local_numbers:
+            continue
+        local_numbers.append(local_number)
+    assert len(local_numbers) == num
+    return local_numbers
+
+
+def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
+                          all_workspaces: List[i3ipc.Con],
+                          renumber_workspaces: bool) -> List[int]:
+    monitor_workspace_ids = {ws.id for ws in monitor_workspaces}
+    other_monitors_workspaces = [
+        ws for ws in all_workspaces if ws.id not in monitor_workspace_ids
+    ]
+    used_local_numbers = get_used_local_numbers(other_monitors_workspaces)
     logger.debug('Local numbers used by group in other monitors: %s',
                  used_local_numbers)
     local_numbers = []
     if renumber_workspaces:
-        for local_number in range(1, 10**5):
-            if len(local_numbers) == len(monitor_workspaces):
-                break
-            if local_number in used_local_numbers:
-                continue
-            local_numbers.append(local_number)
-            used_local_numbers.add(local_number)
-        assert len(local_numbers) == len(monitor_workspaces)
-        return local_numbers
+        return get_lowest_free_local_numbers(len(monitor_workspaces),
+                                             used_local_numbers)
     if used_local_numbers:
         last_used_local_number = max(used_local_numbers)
     else:
@@ -251,7 +261,8 @@ def compute_global_number(monitor_index: int, group_index: int,
 
 
 def global_number_to_group_index(global_number: int) -> int:
-    return global_number // _MAX_WORKSPACES_PER_GROUP
+    return global_number % (_MAX_GROUPS_PER_MONITOR * _MAX_WORKSPACES_PER_GROUP
+                           ) // _MAX_WORKSPACES_PER_GROUP
 
 
 def global_number_to_local_number(global_number: int) -> int:
@@ -514,8 +525,9 @@ class WorkspaceGroupsController:
     # pylint: disable=too-many-locals
     def switch_monitor_active_group(self, monitor_name: str,
                                     target_group: str) -> None:
+        monitor_workspaces = self.get_monitor_workspaces(monitor_name)
         group_to_monitor_workspaces = get_group_to_workspaces(
-            self.get_monitor_workspaces(monitor_name))
+            monitor_workspaces)
         # Store the name of the originally focused workspace which is needed if
         # the group is new (see below).
         focused_workspace = self.get_tree().find_focused().workspace()
@@ -524,13 +536,19 @@ class WorkspaceGroupsController:
             is_group_new = True
             logger.debug(
                 'Requested active group doesn\'t exist, will create it.')
+            group_to_all_workspaces = get_group_to_workspaces(
+                self.get_tree().workspaces())
+            used_local_numbers = get_used_local_numbers(
+                group_to_all_workspaces.get(target_group, []))
+            local_number = next(
+                iter(get_lowest_free_local_numbers(1, used_local_numbers)))
             global_number = compute_global_number(
                 monitor_index=self.get_monitor_index(monitor_name),
-                group_index=len(group_to_monitor_workspaces),
-                local_number=1)
+                group_index=0,
+                local_number=local_number)
             ws_metadata = WorkspaceGroupingMetadata(group=target_group,
                                                     global_number=global_number,
-                                                    local_number=1)
+                                                    local_number=local_number)
             new_workspace_name = create_workspace_name(ws_metadata)
             self.send_i3_command('workspace "{}"'.format(new_workspace_name))
             for workspace in self.get_tree(cached=False):
@@ -639,8 +657,25 @@ class WorkspaceGroupsController:
             if get_local_workspace_number(workspace) == target_local_number:
                 return workspace.name
         monitor_index = self.get_monitor_index(focused_monitor_name)
-        group_index = list(
-            group_to_monitor_workspaces.keys()).index(context_group)
+        # If there are existing workspaces in the group, use them to derive the
+        # group index. Otherwise, use the smallest available group index.
+        # Note that we can't derive the group index from its relative position
+        # in the group list, because there may have been a group that was
+        # implicitly removed because it had a single empty workspace and the
+        # user focused on another workspace.
+        group_to_index = {}
+        for group, workspaces in group_to_monitor_workspaces.items():
+            for workspace in workspaces:
+                parsed_name = parse_workspace_name(workspace.name)
+                if parsed_name.global_number is not None:
+                    group_to_index[group] = global_number_to_group_index(
+                        parsed_name.global_number)
+                    break
+        group_index = 0
+        if context_group in group_to_index:
+            group_index = group_to_index[context_group]
+        elif group_to_index:
+            group_index = max(group_to_index.values())
         ws_metadata = WorkspaceGroupingMetadata(
             group=context_group, local_number=target_local_number)
         ws_metadata.global_number = compute_global_number(

@@ -21,6 +21,7 @@ SECTIONS_DELIM = '\u200b'
 
 _LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
 
+_MAX_GROUPS_PER_MONITOR = 100
 _MAX_WORKSPACES_PER_GROUP = 100
 
 _SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
@@ -217,8 +218,7 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
     for workspace in monitor_workspaces:
         ws_metadata = parse_workspace_name(workspace.name)
         local_number = ws_metadata.local_number
-        if local_number is None or (
-                local_number in used_local_numbers):
+        if local_number is None or (local_number in used_local_numbers):
             local_number = last_used_local_number + 1
             last_used_local_number += 1
         local_numbers.append(local_number)
@@ -241,9 +241,13 @@ def create_workspace_name(ws_metadata: WorkspaceGroupingMetadata) -> str:
     return SECTIONS_DELIM.join(sections)
 
 
-def compute_global_number(group_index: int, local_number: int) -> int:
+def compute_global_number(monitor_index: int, group_index: int,
+                          local_number: int) -> int:
     assert local_number < _MAX_WORKSPACES_PER_GROUP
-    return _MAX_WORKSPACES_PER_GROUP * group_index + local_number
+    monitor_starting_number = monitor_index * (_MAX_GROUPS_PER_MONITOR *
+                                               _MAX_WORKSPACES_PER_GROUP)
+    group_starting_number = _MAX_WORKSPACES_PER_GROUP * group_index
+    return monitor_starting_number + group_starting_number + local_number
 
 
 def global_number_to_group_index(global_number: int) -> int:
@@ -357,6 +361,15 @@ class WorkspaceGroupsController:
                                          workspace.focused))
         return self.workspaces_metadata
 
+    def get_monitor_index(self, monitor_name):
+        ordered_monitors = [
+            output for output in self.i3_connection.get_outputs()
+            if output.active
+        ]
+        # Sort monitors from top to bottom, and from left to right.
+        ordered_monitors.sort(key=lambda m: (m.rect.y, m.rect.x))
+        return [m.name for m in ordered_monitors].index(monitor_name)
+
     def _get_focused_monitor_name(self) -> str:
         focused_monitors = set()
         for ws_display_metadata in self.get_workspaces_display_metadata():
@@ -434,8 +447,10 @@ class WorkspaceGroupsController:
         return workspaces[0]
 
     def organize_workspace_groups(self,
+                                  monitor_name: str,
                                   group_to_monitor_workspaces: GroupToWorkspaces
                                  ) -> None:
+        monitor_index = self.get_monitor_index(monitor_name)
         group_to_all_workspaces = get_group_to_workspaces(
             self.get_tree().workspaces())
         for group_index, (group, workspaces) in enumerate(
@@ -449,7 +464,7 @@ class WorkspaceGroupsController:
                 ws_metadata.group = group
                 ws_metadata.local_number = local_number
                 ws_metadata.global_number = compute_global_number(
-                    group_index, local_number)
+                    monitor_index, group_index, local_number)
                 dynamic_name = ''
                 # Add window icons to the active group if needed.
                 if self.add_window_icons_all_groups or (self.add_window_icons
@@ -462,7 +477,7 @@ class WorkspaceGroupsController:
                     workspace.name, new_name))
                 workspace.name = new_name
 
-    def list_groups(self, monitor_only: bool = True) -> List[str]:
+    def list_groups(self, monitor_only: bool = False) -> List[str]:
         workspaces = self.get_tree().workspaces()
         if monitor_only:
             workspaces = self.get_monitor_workspaces()
@@ -477,7 +492,7 @@ class WorkspaceGroupsController:
 
     def list_workspaces(self,
                         focused_only: bool = False,
-                        monitor_only: bool = True) -> List[i3ipc.Con]:
+                        monitor_only: bool = False) -> List[i3ipc.Con]:
         workspaces = self.get_tree().workspaces()
         if monitor_only:
             workspaces = self.get_monitor_workspaces()
@@ -497,43 +512,40 @@ class WorkspaceGroupsController:
         return [ws for ws in group_workspaces if ws.id == focused_workspace.id]
 
     # pylint: disable=too-many-locals
-    def switch_monitor_active_group(self,
-                                    group_to_workspaces: GroupToWorkspaces,
+    def switch_monitor_active_group(self, monitor_name: str,
                                     target_group: str) -> None:
+        group_to_monitor_workspaces = get_group_to_workspaces(
+            self.get_monitor_workspaces(monitor_name))
         # Store the name of the originally focused workspace which is needed if
         # the group is new (see below).
         focused_workspace = self.get_tree().find_focused().workspace()
         is_group_new = False
-        if target_group not in group_to_workspaces:
+        if target_group not in group_to_monitor_workspaces:
             is_group_new = True
             logger.debug(
                 'Requested active group doesn\'t exist, will create it.')
-            max_global_number = 0
-            for workspaces in group_to_workspaces.values():
-                for workspace in workspaces:
-                    global_number = parse_workspace_name(
-                        workspace.name).global_number
-                    if global_number:
-                        max_global_number = max(max_global_number,
-                                                global_number)
-            ws_metadata = WorkspaceGroupingMetadata(
-                group=target_group,
-                global_number=max_global_number + 1,
+            global_number = compute_global_number(
+                monitor_index=self.get_monitor_index(monitor_name),
+                group_index=len(group_to_monitor_workspaces),
                 local_number=1)
+            ws_metadata = WorkspaceGroupingMetadata(group=target_group,
+                                                    global_number=global_number,
+                                                    local_number=1)
             new_workspace_name = create_workspace_name(ws_metadata)
             self.send_i3_command('workspace "{}"'.format(new_workspace_name))
             for workspace in self.get_tree(cached=False):
                 if workspace.name == new_workspace_name:
-                    group_to_workspaces[target_group] = [workspace]
+                    group_to_monitor_workspaces[target_group] = [workspace]
                     break
         reordered_group_to_workspaces = collections.OrderedDict()
-        reordered_group_to_workspaces[target_group] = group_to_workspaces[
-            target_group]
-        for group, workspaces in group_to_workspaces.items():
+        reordered_group_to_workspaces[
+            target_group] = group_to_monitor_workspaces[target_group]
+        for group, workspaces in group_to_monitor_workspaces.items():
             if group == target_group:
                 continue
             reordered_group_to_workspaces[group] = workspaces
-        self.organize_workspace_groups(reordered_group_to_workspaces)
+        self.organize_workspace_groups(monitor_name,
+                                       reordered_group_to_workspaces)
         # Switch to the originally focused workspace that may have a new name
         # following the workspace organization. Without doing this, if the user
         # switches to the previously focused workspace ("workspace
@@ -556,14 +568,11 @@ class WorkspaceGroupsController:
 
     def switch_active_group(self, target_group: str,
                             focused_monitor_only: bool) -> None:
-        monitor_to_workspaces = self._get_monitor_to_workspaces()
         focused_monitor_name = self._get_focused_monitor_name()
-        self.switch_monitor_active_group(
-            get_group_to_workspaces(
-                monitor_to_workspaces[focused_monitor_name]), target_group)
+        self.switch_monitor_active_group(focused_monitor_name, target_group)
         if focused_monitor_only:
             return
-        for monitor, workspaces in monitor_to_workspaces.items():
+        for monitor, workspaces in self._get_monitor_to_workspaces().items():
             if monitor == focused_monitor_name:
                 continue
             group_to_workspaces = get_group_to_workspaces(workspaces)
@@ -582,8 +591,9 @@ class WorkspaceGroupsController:
         focused_workspace = self.get_tree().find_focused().workspace()
         if get_workspace_group(focused_workspace) == target_group:
             return
+        focused_monitor_name = self._get_focused_monitor_name()
         group_to_monitor_workspaces = get_group_to_workspaces(
-            self.get_monitor_workspaces())
+            self.get_monitor_workspaces(focused_monitor_name))
         for workspaces in group_to_monitor_workspaces.values():
             for to_remove in (
                     ws for ws in workspaces if ws.id == focused_workspace.id):
@@ -591,7 +601,8 @@ class WorkspaceGroupsController:
         if target_group not in group_to_monitor_workspaces:
             group_to_monitor_workspaces[target_group] = []
         group_to_monitor_workspaces[target_group].append(focused_workspace)
-        self.organize_workspace_groups(group_to_monitor_workspaces)
+        self.organize_workspace_groups(focused_monitor_name,
+                                       group_to_monitor_workspaces)
         # try:
         #     group_index = list(
         #         group_to_monitor_workspaces.keys()).index(target_group)
@@ -609,10 +620,11 @@ class WorkspaceGroupsController:
         # self.send_i3_command()
 
     def _get_workspace_name_from_context(self, target_local_number: int) -> str:
+        focused_monitor_name = self._get_focused_monitor_name()
         group_context = self.group_context or ActiveGroupContext(
             self.i3_connection)
         group_to_monitor_workspaces = get_group_to_workspaces(
-            self.get_monitor_workspaces())
+            self.get_monitor_workspaces(focused_monitor_name))
         context_group = group_context.get_group_name(
             self.get_tree(), group_to_monitor_workspaces)
         logger.info('Context group: "%s"', context_group)
@@ -627,12 +639,13 @@ class WorkspaceGroupsController:
         for workspace in group_to_all_workspaces[context_group]:
             if get_local_workspace_number(workspace) == target_local_number:
                 return workspace.name
+        monitor_index = self.get_monitor_index(focused_monitor_name)
         group_index = list(
             group_to_monitor_workspaces.keys()).index(context_group)
         ws_metadata = WorkspaceGroupingMetadata(
             group=context_group, local_number=target_local_number)
         ws_metadata.global_number = compute_global_number(
-            group_index, target_local_number)
+            monitor_index, group_index, target_local_number)
         return create_workspace_name(ws_metadata)
 
     def focus_workspace_number(self, target_local_number: int) -> None:

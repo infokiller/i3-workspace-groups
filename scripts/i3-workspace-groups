@@ -125,11 +125,11 @@ def _create_args_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _create_context_group_finder(args, i3_connection):
+def _create_context_group_finder(args):
     if args.group_name:
         return i3_workspace_groups.NamedGroupContext(args['group_name'])
     if args.group_active:
-        return i3_workspace_groups.ActiveGroupContext(i3_connection)
+        return i3_workspace_groups.ActiveGroupContext()
     if args.group_focused:
         return i3_workspace_groups.FocusedGroupContext()
     return None
@@ -170,7 +170,7 @@ def main():
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
 
     i3_connection = i3ipc.Connection()
-    group_context = _create_context_group_finder(args, i3_connection)
+    group_context = _create_context_group_finder(args)
     controller = i3_workspace_groups.WorkspaceGroupsController(
         i3_connection, group_context, args.window_icons,
         args.window_icons_all_groups, args.renumber_workspaces, args.dry_run)

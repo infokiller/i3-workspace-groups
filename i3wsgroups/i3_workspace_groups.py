@@ -297,9 +297,6 @@ class WorkspaceGroupsError(Exception):
 
 class ActiveGroupContext:
 
-    def __init__(self, i3_connection: i3ipc.Connection):
-        self.i3_connection = i3_connection
-
     @staticmethod
     def get_group_name(_: i3ipc.Con,
                        group_to_workspaces: GroupToWorkspaces) -> str:
@@ -353,24 +350,12 @@ class WorkspaceGroupsController:
         # Other operations like get_workspaces and get_outputs were about 50µs
         # using the same method, which is more negligible.
         self.tree = None
-        self.workspaces_metadata = None
 
     def get_tree(self, cached: bool = True) -> i3ipc.Con:
         if self.tree and cached:
             return self.tree
         self.tree = self.i3_connection.get_tree()
         return self.tree
-
-    def get_workspaces_display_metadata(self, cached: bool = True
-                                       ) -> List[i3ipc.WorkspaceReply]:
-        if self.workspaces_metadata and cached:
-            return self.workspaces_metadata
-        self.workspaces_metadata = []
-        for workspace in self.i3_connection.get_workspaces():
-            self.workspaces_metadata.append(
-                WorkspaceDisplayMetadata(workspace.name, workspace.output,
-                                         workspace.focused))
-        return self.workspaces_metadata
 
     def get_monitor_index(self, monitor_name):
         ordered_monitors = [
@@ -382,20 +367,10 @@ class WorkspaceGroupsController:
         return [m.name for m in ordered_monitors].index(monitor_name)
 
     def _get_focused_monitor_name(self) -> str:
-        # TODO: Consider doing something like this instead:
-        # con = self.get_tree().find_focused()
-        # while con.type != 'output':
-        #   con = con.parent
-        focused_monitors = set()
-        for ws_display_metadata in self.get_workspaces_display_metadata():
-            if ws_display_metadata.is_focused:
-                focused_monitors.add(ws_display_metadata.monitor_name)
-        if not focused_monitors:
-            raise WorkspaceGroupsError('No focused workspaces')
-        if len(focused_monitors) > 1:
-            logger.warning('Focused workspaces detected in multiple monitors')
-        logger.debug('Focused monitors: %s', focused_monitors)
-        return next(iter(focused_monitors))
+        con = self.get_tree().find_focused()
+        while con.type != 'output':
+            con = con.parent
+        return con.name
 
     def get_monitor_workspaces(self, monitor_name: Optional[str] = None
                               ) -> List[i3ipc.Con]:
@@ -404,20 +379,18 @@ class WorkspaceGroupsController:
         return self._get_monitor_to_workspaces()[monitor_name]
 
     def _get_monitor_to_workspaces(self) -> Dict[str, List[i3ipc.Con]]:
-        name_to_workspace = {}
-        for workspace in self.get_tree().workspaces():
-            name_to_workspace[workspace.name] = workspace
-        monitor_to_workspaces = collections.defaultdict(list)
-        for ws_display_metadata in self.get_workspaces_display_metadata():
-            ws_name = ws_display_metadata.workspace_name
-            if ws_name == _SCRATCHPAD_WORKSPACE_NAME:
-                continue
-            if ws_name not in name_to_workspace:
-                logger.warning('Unknown workspace detected: %s', ws_name)
-                continue
-            workspace = name_to_workspace[ws_name]
-            monitor_to_workspaces[ws_display_metadata.monitor_name].append(
-                workspace)
+        active_monitor_names = [
+            output.name for output in self.i3_connection.get_outputs()
+            if output.active
+        ]
+        monitor_to_workspaces = {}
+        # We could do this more efficiently by assuming that the outputs are the
+        # direct children of the root, instead of scanning the whole tree to
+        # find them, but this should be negligible.
+        for con in self.get_tree():
+            if con.type == 'output' and con.name in active_monitor_names:
+                workspaces = [c for c in con if c.type == 'workspace']
+                monitor_to_workspaces[con.name] = workspaces
         return monitor_to_workspaces
 
     def send_i3_command(self, command: str) -> None:
@@ -482,7 +455,7 @@ class WorkspaceGroupsController:
                 ws_metadata.global_number = compute_global_number(
                     monitor_index, group_index, local_number)
                 dynamic_name = ''
-                # Add window icons to the active group if needed.
+                # Add window icons if needed.
                 if self.add_window_icons_all_groups or (self.add_window_icons
                                                         and group_index == 0):
                     dynamic_name = icons.get_workspace_icons_representation(
@@ -556,6 +529,9 @@ class WorkspaceGroupsController:
                                                     local_number=local_number)
             new_workspace_name = create_workspace_name(ws_metadata)
             self.send_i3_command('workspace "{}"'.format(new_workspace_name))
+            # TODO: We don't need to get the full tree from i3, we can just
+            # create a workspace object with the necessary data for
+            # organize_workspace_groups.
             for workspace in self.get_tree(cached=False):
                 if workspace.name == new_workspace_name:
                     group_to_monitor_workspaces[target_group] = [workspace]
@@ -564,9 +540,8 @@ class WorkspaceGroupsController:
         reordered_group_to_workspaces[
             target_group] = group_to_monitor_workspaces[target_group]
         for group, workspaces in group_to_monitor_workspaces.items():
-            if group == target_group:
-                continue
-            reordered_group_to_workspaces[group] = workspaces
+            if group != target_group:
+                reordered_group_to_workspaces[group] = workspaces
         self.organize_workspace_groups(monitor_name,
                                        reordered_group_to_workspaces)
         # Switch to the originally focused workspace that may have a new name
@@ -576,6 +551,8 @@ class WorkspaceGroupsController:
         # originally focused workspace, which will create a new empty workspace.
         focused_group = get_workspace_group(focused_workspace)
         if is_group_new:
+            logger.debug(
+                'Doing a "fake" workspace focus to fix native back_and_forth')
             matching_workspaces = []
             for workspace in reordered_group_to_workspaces[focused_group]:
                 if is_reordered_workspace(focused_workspace.name,
@@ -643,8 +620,7 @@ class WorkspaceGroupsController:
 
     def _get_workspace_name_from_context(self, target_local_number: int) -> str:
         focused_monitor_name = self._get_focused_monitor_name()
-        group_context = self.group_context or ActiveGroupContext(
-            self.i3_connection)
+        group_context = self.group_context or ActiveGroupContext()
         group_to_monitor_workspaces = get_group_to_workspaces(
             self.get_monitor_workspaces(focused_monitor_name))
         context_group = group_context.get_group_name(

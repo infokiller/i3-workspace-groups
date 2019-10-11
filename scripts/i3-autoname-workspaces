@@ -41,7 +41,7 @@ class WorkspaceAutonamer:
         controller = self.create_controller(i3_connection)
         group_to_workspaces = i3_workspace_groups.get_group_to_workspaces(
             controller.get_monitor_workspaces())
-        controller.organize_workspace_groups(group_to_workspaces)
+        controller.organize_workspace_groups(list(group_to_workspaces.items()))
         return controller
 
     def window_event_handler(self, i3_connection: i3ipc.Connection,

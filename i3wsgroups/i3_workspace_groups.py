@@ -438,9 +438,11 @@ class WorkspaceGroupsController:
                 'one', mark)
         return workspaces[0]
 
-    def organize_workspace_groups(self, monitor_name: str,
-                                  workspace_groups: OrderedWorkspaceGroups
-                                 ) -> None:
+    def organize_workspace_groups(self,
+                                  workspace_groups: OrderedWorkspaceGroups,
+                                  monitor_name: Optional[str] = None) -> None:
+        if monitor_name is None:
+            monitor_name = self._get_focused_monitor_name()
         monitor_index = self.get_monitor_index(monitor_name)
         group_to_all_workspaces = get_group_to_workspaces(
             self.get_tree().workspaces())
@@ -530,8 +532,8 @@ class WorkspaceGroupsController:
         for group, workspaces in group_to_monitor_workspaces.items():
             if group != target_group:
                 reordered_group_to_workspaces.append((group, workspaces))
-        self.organize_workspace_groups(monitor_name,
-                                       reordered_group_to_workspaces)
+        self.organize_workspace_groups(reordered_group_to_workspaces,
+                                       monitor_name)
 
     def switch_active_group(self, target_group: str,
                             focused_monitor_only: bool) -> None:
@@ -587,8 +589,8 @@ class WorkspaceGroupsController:
         if target_group not in group_to_monitor_workspaces:
             group_to_monitor_workspaces[target_group] = []
         group_to_monitor_workspaces[target_group].append(focused_workspace)
-        self.organize_workspace_groups(focused_monitor_name,
-                                       group_to_monitor_workspaces)
+        self.organize_workspace_groups(
+            list(group_to_monitor_workspaces.items()), focused_monitor_name)
         # try:
         #     group_index = list(
         #         group_to_monitor_workspaces.keys()).index(target_group)

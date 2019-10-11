@@ -70,7 +70,7 @@ Say we start with the following workspace names:
 An important thing to understand here is that every i3 workspace is always
 assigned to a single group. And since we haven't assigned any workspace to a
 group yet, all the workspaces are implicitly in the
-[default group](#default-group), which is labeled with the string "<default>".
+[default group](#default-group), which is labeled with the string `<default>`.
 
 After a few hours of leisure time, you decide to do some work, which requires
 opening a few windows on a few workspaces. In order to create a new group, first
@@ -98,7 +98,7 @@ you to a new empty workspace in the group "work".
 
 After some time working, you become lazy and you want to get back to cat videos,
 but you promise yourself to get back to work in a few hours, and you don't want
-to lose your open winows. So you press `Super+g` to switch the active work back
+to lose your open windows. So you press `Super+g` to switch the active work back
 to the default one. You should now see your workspaces in i3bar ordered as
 following: "1", "2", "3", "work:4". The focus will also shift to the first
 workspace in the default group ("1" in this case).
@@ -173,10 +173,18 @@ bindsym $mod+Control+0 workspace number 10
 
 ### Limitations
 
-- Workspace names are used for storing the group, so if another tool changes a
-  workspace name without preserving the format that this project uses, the tool
-  can make a mistake about the group assignment.
-- By default, every monitor can have up to 100 groups, each containing up to 100 workspaces.
+- **Interaction with other i3 tools**: workspace names are used for storing the
+  group, so if another tool changes a workspace name without preserving the
+  format that this project uses, the tool can make a mistake about the group
+  assignment.
+- **Latency**: there can be noticeable latency in some machines for the script
+  commands. On my high performance desktop this is not noticeable, but on my
+  laptop it is.  I measured the latency of commands to be around 100-200 ms,
+  most of it coming from importing python libraries, so it's not possible to
+  reduce it much without running it as a daemon (which will overcomplicate
+  things). In the long term, I'm considering rewriting it in go.
+- **Number of workspaces/groups/monitors**: Supports up to 10 monitors, each
+  containing up to 100 groups, each containing up to 100 workspaces.
 
 ### Concepts
 

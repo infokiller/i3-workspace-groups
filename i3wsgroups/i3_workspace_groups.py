@@ -382,6 +382,10 @@ class WorkspaceGroupsController:
         return [m.name for m in ordered_monitors].index(monitor_name)
 
     def _get_focused_monitor_name(self) -> str:
+        # TODO: Consider doing something like this instead:
+        # con = self.get_tree().find_focused()
+        # while con.type != 'output':
+        #   con = con.parent
         focused_monitors = set()
         for ws_display_metadata in self.get_workspaces_display_metadata():
             if ws_display_metadata.is_focused:

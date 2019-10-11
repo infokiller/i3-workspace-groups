@@ -130,7 +130,7 @@ def _create_args_parser() -> argparse.ArgumentParser:
 
 def _create_context_group_finder(args):
     if args.group_name:
-        return i3_groups_controller.NamedGroupContext(args['group_name'])
+        return i3_groups_controller.NamedGroupContext(args.group_name)
     if args.group_active:
         return i3_groups_controller.ActiveGroupContext()
     if args.group_focused:

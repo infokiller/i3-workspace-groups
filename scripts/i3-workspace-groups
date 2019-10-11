@@ -11,7 +11,7 @@ import i3ipc
 from i3wsgroups import cli, i3_workspace_groups, icons
 
 _LIST_WORKSPACES_FIELDS = i3_workspace_groups.WORKSPACE_NAME_SECTIONS + [
-    'window_icons', 'global_name'
+    'window_icons', 'global_name', 'monitor'
 ]
 _LIST_WORKSPACES_FIELDS_HELP = (
     'Comma separated list of fields to output. Options: {}').format(
@@ -138,6 +138,11 @@ def _create_context_group_finder(args):
 def _get_workspace_field(workspace, field):
     if field == 'global_name':
         return workspace.name
+    if field == 'monitor':
+        con = workspace
+        while con.type != 'output':
+            con = con.parent
+        return con.name
     if field == 'window_icons':
         return icons.get_workspace_icons_representation(workspace)
     parsed_name = i3_workspace_groups.parse_workspace_name(workspace.name)

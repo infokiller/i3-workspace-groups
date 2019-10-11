@@ -1,11 +1,11 @@
 import collections
-import logging
 import re
-from typing import Dict
 
 import i3ipc
 
-logger = logging.getLogger(__name__)
+from i3wsgroups import logger
+
+logger = logger.logger
 
 WINDOW_CLASS_REGEX_STR_TO_ICON = {
     'kitty': '',

@@ -10,9 +10,10 @@ import os.path
 
 import i3ipc
 
-from i3wsgroups import cli, i3_workspace_groups
+from i3wsgroups import cli, controller, i3_proxy, logger, workspace_names
 
-logger = i3_workspace_groups.logger
+init_logger = logger.init_logger
+logger = logger.logger
 
 
 class WorkspaceAutonamer:
@@ -26,20 +27,20 @@ class WorkspaceAutonamer:
         self.dry_run = dry_run
 
     def create_controller(self, i3_connection: i3ipc.Connection
-                         ) -> i3_workspace_groups.WorkspaceGroupsController:
-        return i3_workspace_groups.WorkspaceGroupsController(
-            i3_connection,
+                         ) -> controller.WorkspaceGroupsController:
+        return controller.WorkspaceGroupsController(
+            i3_proxy.I3Proxy(i3_connection, self.dry_run),
             group_context=None,
             add_window_icons=True,
             add_window_icons_all_groups=self.add_window_icons_all_groups,
-            renumber_workspaces=self.renumber_workspaces,
-            dry_run=self.dry_run)
+            renumber_workspaces=self.renumber_workspaces)
 
     def update_workspace_names(self, i3_connection: i3ipc.Connection) -> None:
-        controller = self.create_controller(i3_connection)
-        group_to_workspaces = i3_workspace_groups.get_group_to_workspaces(
-            controller.get_monitor_workspaces())
-        controller.organize_workspace_groups(list(group_to_workspaces.items()))
+        groups_controller = self.create_controller(i3_connection)
+        group_to_workspaces = workspace_names.get_group_to_workspaces(
+            groups_controller.i3_proxy.get_monitor_workspaces())
+        groups_controller.organize_workspace_groups(
+            list(group_to_workspaces.items()))
 
     def window_event_handler(self, i3_connection: i3ipc.Connection,
                              event: i3ipc.Event) -> None:
@@ -66,7 +67,7 @@ def main():
     cli.add_common_args(parser)
     cli.add_workspace_naming_args(parser)
     args = parser.parse_args()
-    i3_workspace_groups.init_logger(os.path.basename(__file__))
+    init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
     autonamer = WorkspaceAutonamer(args.window_icons_all_groups,
                                    args.renumber_workspaces, args.dry_run)

@@ -1,4 +1,5 @@
-from i3wsgroups.i3_workspace_groups import *
+from i3wsgroups.workspace_names import *
+from i3wsgroups.controller import *
 from tests import test_util
 
 

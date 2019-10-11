@@ -8,16 +8,19 @@ import sys
 
 import i3ipc
 
-from i3wsgroups import cli, i3_workspace_groups, icons
+from i3wsgroups import cli
+from i3wsgroups import controller as i3_groups_controller
+from i3wsgroups import i3_proxy, icons, logger, workspace_names
 
-_LIST_WORKSPACES_FIELDS = i3_workspace_groups.WORKSPACE_NAME_SECTIONS + [
+_LIST_WORKSPACES_FIELDS = workspace_names.WORKSPACE_NAME_SECTIONS + [
     'window_icons', 'global_name', 'monitor'
 ]
 _LIST_WORKSPACES_FIELDS_HELP = (
     'Comma separated list of fields to output. Options: {}').format(
         ', '.join(_LIST_WORKSPACES_FIELDS))
 
-logger = i3_workspace_groups.logger
+init_logger = logger.init_logger
+logger = logger.logger
 
 
 def _create_args_parser() -> argparse.ArgumentParser:
@@ -90,8 +93,8 @@ def _create_args_parser() -> argparse.ArgumentParser:
         'move-to-number',
         help='Move the focused container to the workspace with the provided '
         'number in the focused group, similar to i3\'s "move container to '
-        'workspace" command').add_argument(
-            'workspace_relative_number', type=int)
+        'workspace" command').add_argument('workspace_relative_number',
+                                           type=int)
     subparsers.add_parser(
         'move-to-back-and-forth',
         help='Move the focused container to the last focused workspace, '
@@ -109,15 +112,15 @@ def _create_args_parser() -> argparse.ArgumentParser:
         help='Similar to i3\'s "renamed workspace" command, but only changes '
         'the name of the workspace within the group, while preserving its '
         'group assignment').add_argument('new_name')
-    subparsers.add_parser(
-        'renumber-workspace',
-        help='Change local number of workspace').add_argument('new_number', type=int)
+    subparsers.add_parser('renumber-workspace',
+                          help='Change local number of workspace').add_argument(
+                              'new_number', type=int)
     switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
         help='Switches the active group to the one provided.')
     switch_active_group_parser.add_argument('group')
-    switch_active_group_parser.add_argument(
-        '--focused-monitor-only', action='store_true')
+    switch_active_group_parser.add_argument('--focused-monitor-only',
+                                            action='store_true')
     subparsers.add_parser(
         'assign-workspace-to-group',
         help='Assigns the focused workspace to the provided group.'
@@ -127,11 +130,11 @@ def _create_args_parser() -> argparse.ArgumentParser:
 
 def _create_context_group_finder(args):
     if args.group_name:
-        return i3_workspace_groups.NamedGroupContext(args['group_name'])
+        return i3_groups_controller.NamedGroupContext(args['group_name'])
     if args.group_active:
-        return i3_workspace_groups.ActiveGroupContext()
+        return i3_groups_controller.ActiveGroupContext()
     if args.group_focused:
-        return i3_workspace_groups.FocusedGroupContext()
+        return i3_groups_controller.FocusedGroupContext()
     return None
 
 
@@ -145,7 +148,7 @@ def _get_workspace_field(workspace, field):
         return con.name
     if field == 'window_icons':
         return icons.get_workspace_icons_representation(workspace)
-    parsed_name = i3_workspace_groups.parse_workspace_name(workspace.name)
+    parsed_name = workspace_names.parse_name(workspace.name)
     value = getattr(parsed_name, field)
     if value is None:
         return ''
@@ -171,14 +174,15 @@ def _print_workspaces(controller, args):
 # pylint: disable=too-many-branches
 def main():
     args = _create_args_parser().parse_args()
-    i3_workspace_groups.init_logger(os.path.basename(__file__))
+    init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
 
     i3_connection = i3ipc.Connection()
     group_context = _create_context_group_finder(args)
-    controller = i3_workspace_groups.WorkspaceGroupsController(
-        i3_connection, group_context, args.window_icons,
-        args.window_icons_all_groups, args.renumber_workspaces, args.dry_run)
+    controller = i3_groups_controller.WorkspaceGroupsController(
+        i3_proxy.I3Proxy(i3_connection,
+                         args.dry_run), group_context, args.window_icons,
+        args.window_icons_all_groups, args.renumber_workspaces)
     try:
         if args.command == 'list-groups':
             print('\n'.join(controller.list_groups(args.focused_monitor_only)))
@@ -190,7 +194,7 @@ def main():
             logger.warning(
                 'workspace-back-and-forth is deprecated, please '
                 'migrate to the native i3 "workspace back_and_forth" command')
-            controller.send_i3_command('workspace back_and_forth')
+            controller.i3_proxy.send_i3_command('workspace back_and_forth')
         elif args.command == 'workspace-next':
             controller.focus_workspace_relative(+1)
         elif args.command == 'workspace-prev':
@@ -198,11 +202,10 @@ def main():
         elif args.command == 'move-to-number':
             controller.move_to_workspace_number(args.workspace_relative_number)
         elif args.command == 'move-to-back-and-forth':
-            controller.move_workspace_back_and_forth()
             logger.warning(
                 'move-to-back-and-forth is deprecated, please '
                 'migrate to the native i3 "workspace back_and_forth" command')
-            controller.send_i3_command('move workspace back_and_forth')
+            controller.i3_proxy.send_i3_command('move workspace back_and_forth')
         elif args.command == 'move-to-next':
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':
@@ -216,7 +219,7 @@ def main():
                                            args.focused_monitor_only)
         elif args.command == 'assign-workspace-to-group':
             controller.assign_workspace_to_group(args.group)
-    except i3_workspace_groups.WorkspaceGroupsError as ex:
+    except i3_groups_controller.WorkspaceGroupsError as ex:
         sys.exit(ex)
 
 

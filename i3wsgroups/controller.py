@@ -44,12 +44,7 @@ class NamedGroupContext:
     def __init__(self, group_name: str):
         self.group_name = group_name
 
-    def get_group_name(self, _: i3ipc.Con,
-                       group_to_workspaces: GroupToWorkspaces) -> str:
-        if self.group_name not in group_to_workspaces:
-            raise WorkspaceGroupsError(
-                'Unknown group \'{}\', known groups: {}'.format(
-                    self.group_name, group_to_workspaces.keys()))
+    def get_group_name(self, _: i3ipc.Con, __: GroupToWorkspaces) -> str:
         return self.group_name
 
 

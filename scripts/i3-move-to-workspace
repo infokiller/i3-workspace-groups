@@ -16,14 +16,27 @@ function command_exists() {
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 TOOL="${DIR}/i3-workspace-groups"
 command_exists "${TOOL}" || TOOL="i3-workspace-groups"
-mesg='<span alpha="50%">Focused container will move to the selected workspace</span>'
-if selected_index="$("${TOOL}" list-workspaces \
-  --fields 'group,local_number,window_icons,static_name' |
-  rofi -format d -dmenu -no-custom -width 30 -p 'Workspace' \
-    -mesg "${mesg}")"; then
-  selected_workspace="$("${TOOL}" list-workspaces --fields 'global_name' |
-    head -"${selected_index}" | tail -1)"
-  i3-msg 'move container to workspace "'"${selected_workspace}"'"'
+
+mapfile -t workspaces < <("${TOOL}" list-workspaces --fields 'global_name')
+mapfile -t displayed_workspaces < <("${TOOL}" list-workspaces \
+  --fields 'group,local_number,window_icons,static_name')
+
+MESG='<span alpha="50%">Focused container will move to the selected workspace</span>'
+
+if selected="$(printf '%s\n' "${displayed_workspaces[@]}" |
+  rofi -dmenu -width 30 -p 'Workspace' -mesg "${MESG}")"; then
+  for i in "${!displayed_workspaces[@]}"; do
+    line="${displayed_workspaces[${i}]}"
+    if [[ "${line}" == "${selected}" ]]; then
+      i3-msg 'move container to workspace "'"${workspaces[${i}]}"'"'
+      exit
+    fi
+  done
+  # No existing workspace was selected, assume it's a new workspace with a
+  # format of "group:local_number".
+  group="${selected%%:*}"
+  local_number="${selected##*:}"
+  "${TOOL}" move-to-number --group-name "${group}" "${local_number}"
 else
   exit $?
 fi

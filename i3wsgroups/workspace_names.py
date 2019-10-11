@@ -27,7 +27,7 @@
 #  "1:mygroup:mail"
 #  "102:mygroup:mail:2"
 import collections
-from typing import Set, Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 import i3ipc
 
@@ -51,6 +51,7 @@ _MAX_WORKSPACES_PER_GROUP = 100
 _SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
 
 GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
+
 
 # pylint: disable=too-few-public-methods
 class WorkspaceDisplayMetadata:
@@ -159,7 +160,7 @@ def get_group(workspace: i3ipc.Con) -> str:
     return parse_name(workspace.name).group
 
 
-def get_used_local_numbers(workspaces: List[i3ipc.Con])-> Set[int]:
+def get_used_local_numbers(workspaces: List[i3ipc.Con]) -> Set[int]:
     used_local_numbers = set()
     for workspace in workspaces:
         local_number = parse_name(workspace.name).local_number
@@ -263,3 +264,25 @@ def _is_reordered_workspace(name1, name2):
     if ws1_metadata.local_number:
         return ws1_metadata.local_number == ws2_metadata.local_number
     return ws1_metadata.static_name == ws2_metadata.static_name
+
+
+def get_group_index(target_group: str, group_to_workspaces: GroupToWorkspaces):
+    # If there are existing workspaces in the group, use them to derive the
+    # group index. Otherwise, use the smallest available group index.
+    # Note that we can't derive the group index from its relative position
+    # in the group list, because there may have been a group that was
+    # implicitly removed because it had a single empty workspace and the
+    # user focused on another workspace.
+    group_to_index = {}
+    for group, workspaces in group_to_workspaces.items():
+        for workspace in workspaces:
+            parsed_name = parse_name(workspace.name)
+            if parsed_name.global_number is not None:
+                group_to_index[group] = global_number_to_group_index(
+                    parsed_name.global_number)
+                break
+    if target_group in group_to_index:
+        return group_to_index[target_group]
+    if group_to_index:
+        return max(group_to_index.values())
+    return 0

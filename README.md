@@ -70,7 +70,7 @@ Say we start with the following workspace names:
 An important thing to understand here is that every i3 workspace is always
 assigned to a single group. And since we haven't assigned any workspace to a
 group yet, all the workspaces are implicitly in the
-[default group](#default-group), which is labeled with the string `<default>`.
+[default group](#default-group), which is labeled with the string "&lt;default>".
 
 After a few hours of leisure time, you decide to do some work, which requires
 opening a few windows on a few workspaces. In order to create a new group, first

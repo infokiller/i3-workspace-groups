@@ -36,7 +36,7 @@ few issues, for example:
 - Finding a free workspace for a new window (that can also be reached with my
   keybindings)
 
-This has led me to create the https://github.com/infokiller/i3-workspace-groups
+This has led me to create the [i3-workspace-groups](https://github.com/infokiller/i3-workspace-groups)
 project, which enables you to define and manage groups of workspaces, each with
 their own "namespace", and switch between them.
 
@@ -80,7 +80,7 @@ enter. You will then notice that the workspace name will change in i3bar to
 "work:4".
 Then, you press `Super+g` in order to switch the [active
 group](#active-group). You will be shown a list of existing groups, which will
-now be "work" and "<default>".
+now be "work" and "&lt;default>".
 You should now see your workspaces in i3bar ordered as following:
 "work:4", "1", "2", "3".
 What happened here?
@@ -110,6 +110,7 @@ you to the workspace "2" in the default group.
 In order to use these tools effectively, commands need to be bound to
 keybindings. For example, my i3 config contains the following exerts:
 
+<!-- markdownlint-disable fenced-code-language -->
 ```
 set $mod Mod4
 
@@ -218,7 +219,7 @@ The group of the focused workspace.
 #### Default group
 
 The group of workspaces that were not assigned to a group by the user. This
-group is usually displayed as "<default>".
+group is usually displayed as "&lt;default>".
 
 ## Installation
 

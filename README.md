@@ -4,6 +4,9 @@ A Python library and set of command line tools for managing i3wm workspaces in g
 that you define.
 I find this tool useful for managing many workspaces in i3.
 
+[![PyPI version](https://badge.fury.io/py/i3-workspace-groups.svg)](https://badge.fury.io/py/i3-workspace-groups)
+[![pipeline status](https://gitlab.com/infokiller/i3-workspace-groups/badges/master/pipeline.svg)](https://gitlab.com/infokiller/i3-workspace-groups/commits/master)
+
 ![Demo flow](./assets/demo.gif?raw=true)
 
 ## Table of Contents

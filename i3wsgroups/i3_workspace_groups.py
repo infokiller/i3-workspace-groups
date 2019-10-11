@@ -470,7 +470,8 @@ class WorkspaceGroupsController:
             self.get_tree().workspaces())
         for group_index, (group, workspaces) in enumerate(
                 group_to_monitor_workspaces.items()):
-            logger.debug('Organizing workspace group: "%s"', group)
+            logger.debug('Organizing workspace group: "%s" in monitor "%s"',
+                         group, monitor_name)
             local_numbers = compute_local_numbers(
                 workspaces, group_to_all_workspaces.get(group, []),
                 self.renumber_workspaces)

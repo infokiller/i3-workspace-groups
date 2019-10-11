@@ -406,6 +406,12 @@ class WorkspaceGroupsController:
             options = '--no-auto-back-and-forth'
         self.send_i3_command('workspace {} "{}"'.format(options, name))
 
+    def rename_workspace(self, old_name: str, new_name: str) -> None:
+        if old_name == new_name:
+            return
+        self.send_i3_command('rename workspace "{}" to "{}"'.format(
+            old_name, new_name))
+
     def get_unique_marked_workspace(self, mark) -> Optional[i3ipc.Con]:
         workspaces = self.get_tree().find_marked(mark)
         if not workspaces:
@@ -445,8 +451,7 @@ class WorkspaceGroupsController:
                         workspace)
                 ws_metadata.dynamic_name = dynamic_name
                 new_name = create_workspace_name(ws_metadata)
-                self.send_i3_command('rename workspace "{}" to "{}"'.format(
-                    workspace.name, new_name))
+                self.rename_workspace(workspace.name, new_name)
                 workspace.name = new_name
 
     def list_groups(self, monitor_only: bool = False) -> List[str]:
@@ -673,13 +678,11 @@ class WorkspaceGroupsController:
         ws_metadata = parse_workspace_name(focused_workspace.name)
         ws_metadata.static_name = new_static_name
         new_global_name = create_workspace_name(ws_metadata)
-        self.send_i3_command('rename workspace "{}" to "{}"'.format(
-            focused_workspace.name, new_global_name))
+        self.rename_workspace(focused_workspace.name, new_global_name)
 
     def renumber_focused_workspace(self, new_local_number: int) -> None:
         focused_workspace = self.get_tree().find_focused().workspace()
         ws_metadata = parse_workspace_name(focused_workspace.name)
         ws_metadata.local_number = new_local_number
         new_global_name = create_workspace_name(ws_metadata)
-        self.send_i3_command('rename workspace "{}" to "{}"'.format(
-            focused_workspace.name, new_global_name))
+        self.rename_workspace(focused_workspace.name, new_global_name)

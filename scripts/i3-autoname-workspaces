@@ -35,19 +35,27 @@ class WorkspaceAutonamer:
             renumber_workspaces=self.renumber_workspaces,
             dry_run=self.dry_run)
 
-    def update_workspace_names(
-            self, i3_connection: i3ipc.Connection
-    ) -> i3_workspace_groups.WorkspaceGroupsController:
+    def update_workspace_names(self, i3_connection: i3ipc.Connection) -> None:
         controller = self.create_controller(i3_connection)
         group_to_workspaces = i3_workspace_groups.get_group_to_workspaces(
             controller.get_monitor_workspaces())
         controller.organize_workspace_groups(list(group_to_workspaces.items()))
-        return controller
 
     def window_event_handler(self, i3_connection: i3ipc.Connection,
                              event: i3ipc.Event) -> None:
         logger.debug('Got window event with change: %s', event.change)
         if event.change in ['new', 'close', 'move']:
+            self.update_workspace_names(i3_connection)
+
+    def workspace_event_handler(self, i3_connection: i3ipc.Connection,
+                                event: i3ipc.Event):
+        logger.debug('Got workspace event with change: %s', event.change)
+        # We must update the workspace names on a focus event because the
+        # workspace focus change may be due to navigating away from an empty
+        # workspace that was the only one in the active group. In that case, the
+        # next group becomes active, so the icons should be restored to the
+        # workspace names.
+        if event.change == 'focus':
             self.update_workspace_names(i3_connection)
 
 
@@ -65,6 +73,7 @@ def main():
     i3_connection = i3ipc.Connection()
     autonamer.update_workspace_names(i3_connection)
     i3_connection.on('window', autonamer.window_event_handler)
+    i3_connection.on('workspace', autonamer.workspace_event_handler)
     i3_connection.main()
 
 

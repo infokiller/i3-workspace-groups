@@ -50,19 +50,6 @@ class WorkspaceAutonamer:
         if event.change in ['new', 'close', 'move']:
             self.update_workspace_names(i3_connection)
 
-    # TODO: Should this be in another daemon script?
-    def workspace_event_handler(self, i3_connection: i3ipc.Connection,
-                                event: i3ipc.Event):
-        logger.debug('Got workspace event with change: %s', event.change)
-        if event.change != 'focus':
-            return
-        # We must update the workspace names because the workspace focus change
-        # may be due to navigating away from an empty workspace that was the
-        # only one in the active group. In that case, the next group becomes
-        # active, so the icons should be restored to the workspace names.
-        controller = self.update_workspace_names(i3_connection)
-        controller.set_focused_workspace(event.current)
-
 
 def main():
     parser = argparse.ArgumentParser(
@@ -78,7 +65,6 @@ def main():
     i3_connection = i3ipc.Connection()
     autonamer.update_workspace_names(i3_connection)
     i3_connection.on('window', autonamer.window_event_handler)
-    i3_connection.on('workspace', autonamer.workspace_event_handler)
     i3_connection.main()
 
 

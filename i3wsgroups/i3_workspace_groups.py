@@ -26,12 +26,6 @@ _MAX_WORKSPACES_PER_GROUP = 100
 
 _SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
 
-LAST_WORKSPACE_MARK = '_i3_groups_last_focused'
-# We need to keep this as well so that we can set the last workspace when
-# subscribing to the workspace focus event of i3, which only triggers after the
-# workspace was focused.
-CURRENT_WORKSPACE_MARK = '_i3_groups_current_focused'
-
 # We use the workspace names to "store" metadata about the workspace, such as
 # the group it belongs to.
 # Workspace name format:
@@ -411,21 +405,6 @@ class WorkspaceGroupsController:
         if not auto_back_and_forth:
             options = '--no-auto-back-and-forth'
         self.send_i3_command('workspace {} "{}"'.format(options, name))
-        updated_tree = self.get_tree(cached=False)
-        focused_workspace = updated_tree.find_focused().workspace()
-        self.set_focused_workspace(focused_workspace)
-
-    def set_focused_workspace(self, workspace):
-        current_workspace = self.get_unique_marked_workspace(
-            CURRENT_WORKSPACE_MARK)
-        if current_workspace:
-            if current_workspace.id == workspace.id:
-                logger.info('Current workspace already set, not resetting it.')
-                return
-            self.send_i3_command('[con_id={}] mark --add "{}"'.format(
-                current_workspace.id, LAST_WORKSPACE_MARK))
-        self.send_i3_command('[con_id={}] mark --add "{}"'.format(
-            workspace.id, CURRENT_WORKSPACE_MARK))
 
     def get_unique_marked_workspace(self, mark) -> Optional[i3ipc.Con]:
         workspaces = self.get_tree().find_marked(mark)
@@ -683,31 +662,11 @@ class WorkspaceGroupsController:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
         self.focus_workspace(next_workspace.name, auto_back_and_forth=False)
 
-    def focus_workspace_back_and_forth(self) -> None:
-        last_workspace = self.get_unique_marked_workspace(LAST_WORKSPACE_MARK)
-        if not last_workspace:
-            logger.info('Falling back to i3\'s built in workspace '
-                        'back_and_forth')
-            self.send_i3_command('workspace back_and_forth')
-            return
-        self.focus_workspace(last_workspace.name, auto_back_and_forth=False)
-
     def move_workspace_relative(self, offset_from_current: int) -> None:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
         self.send_i3_command(
             'move --no-auto-back-and-forth container to workspace "{}"'.format(
                 next_workspace.name))
-
-    def move_workspace_back_and_forth(self) -> None:
-        last_workspace = self.get_unique_marked_workspace(LAST_WORKSPACE_MARK)
-        if not last_workspace:
-            logger.info('Falling back to i3\'s built in move workspace '
-                        'back_and_forth')
-            self.send_i3_command('move workspace back_and_forth')
-            return
-        self.send_i3_command(
-            'move --no-auto-back-and-forth container to workspace "{}"'.format(
-                last_workspace.name))
 
     def rename_focused_workspace(self, new_static_name: str) -> None:
         focused_workspace = self.get_tree().find_focused().workspace()

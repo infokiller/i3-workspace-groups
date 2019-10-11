@@ -187,7 +187,10 @@ def main():
         elif args.command == 'workspace-number':
             controller.focus_workspace_number(args.workspace_relative_number)
         elif args.command == 'workspace-back-and-forth':
-            controller.focus_workspace_back_and_forth()
+            logger.warning(
+                'workspace-back-and-forth is deprecated, please '
+                'migrate to the native i3 "workspace back_and_forth" command')
+            controller.send_i3_command('workspace back_and_forth')
         elif args.command == 'workspace-next':
             controller.focus_workspace_relative(+1)
         elif args.command == 'workspace-prev':
@@ -196,6 +199,10 @@ def main():
             controller.move_to_workspace_number(args.workspace_relative_number)
         elif args.command == 'move-to-back-and-forth':
             controller.move_workspace_back_and_forth()
+            logger.warning(
+                'move-to-back-and-forth is deprecated, please '
+                'migrate to the native i3 "workspace back_and_forth" command')
+            controller.send_i3_command('move workspace back_and_forth')
         elif args.command == 'move-to-next':
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':

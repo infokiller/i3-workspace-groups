@@ -3,7 +3,7 @@
 import collections
 import logging
 import logging.handlers
-from typing import Set, Dict, List, Optional
+from typing import Set, Dict, List, Optional, Tuple
 
 import i3ipc
 
@@ -62,6 +62,7 @@ CURRENT_WORKSPACE_MARK = '_i3_groups_current_focused'
 #  "102:mygroup:mail:2"
 
 GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
+OrderedWorkspaceGroups = List[Tuple[str, List[i3ipc.Con]]]
 
 logger = logging.getLogger(__name__)
 
@@ -404,9 +405,12 @@ class WorkspaceGroupsController:
             if not reply.success:
                 logger.warning('i3 command error: %s', reply.error)
 
-    def focus_workspace(self, name: str) -> None:
-        self.send_i3_command(
-            'workspace --no-auto-back-and-forth  "{}"'.format(name))
+    def focus_workspace(self, name: str,
+                        auto_back_and_forth: bool = True) -> None:
+        options = ''
+        if not auto_back_and_forth:
+            options = '--no-auto-back-and-forth'
+        self.send_i3_command('workspace {} "{}"'.format(options, name))
         updated_tree = self.get_tree(cached=False)
         focused_workspace = updated_tree.find_focused().workspace()
         self.set_focused_workspace(focused_workspace)
@@ -434,15 +438,13 @@ class WorkspaceGroupsController:
                 'one', mark)
         return workspaces[0]
 
-    def organize_workspace_groups(self,
-                                  monitor_name: str,
-                                  group_to_monitor_workspaces: GroupToWorkspaces
+    def organize_workspace_groups(self, monitor_name: str,
+                                  workspace_groups: OrderedWorkspaceGroups
                                  ) -> None:
         monitor_index = self.get_monitor_index(monitor_name)
         group_to_all_workspaces = get_group_to_workspaces(
             self.get_tree().workspaces())
-        for group_index, (group, workspaces) in enumerate(
-                group_to_monitor_workspaces.items()):
+        for group_index, (group, workspaces) in enumerate(workspace_groups):
             logger.debug('Organizing workspace group: "%s" in monitor "%s"',
                          group, monitor_name)
             local_numbers = compute_local_numbers(
@@ -500,88 +502,73 @@ class WorkspaceGroupsController:
         focused_workspace = self.get_tree().find_focused().workspace()
         return [ws for ws in group_workspaces if ws.id == focused_workspace.id]
 
-    # pylint: disable=too-many-locals
+    def _create_new_active_group_workspace_name(self, monitor_name: str,
+                                                target_group: str) -> i3ipc.Con:
+        group_to_all_workspaces = get_group_to_workspaces(
+            self.get_tree().workspaces())
+        used_local_numbers = get_used_local_numbers(
+            group_to_all_workspaces.get(target_group, []))
+        local_number = next(
+            iter(get_lowest_free_local_numbers(1, used_local_numbers)))
+        global_number = compute_global_number(
+            monitor_index=self.get_monitor_index(monitor_name),
+            group_index=0,
+            local_number=local_number)
+        ws_metadata = WorkspaceGroupingMetadata(group=target_group,
+                                                global_number=global_number,
+                                                local_number=local_number)
+        return create_workspace_name(ws_metadata)
+
     def switch_monitor_active_group(self, monitor_name: str,
                                     target_group: str) -> None:
         monitor_workspaces = self.get_monitor_workspaces(monitor_name)
         group_to_monitor_workspaces = get_group_to_workspaces(
             monitor_workspaces)
-        # Store the name of the originally focused workspace which is needed if
-        # the group is new (see below).
-        focused_workspace = self.get_tree().find_focused().workspace()
-        is_group_new = False
-        if target_group not in group_to_monitor_workspaces:
-            is_group_new = True
-            logger.debug(
-                'Requested active group doesn\'t exist, will create it.')
-            group_to_all_workspaces = get_group_to_workspaces(
-                self.get_tree().workspaces())
-            used_local_numbers = get_used_local_numbers(
-                group_to_all_workspaces.get(target_group, []))
-            local_number = next(
-                iter(get_lowest_free_local_numbers(1, used_local_numbers)))
-            global_number = compute_global_number(
-                monitor_index=self.get_monitor_index(monitor_name),
-                group_index=0,
-                local_number=local_number)
-            ws_metadata = WorkspaceGroupingMetadata(group=target_group,
-                                                    global_number=global_number,
-                                                    local_number=local_number)
-            new_workspace_name = create_workspace_name(ws_metadata)
-            self.send_i3_command('workspace "{}"'.format(new_workspace_name))
-            # TODO: We don't need to get the full tree from i3, we can just
-            # create a workspace object with the necessary data for
-            # organize_workspace_groups.
-            for workspace in self.get_tree(cached=False):
-                if workspace.name == new_workspace_name:
-                    group_to_monitor_workspaces[target_group] = [workspace]
-                    break
-        reordered_group_to_workspaces = collections.OrderedDict()
-        reordered_group_to_workspaces[
-            target_group] = group_to_monitor_workspaces[target_group]
+        reordered_group_to_workspaces = [
+            (target_group, group_to_monitor_workspaces.get(target_group, []))
+        ]
         for group, workspaces in group_to_monitor_workspaces.items():
             if group != target_group:
-                reordered_group_to_workspaces[group] = workspaces
+                reordered_group_to_workspaces.append((group, workspaces))
         self.organize_workspace_groups(monitor_name,
                                        reordered_group_to_workspaces)
-        # Switch to the originally focused workspace that may have a new name
-        # following the workspace organization. Without doing this, if the user
-        # switches to the previously focused workspace ("workspace
-        # back_and_forth" command), i3 will switch to the previous name of the
-        # originally focused workspace, which will create a new empty workspace.
-        focused_group = get_workspace_group(focused_workspace)
-        if is_group_new:
-            logger.debug(
-                'Doing a "fake" workspace focus to fix native back_and_forth')
-            matching_workspaces = []
-            for workspace in reordered_group_to_workspaces[focused_group]:
-                if is_reordered_workspace(focused_workspace.name,
-                                          workspace.name):
-                    matching_workspaces.append(workspace)
-            assert len(matching_workspaces) == 1
-            self.send_i3_command('workspace "{}"'.format(
-                matching_workspaces[0].name))
-        if focused_group != target_group:
-            first_workspace_name = reordered_group_to_workspaces[target_group][
-                0].name
-            self.send_i3_command('workspace "{}"'.format(first_workspace_name))
 
     def switch_active_group(self, target_group: str,
                             focused_monitor_only: bool) -> None:
         focused_monitor_name = self._get_focused_monitor_name()
-        self.switch_monitor_active_group(focused_monitor_name, target_group)
-        if focused_monitor_only:
-            return
-        for monitor, workspaces in self._get_monitor_to_workspaces().items():
+        monitor_to_workspaces = self._get_monitor_to_workspaces()
+        for monitor, workspaces in monitor_to_workspaces.items():
+            group_exists = (
+                target_group in get_group_to_workspaces(workspaces))
             if monitor == focused_monitor_name:
+                logger.debug('Switching active group in focused monitor "%s"',
+                             monitor)
+            elif not focused_monitor_only and group_exists:
+                logger.debug(
+                    'Non focused monitor %s has workspaces in the group "%s", '
+                    'switching to it.', monitor, target_group)
+            else:
                 continue
-            group_to_workspaces = get_group_to_workspaces(workspaces)
-            if target_group not in group_to_workspaces:
-                continue
-            logger.debug(
-                'Non focused monitor %s has workspaces in the group "%s", '
-                'switching to it.', monitor, target_group)
             self.switch_monitor_active_group(monitor, target_group)
+        # NOTE: We only switch focus to the new workspace after renaming all the
+        # workspaces in all monitors and groups. Otherwise, if the previously
+        # focused workspace was renamed, i3's `workspace back_and_forth` will
+        # switch focus to a non-existant workspace name.
+        focused_group = get_workspace_group(
+            self.get_tree().find_focused().workspace())
+        # The target group is already focused, no need to do anything.
+        if focused_group == target_group:
+            return
+        group_to_monitor_workspaces = get_group_to_workspaces(
+            monitor_to_workspaces[focused_monitor_name])
+        # The focused monitor doesn't have any workspaces in the target group,
+        # so create one.
+        if target_group in group_to_monitor_workspaces:
+            workspace_name = group_to_monitor_workspaces[target_group][0].name
+        else:
+            workspace_name = self._create_new_active_group_workspace_name(
+                focused_monitor_name, target_group)
+        self.focus_workspace(workspace_name, auto_back_and_forth=False)
 
     def assign_workspace_to_group(self, target_group: str) -> None:
         if not is_valid_group_name(target_group):
@@ -692,7 +679,7 @@ class WorkspaceGroupsController:
 
     def focus_workspace_relative(self, offset_from_current: int) -> None:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
-        self.focus_workspace(next_workspace.name)
+        self.focus_workspace(next_workspace.name, auto_back_and_forth=False)
 
     def focus_workspace_back_and_forth(self) -> None:
         last_workspace = self.get_unique_marked_workspace(LAST_WORKSPACE_MARK)
@@ -701,7 +688,7 @@ class WorkspaceGroupsController:
                         'back_and_forth')
             self.send_i3_command('workspace back_and_forth')
             return
-        self.focus_workspace(last_workspace.name)
+        self.focus_workspace(last_workspace.name, auto_back_and_forth=False)
 
     def move_workspace_relative(self, offset_from_current: int) -> None:
         next_workspace = self._relative_workspace_in_group(offset_from_current)

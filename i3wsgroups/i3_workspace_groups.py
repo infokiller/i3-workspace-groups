@@ -217,7 +217,6 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
     used_local_numbers = get_used_local_numbers(other_monitors_workspaces)
     logger.debug('Local numbers used by group in other monitors: %s',
                  used_local_numbers)
-    local_numbers = []
     if renumber_workspaces:
         return get_lowest_free_local_numbers(len(monitor_workspaces),
                                              used_local_numbers)
@@ -225,6 +224,7 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
         last_used_local_number = max(used_local_numbers)
     else:
         last_used_local_number = 0
+    local_numbers = []
     for workspace in monitor_workspaces:
         ws_metadata = parse_workspace_name(workspace.name)
         local_number = ws_metadata.local_number

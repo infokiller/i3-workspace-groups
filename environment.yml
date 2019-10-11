@@ -6,6 +6,9 @@ dependencies:
   - python=3.6
   - pylint
   - yapf
+  - virtualenv
+  - tox
+  - tox-conda
   - pip
   - pip:
     - i3ipc

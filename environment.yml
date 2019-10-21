@@ -13,4 +13,3 @@ dependencies:
   - pip:
     - i3ipc
     - pytype
-    - pyright

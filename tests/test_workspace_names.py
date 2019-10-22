@@ -1,5 +1,5 @@
-from i3wsgroups.workspace_names import *
 from i3wsgroups.controller import *
+from i3wsgroups.workspace_names import *
 from tests import test_util
 
 
@@ -58,6 +58,7 @@ def test_compute_local_numbers3():
                                           True)
     assert local_numbers == [2, 3]
 
+
 def test_compute_local_numbers4():
     monitor_workspaces = [
         test_util.create_workspace(
@@ -72,3 +73,37 @@ def test_compute_local_numbers4():
     local_numbers = compute_local_numbers(monitor_workspaces, all_workspaces,
                                           False)
     assert local_numbers == [1, 3]
+
+
+def test_compute_group_index_empty():
+    assert get_group_index('', {}) == 0
+
+
+def test_compute_group_index_simple():
+    group_to_workspaces = {
+        'a': [
+            test_util.create_workspace(
+                1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
+        ],
+    }
+    assert get_group_index('a', group_to_workspaces) == 0
+    assert get_group_index('', group_to_workspaces) == 1
+    assert get_group_index('test', group_to_workspaces) == 1
+
+
+def test_compute_group_index_gaps():
+    group_to_workspaces = {
+        'a': [
+            test_util.create_workspace(
+                1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
+        ],
+        'b': [
+            test_util.create_workspace(
+                2, WorkspaceGroupingMetadata(global_number=201,
+                                             local_number=1)),
+        ],
+    }
+    assert get_group_index('a', group_to_workspaces) == 0
+    assert get_group_index('b', group_to_workspaces) == 2
+    assert get_group_index('', group_to_workspaces) == 3
+    assert get_group_index('test', group_to_workspaces) == 3

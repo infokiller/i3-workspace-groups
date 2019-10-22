@@ -10,5 +10,7 @@ def create_workspace(workspace_id: int,
                     ) -> i3ipc.Con:
     workspace = mock.create_autospec(i3ipc.Con)
     workspace.id = workspace_id
+    if ws_metadata.group is None:
+        ws_metadata.group = ''
     workspace.name = workspace_names.create_name(ws_metadata)
     return workspace

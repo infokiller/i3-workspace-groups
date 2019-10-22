@@ -6,7 +6,7 @@ from tests import test_util
 def test_compute_global_number():
     assert compute_global_number(0, 0, 1) == 1
     assert compute_global_number(0, 1, 1) == 101
-    assert compute_global_number(1, 1, 1) == 10101
+    assert compute_global_number(1, 1, 1) == 100101
 
 
 def test_global_number_to_group_index():

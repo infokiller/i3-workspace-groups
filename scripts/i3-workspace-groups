@@ -168,7 +168,8 @@ def _print_workspaces(controller, args):
             sys.exit('Invalid field: "{}". Valid fields: {}'.format(
                 field, _LIST_WORKSPACES_FIELDS))
     table = []
-    for workspace in controller.list_workspaces(args.focused_only,
+    for workspace in controller.list_workspaces(_create_group_context(args),
+                                                args.focused_only,
                                                 args.focused_monitor_only):
         row = []
         for field in fields:

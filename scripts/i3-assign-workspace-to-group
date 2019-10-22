@@ -1,46 +1,36 @@
 #!/usr/bin/env bash
 
-# Exit on error. Append "|| true" if you expect an error.
-set -o errexit
-# Exit on error inside any functions or subshells.
-set -o errtrace
-# Do not allow use of undefined vars. Use ${VAR:-} to use an undefined VAR
-set -o nounset
-# Catch the error in case mysqldump fails (but gzip succeeds) in `mysqldump |gzip`
-set -o pipefail
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -o errexit -o errtrace -o nounset -o pipefail
 
-function command_exists() {
+readonly HELP_HEADING='Select a group to assign to the focused workspace.'
+readonly HELP_CONTENT='You can assign it to a new group by typing a new name.
+Note that the default group is shown as &lt;default>.'
+readonly HELP_FORMAT='<span alpha="60%%" style="italic"><b>%s</b>
+%s</span>'
+# shellcheck disable=SC2059
+readonly HELP_TEXT="$(printf "${HELP_FORMAT}" "${HELP_HEADING}" \
+  "${HELP_CONTENT}")"
+
+command_exists() {
   type "$1" &> /dev/null
 }
 
-function list_groups() {
-  groups="$("${TOOL}" list-groups)"
-  if ! echo "${groups}" | grep -qE '^$'; then
-    echo ''
-  fi
-  echo "${groups}"
+get_tool() {
+  filename="$1"
+  local dir tool
+  dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+  tool="${dir}/${filename}"
+  command_exists "${tool}" || tool="${filename}"
+  printf '%s\n' "${tool}"
 }
 
-# The default group name is the empty string, so in order to make it clearer we
-# replace it with this string when presenting it to the user.
-DEFAULT_GROUP_ITEM='<default>'
-# NOTE: This used to have a span tag for adding transparency (see commented line
-# below), but I removed it because Rofi has a bug where pango markup
-# is being matched in dmenu mode, which is confusing. See also:
-# https://github.com/DaveDavenport/rofi/issues/597
-# DEFAULT_GROUP_ITEM='<span alpha="50%">(Default group)</span>'
-
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-TOOL="${DIR}/i3-workspace-groups"
-command_exists "${TOOL}" || TOOL="i3-workspace-groups"
-if group="$(list_groups |
-  sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |
-  rofi -dmenu -p 'Assign workspace to group' -lines 10 -width 30
-)"; then
-  if [[ "${group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
-    group=''
+main() {
+  select_groups="$(get_tool i3-select-workspace-group)"
+  if ! group="$("${select_groups}" -mesg "${HELP_TEXT}")"; then
+    exit 1
   fi
-  "${TOOL}" "$@" assign-workspace-to-group "${group}"
-else
-  exit $?
-fi
+  "$(get_tool i3-workspace-groups)" "$@" assign-workspace-to-group "${group}"
+}
+
+main "$@"

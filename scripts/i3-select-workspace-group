@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -o errexit -o errtrace -o nounset -o pipefail
+
+# The default group name is the empty string, so in order to make it clearer we
+# replace it with this string when presenting it to the user.
+DEFAULT_GROUP_ITEM='<default>'
+# NOTE: This used to have a span tag for adding transparency (see commented line
+# below), but I removed it because Rofi has a bug where pango markup
+# is being matched in dmenu mode, which is confusing. See also:
+# https://github.com/DaveDavenport/rofi/issues/597
+# DEFAULT_GROUP_ITEM='<span alpha="50%">(Default group)</span>'
+
+ROFI_ARGS=(rofi -dmenu -width 30 -lines 10)
+
+command_exists() {
+  type "$1" &> /dev/null
+}
+
+get_tool() {
+  filename="$1"
+  local dir tool
+  dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+  tool="${dir}/${filename}"
+  command_exists "${tool}" || tool="${filename}"
+  printf '%s\n' "${tool}"
+}
+
+list_groups() {
+  local tool="$1"
+  groups="$("${tool}" list-groups)"
+  if ! echo "${groups}" | grep -qE '^$'; then
+    echo ''
+  fi
+  echo "${groups}"
+}
+
+main() {
+  local tool
+  tool="$(get_tool i3-workspace-groups)"
+  if ! group="$(
+    list_groups "${tool}" |
+      sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |
+      "${ROFI_ARGS[@]}" -p 'Workspace Group' "$@"
+  )"; then
+    exit 1
+  fi
+  if [[ "${group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
+    group=''
+  fi
+  echo "${group}"
+}
+
+main "$@"

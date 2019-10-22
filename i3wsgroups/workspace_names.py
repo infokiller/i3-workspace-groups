@@ -45,7 +45,7 @@ WORKSPACE_NAME_SECTIONS = [
 # Unicode zero width char.
 SECTIONS_DELIM = '\u200b'
 
-_MAX_GROUPS_PER_MONITOR = 100
+_MAX_GROUPS_PER_MONITOR = 1000
 _MAX_WORKSPACES_PER_GROUP = 100
 
 _SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
@@ -72,14 +72,14 @@ class WorkspaceGroupingMetadata:
     # pylint: disable=too-many-arguments
     def __init__(self,
                  global_number: Optional[int] = None,
-                 group: str = '',
-                 static_name: str = '',
-                 dynamic_name: str = '',
+                 group: Optional[str] = None,
+                 static_name: Optional[str] = None,
+                 dynamic_name: Optional[str] = None,
                  local_number: Optional[int] = None):
         self.global_number: Optional[int] = global_number
-        self.group: str = group
-        self.static_name: str = static_name
-        self.dynamic_name: str = dynamic_name
+        self.group: Optional[str] = group
+        self.static_name: Optional[str] = static_name
+        self.dynamic_name: Optional[str] = dynamic_name
         self.local_number: Optional[int] = local_number
 
     def __str__(self):
@@ -128,7 +128,7 @@ def is_recognized_name_format(workspace_name: str) -> bool:
 
 
 def parse_name(workspace_name: str) -> WorkspaceGroupingMetadata:
-    result = WorkspaceGroupingMetadata()
+    result = WorkspaceGroupingMetadata(group='')
     if not is_recognized_name_format(workspace_name):
         result.static_name = sanitize_section_value(workspace_name)
         return result
@@ -212,6 +212,7 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
 
 def create_name(ws_metadata: WorkspaceGroupingMetadata) -> str:
     assert ws_metadata.global_number is not None
+    assert ws_metadata.group is not None
     sections = ['{}:'.format(ws_metadata.global_number), ws_metadata.group]
     need_prefix_colons = bool(ws_metadata.group)
     for section in ['static_name', 'dynamic_name', 'local_number']:
@@ -284,5 +285,5 @@ def get_group_index(target_group: str, group_to_workspaces: GroupToWorkspaces):
     if target_group in group_to_index:
         return group_to_index[target_group]
     if group_to_index:
-        return max(group_to_index.values())
+        return max(group_to_index.values()) + 1
     return 0

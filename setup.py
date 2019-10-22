@@ -9,7 +9,7 @@ with open(README_PATH) as f:
 
 setuptools.setup(
     name='i3-workspace-groups',
-    version='0.4.2-alpha',
+    version='0.4.3-alpha',
     description='Manage i3wm workspaces in groups you control',
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
@@ -36,6 +36,7 @@ setuptools.setup(
         'scripts/i3-focus-on-workspace',
         'scripts/i3-move-to-workspace',
         'scripts/i3-rename-workspace',
+        'scripts/i3-select-workspace-group',
         'scripts/i3-switch-active-workspace-group',
         'scripts/i3-workspace-groups',
     ],

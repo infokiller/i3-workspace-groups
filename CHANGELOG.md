@@ -9,3 +9,4 @@
   built-in i3 commands should work
 - Move group CLI arguments to specific subcommands used
 - Support focusing and moving to workspaces that don't exist (fixes #10)
+- Support renaming, renumbering, and regrouping workspaces in i3-rename-workspace

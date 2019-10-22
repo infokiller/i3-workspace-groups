@@ -1,28 +1,92 @@
 #!/usr/bin/env bash
 
-# Exit on error. Append "|| true" if you expect an error.
-set -o errexit
-# Exit on error inside any functions or subshells.
-set -o errtrace
-# Do not allow use of undefined vars. Use ${VAR:-} to use an undefined VAR
-set -o nounset
-# Catch the error in case mysqldump fails (but gzip succeeds) in `mysqldump |gzip`
-set -o pipefail
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -o errexit -o errtrace -o nounset -o pipefail
 
-function command_exists() {
+readonly HELP_HEADING_FORMAT='Enter a new name for workspace "%s"'
+readonly HELP_CONTENT='By default only the name is changed, but you can also use colons to change the number or group. The following is a list of example inputs and what properties they change.
+- <b>foo</b> - set name "foo".
+- <b>foo:2</b> - set name to "foo", number to 2.
+- <b>:2</b> - set number to 22.
+- <b>bar:foo:2</b> - set group to bar, name to "foo", and number to 2.
+- <b>bar::2</b> - set group to bar and number to 2.'
+readonly HELP_FORMAT='<span alpha="60%%" style="italic"><b>%s</b>
+%s</span>'
+
+ROFI_ARGS=(rofi -dmenu -width 30)
+
+command_exists() {
   type "$1" &> /dev/null
 }
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-TOOL="${DIR}/i3-workspace-groups"
-command_exists "${TOOL}" || TOOL="i3-workspace-groups"
-mesg=()
-if current_name="$("${TOOL}" list-workspaces --fields static_name --focused-only)"; then
-  mesg[1]='-mesg'
-  mesg[2]="$(printf '<span alpha="50%%">Current name: "%s"</span>' "${current_name}")"
-fi
-if new_name="$(rofi -dmenu -p 'New workspace name' -lines 0 -width 30 "${mesg[@]}")"; then
-  "${TOOL}" rename-workspace "${new_name}"
-else
-  exit $?
-fi
+get_tool() {
+  filename="$1"
+  local dir tool
+  dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+  tool="${dir}/${filename}"
+  command_exists "${tool}" || tool="${filename}"
+  printf '%s\n' "${tool}"
+}
+
+error() {
+  local error normal
+  # Red color
+  error="$(tput setaf 1)"
+  normal="$(tput sgr0)"
+  printf >&2 '%s\n' "${error}${*}${normal}"
+}
+
+rename_workspace() {
+  local name_pattern="$1"
+  mapfile -d ':' -t fields < <(printf '%s' "${name_pattern}")
+  local num_fields=${#fields[@]}
+  if ((num_fields == 0)); then
+    fields=('')
+    num_fields=1
+  fi
+  local static_name_arg=()
+  local local_number_arg=()
+  local group_arg=()
+  # When there is a single field, i.e. there was no column in the pattern, it
+  # means that this is the new static name, even if it's an empty string.
+  # In contrast, when there is more than one field, an empty string actually
+  # means "do not change".
+  if ((num_fields == 1)); then
+    static_name_arg=('--name' "${fields[0]}")
+  elif ((num_fields == 2)); then
+    [[ -n "${fields[0]}" ]] && static_name_arg=('--name' "${fields[0]}")
+    [[ -n "${fields[1]}" ]] && local_number_arg=('--number' "${fields[1]}")
+  elif ((num_fields == 3)); then
+    [[ -n "${fields[0]}" ]] && group_arg=('--group' "${fields[0]}")
+    [[ -n "${fields[1]}" ]] && static_name_arg=('--name' "${fields[1]}")
+    [[ -n "${fields[2]}" ]] && local_number_arg=('--number' "${fields[2]}")
+  else
+    error 'Name pattern cannot contain more than 3 colons'
+    exit 3
+  fi
+  "${tool}" rename-workspace "${static_name_arg[@]}" "${local_number_arg[@]}" \
+    "${group_arg[@]}"
+
+}
+
+main() {
+  local tool
+  tool="$(get_tool i3-workspace-groups)"
+  mesg=()
+  if current_name="$("${tool}" list-workspaces --fields static_name \
+    --focused-only)"; then
+    local help_heading
+    # shellcheck disable=SC2059
+    help_heading="$(printf "${HELP_HEADING_FORMAT}" "${current_name}")"
+    mesg[1]='-mesg'
+    # shellcheck disable=SC2059
+    mesg[2]="$(printf "${HELP_FORMAT}" "${help_heading}" "${HELP_CONTENT}")"
+  fi
+  if ! new_name_pattern="$("${ROFI_ARGS[@]}" -lines 0 -p 'Rename' \
+    "${mesg[@]}")"; then
+    exit 1
+  fi
+  rename_workspace "${new_name_pattern}"
+}
+
+main "$@"

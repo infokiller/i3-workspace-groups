@@ -23,7 +23,7 @@ init_logger = logger.init_logger
 logger = logger.logger
 
 
-def _add_group_args(parser: argparse.ArgumentParser):
+def _add_group_args(parser: argparse.ArgumentParser) -> None:
     # The argparse argument group of the workspace group arguments.
     group_arg_group = parser.add_mutually_exclusive_group()
     group_arg_group.add_argument(
@@ -40,6 +40,38 @@ def _add_group_args(parser: argparse.ArgumentParser):
         help='Use the focused group for any commands that implicitly assume a '
         'group, such as workspace-next.')
     group_arg_group.add_argument('--group-name')
+
+
+def _add_list_workspaces_args(parser: argparse.ArgumentParser) -> None:
+    _add_group_args(parser)
+    parser.add_argument('--fields',
+                        default=','.join(_LIST_WORKSPACES_FIELDS),
+                        help=_LIST_WORKSPACES_FIELDS_HELP)
+    parser.add_argument(
+        '--focused-only',
+        action='store_true',
+        help='List only the focused workspace in the given group context.')
+    parser.add_argument('--focused-monitor-only',
+                        action='store_true',
+                        help='List only workspaces on the current monitor.')
+
+
+def _add_rename_workspace_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        '--name',
+        help='New name to set for the workspace.\n'
+        'Note that this is not the same as the workspace number.\n'
+        'If not provided, keeps the existing name.')
+    parser.add_argument(
+        '--number',
+        type=int,
+        help='New number to set for the workspace.\n'
+        'Note that this is not the same as the workspace name.\n'
+        'If not provided, keeps the existing number.')
+    parser.add_argument(
+        '--group',
+        help='Group to assign to the focused workspace. If not provided, keeps '
+        'the existing group assignment.')
 
 
 def _create_args_parser() -> argparse.ArgumentParser:
@@ -62,30 +94,13 @@ def _create_args_parser() -> argparse.ArgumentParser:
         help='List only workspaces on the current monitor.')
     list_workspaces_parser = subparsers.add_parser(
         'list-workspaces', help='List workspaces and their group.')
-    _add_group_args(list_workspaces_parser)
-    list_workspaces_parser.add_argument(
-        '--fields',
-        default=','.join(_LIST_WORKSPACES_FIELDS),
-        help=_LIST_WORKSPACES_FIELDS_HELP)
-    list_workspaces_parser.add_argument(
-        '--focused-only',
-        action='store_true',
-        help='List only the focused workspace in the given group context.')
-    list_workspaces_parser.add_argument(
-        '--focused-monitor-only',
-        action='store_true',
-        help='List only workspaces on the current monitor.')
+    _add_list_workspaces_args(list_workspaces_parser)
     workspace_number_parser = subparsers.add_parser(
         'workspace-number',
         help='Focus on the workspace with the provided number in the focused '
         'group, similar to i3\'s "workspace number" command')
     workspace_number_parser.add_argument('workspace_relative_number', type=int)
     _add_group_args(workspace_number_parser)
-    subparsers.add_parser(
-        'workspace-back-and-forth',
-        help='Focus on the last focused workspace, similar to i3\'s '
-        '"workspace back_and_forth" command. Needed to avoid some issues with '
-        'automatic renaming')
     subparsers.add_parser(
         'workspace-next',
         help='Focus on the next workspace in the focused group, similar to '
@@ -102,10 +117,6 @@ def _create_args_parser() -> argparse.ArgumentParser:
     move_to_number_parser.add_argument('workspace_relative_number', type=int)
     _add_group_args(move_to_number_parser)
     subparsers.add_parser(
-        'move-to-back-and-forth',
-        help='Move the focused container to the last focused workspace, '
-        'similar to i3\'s "move container to back_and_forth" command')
-    subparsers.add_parser(
         'move-to-next',
         help='Move the focused container to the prev workspace in the focused '
         'group, similar to i3\'s "move container to workspace next" command')
@@ -113,24 +124,31 @@ def _create_args_parser() -> argparse.ArgumentParser:
         'move-to-prev',
         help='Move the focused container to the prev workspace in the focused '
         'group, similar to i3\'s "move container to workspace prev" command')
-    subparsers.add_parser(
-        'rename-workspace',
-        help='Similar to i3\'s "renamed workspace" command, but only changes '
-        'the name of the workspace within the group, while preserving its '
-        'group assignment').add_argument('new_name')
-    subparsers.add_parser('renumber-workspace',
-                          help='Change local number of workspace').add_argument(
-                              'new_number', type=int)
     switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
         help='Switches the active group to the one provided.')
     switch_active_group_parser.add_argument('group')
     switch_active_group_parser.add_argument('--focused-monitor-only',
                                             action='store_true')
+    rename_workspace_parser = subparsers.add_parser(
+        'rename-workspace',
+        help='Renames and optionally changes the group of the focused workspace'
+    )
+    _add_rename_workspace_args(rename_workspace_parser)
     subparsers.add_parser(
         'assign-workspace-to-group',
         help='Assigns the focused workspace to the provided group.'
     ).add_argument('group')
+    # Deprecated commands, will be removed in a future release.
+    subparsers.add_parser(
+        'workspace-back-and-forth',
+        help='[DEPRECATED] Focus on the last focused workspace, similar to '
+        'i3\'s "workspace back_and_forth" command.')
+    subparsers.add_parser(
+        'move-to-back-and-forth',
+        help='[DEPRECATED] Move the focused container to the last focused '
+        'workspace, similar to i3\'s "move container to back_and_forth" command'
+    )
     return parser
 
 
@@ -196,11 +214,6 @@ def main():
         elif args.command == 'workspace-number':
             controller.focus_workspace_number(_create_group_context(args),
                                               args.workspace_relative_number)
-        elif args.command == 'workspace-back-and-forth':
-            logger.warning(
-                'workspace-back-and-forth is deprecated, please '
-                'migrate to the native i3 "workspace back_and_forth" command')
-            controller.i3_proxy.send_i3_command('workspace back_and_forth')
         elif args.command == 'workspace-next':
             controller.focus_workspace_relative(+1)
         elif args.command == 'workspace-prev':
@@ -208,24 +221,34 @@ def main():
         elif args.command == 'move-to-number':
             controller.move_to_workspace_number(_create_group_context(args),
                                                 args.workspace_relative_number)
+        elif args.command == 'move-to-next':
+            controller.move_workspace_relative(+1)
+        elif args.command == 'move-to-prev':
+            controller.move_workspace_relative(-1)
+        elif args.command == 'switch-active-group':
+            controller.switch_active_group(args.group,
+                                           args.focused_monitor_only)
+        elif args.command == 'rename-workspace':
+            metadata_updates = workspace_names.WorkspaceGroupingMetadata(
+                group=args.group,
+                static_name=args.name,
+                local_number=args.number)
+            controller.update_focused_workspace(metadata_updates)
+        elif args.command == 'assign-workspace-to-group':
+            metadata_updates = workspace_names.WorkspaceGroupingMetadata(
+                group=args.group)
+            controller.update_focused_workspace(metadata_updates)
+        # Deprecated commands, will be removed in a future release.
+        elif args.command == 'workspace-back-and-forth':
+            logger.warning(
+                'workspace-back-and-forth is deprecated, please '
+                'migrate to the native i3 "workspace back_and_forth" command')
+            controller.i3_proxy.send_i3_command('workspace back_and_forth')
         elif args.command == 'move-to-back-and-forth':
             logger.warning(
                 'move-to-back-and-forth is deprecated, please '
                 'migrate to the native i3 "workspace back_and_forth" command')
             controller.i3_proxy.send_i3_command('move workspace back_and_forth')
-        elif args.command == 'move-to-next':
-            controller.move_workspace_relative(+1)
-        elif args.command == 'move-to-prev':
-            controller.move_workspace_relative(-1)
-        elif args.command == 'rename-workspace':
-            controller.rename_focused_workspace(args.new_name)
-        elif args.command == 'renumber-workspace':
-            controller.renumber_focused_workspace(args.new_number)
-        elif args.command == 'switch-active-group':
-            controller.switch_active_group(args.group,
-                                           args.focused_monitor_only)
-        elif args.command == 'assign-workspace-to-group':
-            controller.assign_workspace_to_group(args.group)
     except i3_groups_controller.WorkspaceGroupsError as ex:
         sys.exit(ex)
 

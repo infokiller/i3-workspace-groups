@@ -30,7 +30,6 @@ class WorkspaceAutonamer:
                          ) -> controller.WorkspaceGroupsController:
         return controller.WorkspaceGroupsController(
             i3_proxy.I3Proxy(i3_connection, self.dry_run),
-            group_context=None,
             add_window_icons=True,
             add_window_icons_all_groups=self.add_window_icons_all_groups,
             renumber_workspaces=self.renumber_workspaces)

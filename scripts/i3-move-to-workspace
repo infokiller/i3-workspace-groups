@@ -1,42 +1,60 @@
 #!/usr/bin/env bash
 
-# Exit on error. Append "|| true" if you expect an error.
-set -o errexit
-# Exit on error inside any functions or subshells.
-set -o errtrace
-# Do not allow use of undefined vars. Use ${VAR:-} to use an undefined VAR
-set -o nounset
-# Catch the error in case mysqldump fails (but gzip succeeds) in `mysqldump |gzip`
-set -o pipefail
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -o errexit -o errtrace -o nounset -o pipefail
 
-function command_exists() {
+readonly HELP_HEADING='Select a workspace to move the focused container into'
+readonly HELP_CONTENT='You can select a new (non existing) workspace by using the format "group:number", for example "work:2".
+Displayed table columns: group, number, window icons, and name.'
+readonly HELP_FORMAT='<span alpha="60%%" style="italic"><b>%s</b>
+%s</span>'
+# shellcheck disable=SC2059
+readonly HELP_TEXT="$(printf "${HELP_FORMAT}" "${HELP_HEADING}" "${HELP_CONTENT}")"
+
+readonly DISPLAYED_FIELDS='group,local_number,window_icons,static_name'
+
+ROFI_ARGS=(rofi -dmenu -width 30)
+
+command_exists() {
   type "$1" &> /dev/null
 }
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-TOOL="${DIR}/i3-workspace-groups"
-command_exists "${TOOL}" || TOOL="i3-workspace-groups"
+get_tool() {
+  filename="$1"
+  local dir tool
+  dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+  tool="${dir}/${filename}"
+  command_exists "${tool}" || tool="${filename}"
+  printf '%s\n' "${tool}"
+}
 
-mapfile -t workspaces < <("${TOOL}" list-workspaces --fields 'global_name')
-mapfile -t displayed_workspaces < <("${TOOL}" list-workspaces \
-  --fields 'group,local_number,window_icons,static_name')
-
-MESG='<span alpha="50%">Focused container will move to the selected workspace</span>'
-
-if selected="$(printf '%s\n' "${displayed_workspaces[@]}" |
-  rofi -dmenu -width 30 -p 'Workspace' -mesg "${MESG}")"; then
+main() {
+  local tool
+  tool="$(get_tool i3-workspace-groups)"
+  local displayed_workspaces
+  mapfile -t displayed_workspaces < <(
+    "${tool}" list-workspaces --fields "${DISPLAYED_FIELDS}"
+  )
+  if ! selected="$(printf '%s\n' "${displayed_workspaces[@]}" |
+    "${ROFI_ARGS[@]}" -p 'Workspace' -mesg "${HELP_TEXT}")"; then
+    exit 1
+  fi
+  local workspaces
+  mapfile -t workspaces < <("${tool}" list-workspaces --fields 'global_name')
   for i in "${!displayed_workspaces[@]}"; do
+    local line
     line="${displayed_workspaces[${i}]}"
     if [[ "${line}" == "${selected}" ]]; then
       i3-msg 'move container to workspace "'"${workspaces[${i}]}"'"'
       exit
     fi
   done
+  local group local_number
   # No existing workspace was selected, assume it's a new workspace with a
   # format of "group:local_number".
   group="${selected%%:*}"
   local_number="${selected##*:}"
-  "${TOOL}" move-to-number --group-name "${group}" "${local_number}"
-else
-  exit $?
-fi
+  "${tool}" move-to-number --group-name "${group}" "${local_number}"
+}
+
+main "$@"

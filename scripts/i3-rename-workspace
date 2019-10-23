@@ -4,9 +4,11 @@
 set -o errexit -o errtrace -o nounset -o pipefail
 
 readonly HELP_HEADING_FORMAT='Enter a new name for workspace "%s"'
-readonly HELP_CONTENT='By default only the name is changed, but you can also use colons to change the number or group. The following is a list of example inputs and what properties they change.
+readonly HELP_CONTENT='By default only the name is changed, but you can also use colons to change the number or group, In addition, you can use an hyphen ("-") to reset a property. 
+The following is a list of example inputs and what properties they change.
 - <b>foo</b> - set name "foo".
 - <b>foo:2</b> - set name to "foo", number to 2.
+- <b>-:2</b> - set name to "" and number to 22.
 - <b>:2</b> - set number to 22.
 - <b>bar:foo:2</b> - set group to bar, name to "foo", and number to 2.
 - <b>bar::2</b> - set group to bar and number to 2.'
@@ -64,6 +66,10 @@ rename_workspace() {
     error 'Name pattern cannot contain more than 3 colons'
     exit 3
   fi
+  # Replace '-' with an empty string.
+  [[ "${static_name_arg[1]:-}" == '-' ]] && static_name_arg[1]=''
+  [[ "${local_number_arg[1]:-}" == '-' ]] && local_number_arg[1]=''
+  [[ "${group_arg[1]:-}" == '-' ]] && group_arg[1]=''
   "${tool}" rename-workspace "${static_name_arg[@]}" "${local_number_arg[@]}" \
     "${group_arg[@]}"
 

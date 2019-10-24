@@ -234,7 +234,6 @@ interactively managing the groups, using rofi as the UI. They include:
 - [`i3-move-to-workspace`](scripts/i3-move-to-workspace)
 - [`i3-rename-workspace`](scripts/i3-rename-workspace)
 - [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
-- [`i3-workspace-groups`](scripts/i3-workspace-groups)
 
 ### Sway compatibility note
 

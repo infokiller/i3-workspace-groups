@@ -220,7 +220,7 @@ group is usually displayed as "&lt;default>".
 The scripts can be installed using pip:
 
 ```shell
-pip install i3-workspace-groups
+python3 -m pip install i3-workspace-groups
 ```
 
 Then you should be able to run the command line tool

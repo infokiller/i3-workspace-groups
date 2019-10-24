@@ -232,6 +232,8 @@ The scripts can be installed using pip:
 pip install i3-workspace-groups
 ```
 
+*Note: The project run under Python 3 be careful to use the right pip.*
+
 Then you should be able to run the command line tool
 [`i3-workspace-groups`](scripts/i3-workspace-groups).
 There are also a few utility scripts provided that require

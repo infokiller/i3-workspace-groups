@@ -60,7 +60,7 @@ workspace. For example, if a user assigns the workspace "mail" to the group
 
 ### Example walk through
 
-> NOTE: This walk through assumes that you configured keybindings like the
+> **NOTE:** This walk through assumes that you configured keybindings like the
 > [example i3 config](#i3-config).
 
 Say we start with the following workspace names:
@@ -123,8 +123,18 @@ set $exec_i3_groups exec --no-startup-id i3-workspace-groups
 
 # Switch active workspace group
 bindsym $mod+g exec --no-startup-id i3-switch-active-workspace-group
-# Move workspace to another group
+
+# Assign workspace to a group
 bindsym $mod+Shift+g exec --no-startup-id i3-assign-workspace-to-group
+
+# Select workspace to focus on
+bindsym $mod+w exec --no-startup-id i3-focus-on-workspace
+
+# Move the focused container to another workspace
+bindsym $mod+Shift+w exec --no-startup-id i3-move-to-workspace
+
+# Rename/renumber workspace. Uses Super+Alt+n
+bindsym Mod1+Mod4+n exec --no-startup-id i3-rename-workspace
 
 bindsym $mod+1 $exec_i3_groups workspace-number 1
 bindsym $mod+2 $exec_i3_groups workspace-number 2
@@ -153,22 +163,6 @@ bindsym $mod+p workspace prev
 bindsym $mod+n workspace next
 ```
 
-I also recommend keeping keybindings for the i3 built in workspace navigation
-commands, for example:
-
-```
-bindsym $mod+Control+1 workspace number 1
-bindsym $mod+Control+2 workspace number 2
-bindsym $mod+Control+3 workspace number 3
-bindsym $mod+Control+4 workspace number 4
-bindsym $mod+Control+5 workspace number 5
-bindsym $mod+Control+6 workspace number 6
-bindsym $mod+Control+7 workspace number 7
-bindsym $mod+Control+8 workspace number 8
-bindsym $mod+Control+9 workspace number 9
-bindsym $mod+Control+0 workspace number 10
-```
-
 ### Limitations
 
 - **Interaction with other i3 tools**: workspace names are used for storing the
@@ -193,9 +187,9 @@ before you use the provided scripts to manage you workspaces, this will be the
 one that appears first in the workspace list in i3bar (by default the leftmost
 one).
 
-> NOTE: In a multi-monitor setup, there is an active workspace per monitor.
+> **NOTE:** In a multi-monitor setup, there is an active workspace per monitor.
 >
-> NOTE: The active workspace is not affected by whether its focused or not.
+> **NOTE:** The active workspace is not affected by whether its focused or not.
 
 #### Active group
 
@@ -207,7 +201,7 @@ Workspaces that are not in the active group can still be interacted with, but
 some commands provided are designed to make it easier to interact with the
 workspaces of the active group.
 
-> NOTE: In a multi-monitor setup, there is an active group per monitor (which
+> **NOTE:** In a multi-monitor setup, there is an active group per monitor (which
 > can be the same, depending on the group of the active workspace in that
 > monitor).
 

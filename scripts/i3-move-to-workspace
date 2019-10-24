@@ -6,8 +6,8 @@ set -o errexit -o errtrace -o nounset -o pipefail
 readonly HELP_HEADING='Select a workspace to move the focused container into'
 readonly HELP_CONTENT='You can select a new (non existing) workspace by using the format "group:number", for example "work:2".
 Displayed table columns: group, number, window icons, and name.'
-readonly HELP_FORMAT='<span alpha="60%%" style="italic"><b>%s</b>
-%s</span>'
+readonly HELP_FORMAT='<span alpha="50%%" size="smaller"><b>%s</b>
+<i>%s</i></span>'
 # shellcheck disable=SC2059
 readonly HELP_TEXT="$(printf "${HELP_FORMAT}" "${HELP_HEADING}" "${HELP_CONTENT}")"
 

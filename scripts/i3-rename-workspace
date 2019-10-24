@@ -4,15 +4,21 @@
 set -o errexit -o errtrace -o nounset -o pipefail
 
 readonly HELP_HEADING_FORMAT='Enter a new name for workspace "%s"'
-readonly HELP_CONTENT='By default only the name is changed, but you can also use colons to change the number or group, In addition, you can use an hyphen ("-") to reset a property. 
-The following is a list of example inputs and what properties they change.
-- <b>foo</b> - set name "foo".
-- <b>foo:2</b> - set name to "foo", number to 2.
-- <b>-:2</b> - set name to "" and number to 22.
-- <b>:2</b> - set number to 22.
-- <b>bar:foo:2</b> - set group to bar, name to "foo", and number to 2.
-- <b>bar::2</b> - set group to bar and number to 2.'
-readonly HELP_FORMAT='<span alpha="60%%" style="italic"><b>%s</b>
+readonly HELP_CONTENT_FORMAT='<i>By default only the name is changed, but you can also use colons to change the number or group, In addition, you can use an hyphen ("-") to reset a property. 
+Example inputs and what properties they change:</i> %s'
+readonly HELP_EXAMPLES='
++-----------+-----------------------------------+
+|   Input   |              Changes              |
++-----------+-----------------------------------+
+| foo       | name="foo"                        |
+| foo:2     | name="foo", number=2              |
+| -:2       | name="", number=2                 |
+| :2        | number=2                          |
+| bar:foo:2 | group="bar", name="foo", number=2 |
+| bar::2    | group="bar", number=2             |
++-----------+-----------------------------------+'
+
+readonly HELP_FORMAT='<span alpha="50%%" size="smaller"><b>%s</b>
 %s</span>'
 
 ROFI_ARGS=(rofi -dmenu -width 30)
@@ -84,9 +90,11 @@ main() {
     local help_heading
     # shellcheck disable=SC2059
     help_heading="$(printf "${HELP_HEADING_FORMAT}" "${current_name}")"
+    # shellcheck disable=SC2059
+    help_content="$(printf "${HELP_CONTENT_FORMAT}" "${HELP_EXAMPLES}")"
     mesg[1]='-mesg'
     # shellcheck disable=SC2059
-    mesg[2]="$(printf "${HELP_FORMAT}" "${help_heading}" "${HELP_CONTENT}")"
+    mesg[2]="$(printf "${HELP_FORMAT}" "${help_heading}" "${help_content}")"
   fi
   if ! new_name_pattern="$("${ROFI_ARGS[@]}" -lines 0 -p 'Rename' \
     "${mesg[@]}")"; then

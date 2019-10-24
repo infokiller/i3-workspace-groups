@@ -73,14 +73,15 @@ Say we start with the following workspace names:
 An important thing to understand here is that every i3 workspace is always
 assigned to a single group. And since we haven't assigned any workspace to a
 group yet, all the workspaces are implicitly in the
-[default group](#default-group), which is labeled with the string "&lt;default>".
+[default group](#default-group), which is denoted as "&lt;default>".
 
 After a few hours of leisure time, you decide to do some work, which requires
 opening a few windows on a few workspaces. In order to create a new group, first
 you switch to the workspace "4", and then you press `Super+Shift+g`, which will
-prompt you for a new for the new group. You decide to name it "work" and press
-enter. You will then notice that the workspace name will change in i3bar to
-"work:4".
+prompt you for a group to assign to the current workspace. You type "work" and
+press enter. Since there's no group named "work" yet, the tool will create it
+and assign the focused workspace to it. You will then notice that the
+workspace name will change in i3bar to "work:4".
 Then, you press `Super+g` in order to switch the [active
 group](#active-group). You will be shown a list of existing groups, which will
 now be "work" and "&lt;default>".
@@ -90,8 +91,8 @@ What happened here?
 When you switched to the "work" group, the first thing that the tool did was to
 move all the workspaces in the work group (only "work:mail") to be in the
 beginning of the workspace list. Then, it renamed the workspaces in the default
-group to include the group name, so that they can be
-differentiated from other workspaces in the "work" group with the same name.
+group to include the group name, so that they can be differentiated from other
+workspaces in the "work" group with the same name.
 
 Then, you decide that you want to open a new terminal window in a new workspace.
 So you press `Super+2`, which will move you to a new workspace named "work:2".

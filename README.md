@@ -229,10 +229,8 @@ group is usually displayed as "&lt;default>".
 The scripts can be installed using pip:
 
 ```shell
-pip install i3-workspace-groups
+python3 -m pip install i3-workspace-groups
 ```
-
-*Note: The project run under Python 3 be careful to use the right pip.*
 
 Then you should be able to run the command line tool
 [`i3-workspace-groups`](scripts/i3-workspace-groups).

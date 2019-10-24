@@ -60,8 +60,8 @@ workspace. For example, if a user assigns the workspace "mail" to the group
 
 ### Example walk through
 
-NOTE: This walk through assumes that you configured keybindings like the
-[example i3 config](#i3-config).
+> NOTE: This walk through assumes that you configured keybindings like the
+> [example i3 config](#i3-config).
 
 Say we start with the following workspace names:
 
@@ -148,15 +148,9 @@ bindsym $mod+Shift+8 $exec_i3_groups move-to-number 8
 bindsym $mod+Shift+9 $exec_i3_groups move-to-number 9
 bindsym $mod+Shift+0 $exec_i3_groups move-to-number 10
 
-# Switch to previous workspace in group.
+# Switch to previous/next workspace (in all groups).
 bindsym $mod+p workspace prev
-# Switch to next workspace in group.
 bindsym $mod+n workspace next
-
-# Move to previous workspace in group.
-bindsym $mod+Shift+p move container to workspace prev
-# Move to next workspace in group.
-bindsym $mod+Shift+n move container to workspace next
 ```
 
 I also recommend keeping keybindings for the i3 built in workspace navigation
@@ -199,8 +193,9 @@ before you use the provided scripts to manage you workspaces, this will be the
 one that appears first in the workspace list in i3bar (by default the leftmost
 one).
 
-NOTE: In a multi-monitor setup, there is an active workspace per monitor.
-NOTE: The active workspace is not affected by whether its focused or not.
+> NOTE: In a multi-monitor setup, there is an active workspace per monitor.
+>
+> NOTE: The active workspace is not affected by whether its focused or not.
 
 #### Active group
 
@@ -212,8 +207,9 @@ Workspaces that are not in the active group can still be interacted with, but
 some commands provided are designed to make it easier to interact with the
 workspaces of the active group.
 
-NOTE: In a multi-monitor setup, there is an active group per monitor (which can
-be the same, depending on the group of the active workspace in that monitor).
+> NOTE: In a multi-monitor setup, there is an active group per monitor (which
+> can be the same, depending on the group of the active workspace in that
+> monitor).
 
 #### Focused group
 

@@ -67,6 +67,7 @@ confidence=
 disable=fixme,
         logging-format-interpolation,
         missing-docstring,
+        too-few-public-methods,
 
 # Things I disabled but were in the default config:
 # disable=print-statement,

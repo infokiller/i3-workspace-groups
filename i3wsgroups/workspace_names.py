@@ -53,7 +53,6 @@ _SCRATCHPAD_WORKSPACE_NAME = '__i3_scratch'
 GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
 
 
-# pylint: disable=too-few-public-methods
 class WorkspaceDisplayMetadata:
 
     def __init__(self, workspace_name: str, monitor_name: str,
@@ -66,7 +65,6 @@ class WorkspaceDisplayMetadata:
         return str(self.__dict__)
 
 
-# pylint: disable=too-few-public-methods
 class WorkspaceGroupingMetadata:
 
     # pylint: disable=too-many-arguments

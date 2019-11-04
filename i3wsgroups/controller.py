@@ -20,7 +20,6 @@ class WorkspaceGroupsError(Exception):
     pass
 
 
-# pylint: disable=too-few-public-methods
 class ActiveGroupContext:
 
     @staticmethod
@@ -30,7 +29,6 @@ class ActiveGroupContext:
         return next(iter(group_to_workspaces))
 
 
-# pylint: disable=too-few-public-methods
 class FocusedGroupContext:
 
     @staticmethod
@@ -39,7 +37,6 @@ class FocusedGroupContext:
         return ws_names.get_group(focused_workspace)
 
 
-# pylint: disable=too-few-public-methods
 class NamedGroupContext:
 
     def __init__(self, group_name: str):

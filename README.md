@@ -12,17 +12,19 @@ I find this tool useful for managing many workspaces in i3.
 ## Table of Contents
 
 - [Background](#background)
-- [Overview](#overview)
-  - [Example walk through](#example-walk-through)
-  - [i3 config](#i3-config)
-  - [Limitations](#limitations)
-  - [Concepts](#concepts)
-    - [Active workspace](#active-workspace)
-    - [Active group](#active-group)
-    - [Focused group](#focused-group)
-    - [Default group](#default-group)
 - [Installation](#installation)
-  - [Sway compatibility note](#sway-compatibility-note)
+- [Configuration](#configuration)
+  - [i3 config](#i3-config)
+  - [i3-workspace-groups configuration file](#i3-workspace-groups-configuration-file)
+- [Usage](#usage)
+  - [Example walk through](#example-walk-through)
+- [Concepts](#concepts)
+  - [Active workspace](#active-workspace)
+  - [Active group](#active-group)
+  - [Focused group](#focused-group)
+  - [Default group](#default-group)
+- [Limitations](#limitations)
+  - [Sway compatibility](#sway-compatibility)
 
 ## Background
 
@@ -43,7 +45,93 @@ This has led me to create the [i3-workspace-groups](https://github.com/infokille
 project, which enables you to define and manage groups of workspaces, each with
 their own "namespace", and switch between them.
 
-## Overview
+## Installation
+
+The scripts can be installed using pip:
+
+```shell
+python3 -m pip install i3-workspace-groups
+```
+
+Then you should be able to run the command line tool
+[`i3-workspace-groups`](scripts/i3-workspace-groups).
+There are also a few utility scripts provided that require
+[rofi](https://github.com/DaveDavenport/rofi) and which are useful for
+interactively managing the groups, using rofi as the UI. They include:
+
+- [`i3-assign-workspace-to-group`](scripts/i3-assign-workspace-to-group)
+- [`i3-focus-on-workspace`](scripts/i3-focus-on-workspace)
+- [`i3-move-to-workspace`](scripts/i3-move-to-workspace)
+- [`i3-rename-workspace`](scripts/i3-rename-workspace)
+- [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
+
+## Configuration
+
+### i3 config
+
+In order to use these tools effectively, commands need to be bound to
+keybindings. For example, my i3 config contains the following exerts:
+
+<!-- markdownlint-disable fenced-code-language -->
+
+```
+set $mod Mod4
+
+strip_workspace_numbers yes
+
+set $exec_i3_groups exec --no-startup-id i3-workspace-groups
+
+# Switch active workspace group
+bindsym $mod+g exec --no-startup-id i3-switch-active-workspace-group
+
+# Assign workspace to a group
+bindsym $mod+Shift+g exec --no-startup-id i3-assign-workspace-to-group
+
+# Select workspace to focus on
+bindsym $mod+w exec --no-startup-id i3-focus-on-workspace
+
+# Move the focused container to another workspace
+bindsym $mod+Shift+w exec --no-startup-id i3-move-to-workspace
+
+# Rename/renumber workspace. Uses Super+Alt+n
+bindsym Mod1+Mod4+n exec --no-startup-id i3-rename-workspace
+
+bindsym $mod+1 $exec_i3_groups workspace-number 1
+bindsym $mod+2 $exec_i3_groups workspace-number 2
+bindsym $mod+3 $exec_i3_groups workspace-number 3
+bindsym $mod+4 $exec_i3_groups workspace-number 4
+bindsym $mod+5 $exec_i3_groups workspace-number 5
+bindsym $mod+6 $exec_i3_groups workspace-number 6
+bindsym $mod+7 $exec_i3_groups workspace-number 7
+bindsym $mod+8 $exec_i3_groups workspace-number 8
+bindsym $mod+9 $exec_i3_groups workspace-number 9
+bindsym $mod+0 $exec_i3_groups workspace-number 10
+
+bindsym $mod+Shift+1 $exec_i3_groups move-to-number 1
+bindsym $mod+Shift+2 $exec_i3_groups move-to-number 2
+bindsym $mod+Shift+3 $exec_i3_groups move-to-number 3
+bindsym $mod+Shift+4 $exec_i3_groups move-to-number 4
+bindsym $mod+Shift+5 $exec_i3_groups move-to-number 5
+bindsym $mod+Shift+6 $exec_i3_groups move-to-number 6
+bindsym $mod+Shift+7 $exec_i3_groups move-to-number 7
+bindsym $mod+Shift+8 $exec_i3_groups move-to-number 8
+bindsym $mod+Shift+9 $exec_i3_groups move-to-number 9
+bindsym $mod+Shift+0 $exec_i3_groups move-to-number 10
+
+# Switch to previous/next workspace (in all groups).
+bindsym $mod+p workspace prev
+bindsym $mod+n workspace next
+```
+
+### i3-workspace-groups configuration file
+
+i3-workspace-groups has an optional config file located at
+`$XDG_CONFIG_HOME/i3-workspace-groups/config.toml`
+(defaults to `~/.config/i3-workspace-groups/config.toml`).
+See the [default config file](./i3wsgroups/default_config.toml) for all the
+possible options to configure, their meaning, and their default values.
+
+## Usage
 
 The main operations that the CLI tool `i3-workspace-groups` supports are:
 
@@ -109,79 +197,9 @@ workspace in the default group ("1" in this case).
 Now that you're back in the default group, pressing `Super+2` will again lead
 you to the workspace "2" in the default group.
 
-### i3 config
+## Concepts
 
-In order to use these tools effectively, commands need to be bound to
-keybindings. For example, my i3 config contains the following exerts:
-
-<!-- markdownlint-disable fenced-code-language -->
-```
-set $mod Mod4
-
-strip_workspace_numbers yes
-
-set $exec_i3_groups exec --no-startup-id i3-workspace-groups
-
-# Switch active workspace group
-bindsym $mod+g exec --no-startup-id i3-switch-active-workspace-group
-
-# Assign workspace to a group
-bindsym $mod+Shift+g exec --no-startup-id i3-assign-workspace-to-group
-
-# Select workspace to focus on
-bindsym $mod+w exec --no-startup-id i3-focus-on-workspace
-
-# Move the focused container to another workspace
-bindsym $mod+Shift+w exec --no-startup-id i3-move-to-workspace
-
-# Rename/renumber workspace. Uses Super+Alt+n
-bindsym Mod1+Mod4+n exec --no-startup-id i3-rename-workspace
-
-bindsym $mod+1 $exec_i3_groups workspace-number 1
-bindsym $mod+2 $exec_i3_groups workspace-number 2
-bindsym $mod+3 $exec_i3_groups workspace-number 3
-bindsym $mod+4 $exec_i3_groups workspace-number 4
-bindsym $mod+5 $exec_i3_groups workspace-number 5
-bindsym $mod+6 $exec_i3_groups workspace-number 6
-bindsym $mod+7 $exec_i3_groups workspace-number 7
-bindsym $mod+8 $exec_i3_groups workspace-number 8
-bindsym $mod+9 $exec_i3_groups workspace-number 9
-bindsym $mod+0 $exec_i3_groups workspace-number 10
-
-bindsym $mod+Shift+1 $exec_i3_groups move-to-number 1
-bindsym $mod+Shift+2 $exec_i3_groups move-to-number 2
-bindsym $mod+Shift+3 $exec_i3_groups move-to-number 3
-bindsym $mod+Shift+4 $exec_i3_groups move-to-number 4
-bindsym $mod+Shift+5 $exec_i3_groups move-to-number 5
-bindsym $mod+Shift+6 $exec_i3_groups move-to-number 6
-bindsym $mod+Shift+7 $exec_i3_groups move-to-number 7
-bindsym $mod+Shift+8 $exec_i3_groups move-to-number 8
-bindsym $mod+Shift+9 $exec_i3_groups move-to-number 9
-bindsym $mod+Shift+0 $exec_i3_groups move-to-number 10
-
-# Switch to previous/next workspace (in all groups).
-bindsym $mod+p workspace prev
-bindsym $mod+n workspace next
-```
-
-### Limitations
-
-- **Interaction with other i3 tools**: workspace names are used for storing the
-  group, so if another tool changes a workspace name without preserving the
-  format that this project uses, the tool can make a mistake about the group
-  assignment.
-- **Latency**: there can be noticeable latency in some machines for the script
-  commands. On my high performance desktop this is not noticeable, but on my
-  laptop it is.  I measured the latency of commands to be around 100-200 ms,
-  most of it coming from importing python libraries, so it's not possible to
-  reduce it much without running it as a daemon (which will overcomplicate
-  things). In the long term, I'm considering rewriting it in go.
-- **Number of workspaces/groups/monitors**: Supports up to 10 monitors, each
-  containing up to 100 groups, each containing up to 100 workspaces.
-
-### Concepts
-
-#### Active workspace
+### Active workspace
 
 The active workspace is the workspace with the lowest number in i3. Typically,
 before you use the provided scripts to manage you workspaces, this will be the
@@ -192,7 +210,7 @@ one).
 >
 > **NOTE:** The active workspace is not affected by whether its focused or not.
 
-#### Active group
+### Active group
 
 The active group is the group of the [active workspace](#active-workspace).
 This group will normally contain workspaces related to the task you're doing at
@@ -206,36 +224,31 @@ workspaces of the active group.
 > can be the same, depending on the group of the active workspace in that
 > monitor).
 
-#### Focused group
+### Focused group
 
 The group of the focused workspace.
 
-#### Default group
+### Default group
 
 The group of workspaces that were not assigned to a group by the user. This
 group is usually displayed as "&lt;default>".
 
-## Installation
+## Limitations
 
-The scripts can be installed using pip:
+- **Interaction with other i3 tools**: workspace names are used for storing the
+  group, so if another tool changes a workspace name without preserving the
+  format that this project uses, the tool can make a mistake about the group
+  assignment.
+- **Latency**: there can be noticeable latency in some machines for the script
+  commands. On my high performance desktop this is not noticeable, but on my
+  laptop it is. I measured the latency of commands to be around 100-200 ms,
+  most of it coming from importing python libraries, so it's not possible to
+  reduce it much without running it as a daemon (which will overcomplicate
+  things). In the long term, I'm considering rewriting it in go.
+- **Number of workspaces/groups/monitors**: Supports up to 10 monitors, each
+  containing up to 100 groups, each containing up to 100 workspaces.
 
-```shell
-python3 -m pip install i3-workspace-groups
-```
-
-Then you should be able to run the command line tool
-[`i3-workspace-groups`](scripts/i3-workspace-groups).
-There are also a few utility scripts provided that require
-[rofi](https://github.com/DaveDavenport/rofi) and which are useful for
-interactively managing the groups, using rofi as the UI. They include:
-
-- [`i3-assign-workspace-to-group`](scripts/i3-assign-workspace-to-group)
-- [`i3-focus-on-workspace`](scripts/i3-focus-on-workspace)
-- [`i3-move-to-workspace`](scripts/i3-move-to-workspace)
-- [`i3-rename-workspace`](scripts/i3-rename-workspace)
-- [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
-
-### Sway compatibility note
+### Sway compatibility
 
 This project depends on [i3ipc](https://github.com/acrisci/i3ipc-python) for its
 interaction with i3, so should also work the same on sway. That said, I didn't

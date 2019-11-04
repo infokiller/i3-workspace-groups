@@ -51,15 +51,10 @@ class NamedGroupContext:
 
 class WorkspaceGroupsController:
 
-    def __init__(self,
-                 i3_proxy_: i3_proxy.I3Proxy,
-                 add_window_icons: bool = False,
-                 add_window_icons_all_groups: bool = False,
-                 renumber_workspaces: bool = False):
+    def __init__(self, i3_proxy_: i3_proxy.I3Proxy, config):
         self.i3_proxy = i3_proxy_
-        self.add_window_icons = add_window_icons
-        self.add_window_icons_all_groups = add_window_icons_all_groups
-        self.renumber_workspaces = renumber_workspaces
+        self.config = config
+        self.icons_resolver = icons.IconsResolver(self.config['icons'])
 
     def get_tree(self, cached: bool = True) -> i3ipc.Con:
         return self.i3_proxy.get_tree(cached)
@@ -77,7 +72,7 @@ class WorkspaceGroupsController:
                          group, monitor_name)
             local_numbers = ws_names.compute_local_numbers(
                 workspaces, group_to_all_workspaces.get(group, []),
-                self.renumber_workspaces)
+                self.config['renumber_workspaces'])
             for workspace, local_number in zip(workspaces, local_numbers):
                 ws_metadata = ws_names.parse_name(workspace.name)
                 ws_metadata.group = group
@@ -86,9 +81,10 @@ class WorkspaceGroupsController:
                     monitor_index, group_index, local_number)
                 dynamic_name = ''
                 # Add window icons if needed.
-                if self.add_window_icons_all_groups or (self.add_window_icons
-                                                        and group_index == 0):
-                    dynamic_name = icons.get_workspace_icons_representation(
+                if self.config['icons']['enable'] and (
+                        self.config['icons']['enable_all_groups'] or
+                        group_index == 0):
+                    dynamic_name = self.icons_resolver.get_workspace_icons(
                         workspace)
                 ws_metadata.dynamic_name = dynamic_name
                 new_name = ws_names.create_name(ws_metadata)

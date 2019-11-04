@@ -4,6 +4,7 @@
 import argparse
 import logging
 import os.path
+import pprint
 import sys
 
 import i3ipc
@@ -78,12 +79,6 @@ def _create_args_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Control i3 workspace groups.')
     cli.add_common_args(parser)
     cli.add_workspace_naming_args(parser)
-    parser.add_argument(
-        '--window-icons',
-        action='store_true',
-        default=False,
-        help='If true, will add the icons of the open windows to the workspace'
-        ' names when organizing or renaming workspaces.')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
     list_groups_parser = subparsers.add_parser(
@@ -162,7 +157,7 @@ def _create_group_context(args):
     return None
 
 
-def _get_workspace_field(workspace, field):
+def _get_workspace_field(controller, workspace, field):
     if field == 'global_name':
         return workspace.name
     if field == 'monitor':
@@ -171,7 +166,7 @@ def _get_workspace_field(workspace, field):
             con = con.parent
         return con.name
     if field == 'window_icons':
-        return icons.get_workspace_icons_representation(workspace)
+        return controller.icons_resolver.get_workspace_icons(workspace)
     parsed_name = workspace_names.parse_name(workspace.name)
     value = getattr(parsed_name, field)
     if value is None:
@@ -191,9 +186,10 @@ def _print_workspaces(controller, args):
                                                 args.focused_monitor_only):
         row = []
         for field in fields:
-            row.append(_get_workspace_field(workspace, field))
+            row.append(_get_workspace_field(controller, workspace, field))
         table.append(row)
     print('\n'.join('\t'.join(str(e) for e in row) for row in table))
+
 
 
 # pylint: disable=too-many-branches
@@ -202,10 +198,11 @@ def main():
     init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
 
+    config = cli.get_config_with_overrides(args)
+    logger.debug('Using merged config:\n%s', pprint.pformat(config))
     i3_connection = i3ipc.Connection()
     controller = i3_groups_controller.WorkspaceGroupsController(
-        i3_proxy.I3Proxy(i3_connection, args.dry_run), args.window_icons,
-        args.window_icons_all_groups, args.renumber_workspaces)
+        i3_proxy.I3Proxy(i3_connection, args.dry_run), config)
     try:
         if args.command == 'list-groups':
             print('\n'.join(controller.list_groups(args.focused_monitor_only)))

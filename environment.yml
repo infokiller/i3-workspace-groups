@@ -12,4 +12,5 @@ dependencies:
   - pip
   - pip:
     - i3ipc
+    - toml
     - pytype

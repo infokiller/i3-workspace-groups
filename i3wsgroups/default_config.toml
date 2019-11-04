@@ -1,0 +1,140 @@
+# If true, will renumber workspaces in every groups so that they are in
+# numerical order, similar to tmux's `renumber-windows` option.
+renumber_workspaces = false
+
+[icons]
+# If true, show window icons in the workspace name.
+enable = false
+# By default, icons are only shown for workspaces in the active group. If you
+# set this to true, icons will be shown for all the workspaces.
+enable_all_groups = false
+# Delimiter for multiple icons.
+delimiter = ''
+# Minimum number of duplicate icons in a workspace for them to show as Nx<icon>
+min_duplicates_count = 3
+# The icon used when no rule matches. Set to the empty string to disable the
+# when no rule matches.
+default_icon = ''
+# If true and none of the rules in the config match the window, will try a set
+# of fallback rules before finally falling back to the default icon.
+try_fallback_rules = true
+
+# Other relevant glyphs:
+#   
+#            樓  
+#         
+#          墳 奄 奔 婢
+#        
+#      
+#  
+#       
+
+[[icons.rules]]
+property = 'class'
+match = 'kitty|Termite|URxvtc?'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Chromium|Chrome'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Firefox'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'copyq'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Ranger'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Rofi'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Pqiv'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Pinta'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = '[Mm]pv'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = '[Vv]lc'
+icon = '嗢'
+
+[[icons.rules]]
+property = 'class'
+match = '[Ll]ibreoffice-writer'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = '[Ll]ibreoffice-calc'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Peek'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'ipython'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'python'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'jupyter-qtconsole'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Gvim'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'settings'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'slack'
+icon = '聆'
+
+[[icons.rules]]
+property = 'class'
+match = 'Zathura'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Telegram'
+icon = ''
+
+[[icons.rules]]
+property = 'class'
+match = 'Pavucontrol'
+icon = '墳'

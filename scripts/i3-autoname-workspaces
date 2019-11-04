@@ -7,6 +7,7 @@ import argparse
 import logging
 import logging.handlers
 import os.path
+import pprint
 
 import i3ipc
 
@@ -18,21 +19,14 @@ logger = logger.logger
 
 class WorkspaceAutonamer:
 
-    def __init__(self,
-                 add_window_icons_all_groups: bool = False,
-                 renumber_workspaces: bool = False,
-                 dry_run: bool = True):
-        self.add_window_icons_all_groups = add_window_icons_all_groups
-        self.renumber_workspaces = renumber_workspaces
+    def __init__(self, config, dry_run: bool = True):
         self.dry_run = dry_run
+        self.config = config
 
     def create_controller(self, i3_connection: i3ipc.Connection
                          ) -> controller.WorkspaceGroupsController:
         return controller.WorkspaceGroupsController(
-            i3_proxy.I3Proxy(i3_connection, self.dry_run),
-            add_window_icons=True,
-            add_window_icons_all_groups=self.add_window_icons_all_groups,
-            renumber_workspaces=self.renumber_workspaces)
+            i3_proxy.I3Proxy(i3_connection, self.dry_run), self.config)
 
     def update_workspace_names(self, i3_connection: i3ipc.Connection) -> None:
         groups_controller = self.create_controller(i3_connection)
@@ -68,8 +62,11 @@ def main():
     args = parser.parse_args()
     init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
-    autonamer = WorkspaceAutonamer(args.window_icons_all_groups,
-                                   args.renumber_workspaces, args.dry_run)
+
+    config = cli.get_config_with_overrides(args)
+    logger.debug('Using merged config:\n%s', pprint.pformat(config))
+
+    autonamer = WorkspaceAutonamer(config, args.dry_run)
     i3_connection = i3ipc.Connection()
     autonamer.update_workspace_names(i3_connection)
     i3_connection.on('window', autonamer.window_event_handler)

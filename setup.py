@@ -29,7 +29,7 @@ setuptools.setup(
     ],
     keywords='i3 i3wm extensions add-ons',
     packages=setuptools.find_packages(),
-    package_data={'i3wsgroups': 'default_config.toml'},
+    package_data={'i3wsgroups': ['default_config.toml']},
     install_requires=['i3ipc >= 2, < 3', 'toml >= 0.10, < 1'],
     scripts=[
         'scripts/i3-assign-workspace-to-group',

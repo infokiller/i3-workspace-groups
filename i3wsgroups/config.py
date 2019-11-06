@@ -10,20 +10,19 @@ XDG_CONFIG_HOME = os.environ.get('XDG_CONFIG_HOME',
 CONFIG_PATH = os.path.join(XDG_CONFIG_HOME, 'i3-workspace-groups',
                            'config.toml')
 
-# _DEFAULT_CONFIG = None
-#
-#
-# def get_default_config():
-#     global _DEFAULT_CONFIG
-#     if not _DEFAULT_CONFIG:
-#         _DEFAULT_CONFIG = toml.load(_DEFAULT_CONFIG_PATH)
-#     return _DEFAULT_CONFIG
+
+class ConfigError(Exception):
+    pass
 
 
 # TODO: Validate config.
-def get_config_with_defaults(path=CONFIG_PATH):
-    config = toml.load(path, collections.OrderedDict)
-    default_config = toml.load(DEFAULT_CONFIG_PATH, collections.OrderedDict)
+def get_config_with_defaults(path=CONFIG_PATH, fail_if_missing=False):
+    if fail_if_missing and not os.path.exists(path):
+        raise ConfigError(f'No config file found in {path}')
+    config = {}
+    if os.path.exists(path):
+        config = toml.load(path)
+    default_config = toml.load(DEFAULT_CONFIG_PATH)
     if 'renumber_workspaces' not in config:
         config['renumber_workspaces'] = default_config['renumber_workspaces']
     if 'icons' not in config:

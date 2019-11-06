@@ -30,3 +30,6 @@ shellcheck:
     - shellcheck scripts/i3-move-to-workspace
     - shellcheck scripts/i3-rename-workspace
     - shellcheck scripts/i3-switch-active-workspace-group
+
+setup_develop:
+  script: python3 setup.py develop

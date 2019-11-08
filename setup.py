@@ -9,7 +9,7 @@ with open(README_PATH) as f:
 
 setuptools.setup(
     name='i3-workspace-groups',
-    version='0.4.6a3',
+    version='0.4.6a4',
     description='Manage i3wm workspaces in groups you control',
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
@@ -28,7 +28,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.7',
     ],
     keywords='i3 i3wm extensions add-ons',
-    packages=setuptools.find_packages('i3wsgroups'),
+    packages=setuptools.find_packages(exclude=['tests']),
     package_data={'i3wsgroups': ['default_config.toml']},
     install_requires=['i3ipc >= 2, < 3', 'toml >= 0.10, < 1'],
     scripts=[

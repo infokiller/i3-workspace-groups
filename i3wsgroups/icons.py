@@ -24,7 +24,8 @@ class IconRule:
             property_value = window.window_instance
         else:
             property_value = window.window_title
-        if self.matcher.match(property_value):
+        # The value can be None for i3 placeholder windows and possibly others.
+        if property_value and self.matcher.match(property_value):
             return self.icon
         return None
 

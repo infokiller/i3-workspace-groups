@@ -196,8 +196,11 @@ class WorkspaceGroupsController:
         group_index = ws_names.get_group_index(metadata.group,
                                                group_to_monitor_workspaces)
         metadata = copy.deepcopy(metadata)
+        local_number = metadata.local_number
+        if local_number is None:
+            local_number = 1
         metadata.global_number = ws_names.compute_global_number(
-            monitor_index, group_index, (metadata.local_number))
+            monitor_index, group_index, (local_number))
         return ws_names.create_name(metadata)
 
     # If an existing workspace matches certain properties of the given metadata,

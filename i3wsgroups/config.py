@@ -14,6 +14,18 @@ class ConfigError(Exception):
     pass
 
 
+def merge_config(merge_from, merge_into):
+    for key, value in merge_from.items():
+        if isinstance(value, list):
+            continue
+        if isinstance(value, dict):
+            if key not in merge_into:
+                merge_into[key] = type(value)()
+            merge_config(value, merge_into[key])
+        elif key not in merge_into:
+            merge_into[key] = value
+
+
 # TODO: Validate config.
 def get_config_with_defaults(path=CONFIG_PATH, fail_if_missing=False):
     if fail_if_missing and not os.path.exists(path):
@@ -22,20 +34,7 @@ def get_config_with_defaults(path=CONFIG_PATH, fail_if_missing=False):
     if os.path.exists(path):
         config = toml.load(path)
     default_config = toml.load(DEFAULT_CONFIG_PATH)
-    if 'renumber_workspaces' not in config:
-        config['renumber_workspaces'] = default_config['renumber_workspaces']
-    if 'icons' not in config:
-        config['icons'] = {}
-    for icon_prop in [
-            'enable',
-            'enable_all_groups',
-            'delimiter',
-            'min_duplicates_count',
-            'default_icon',
-            'try_fallback_rules',
-    ]:
-        if icon_prop not in config['icons']:
-            config['icons'][icon_prop] = default_config['icons'][icon_prop]
+    merge_config(default_config, config)
     if config['icons']['try_fallback_rules']:
         if 'rules' not in config['icons']:
             config['icons']['rules'] = []

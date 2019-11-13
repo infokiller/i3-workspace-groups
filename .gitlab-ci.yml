@@ -16,12 +16,19 @@ pytype_py36:
 pytype_py37:
   script: pytype i3wsgroups
 
+pytype_py37:
+  image: python:3.8
+  script: pytype i3wsgroups
+
 test_py36:
   image: python:3.6
   script: tox -e py36
 
 test_py37:
   script: tox -e py37
+
+test_py38:
+  script: tox -e py38
 
 shellcheck:
   script: 

@@ -77,8 +77,6 @@ keybindings. For example, my i3 config contains the following exerts:
 ```
 set $mod Mod4
 
-strip_workspace_numbers yes
-
 set $exec_i3_groups exec --no-startup-id i3-workspace-groups
 
 # Switch active workspace group
@@ -121,6 +119,12 @@ bindsym $mod+Shift+0 $exec_i3_groups move-to-number 10
 # Switch to previous/next workspace (in all groups).
 bindsym $mod+p workspace prev
 bindsym $mod+n workspace next
+
+bar {
+  strip_workspace_numbers yes
+  # The rest of your bar config goes below.
+  # ...
+}
 ```
 
 ### i3-workspace-groups configuration file

@@ -16,9 +16,10 @@ pytype_py36:
 pytype_py37:
   script: pytype i3wsgroups
 
-pytype_py37:
-  image: python:3.8
-  script: pytype i3wsgroups
+# NOTE: As of 2019-11-13, pytype doesn't support python 3.8 yet.
+# pytype_py38:
+#   image: python:3.8
+#   script: pytype i3wsgroups
 
 test_py36:
   image: python:3.6
@@ -28,6 +29,7 @@ test_py37:
   script: tox -e py37
 
 test_py38:
+  image: python:3.8
   script: tox -e py38
 
 shellcheck:

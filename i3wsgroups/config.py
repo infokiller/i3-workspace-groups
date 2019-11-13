@@ -27,6 +27,8 @@ def get_config_with_defaults(path=CONFIG_PATH, fail_if_missing=False):
     if 'icons' not in config:
         config['icons'] = {}
     for icon_prop in [
+            'enable',
+            'enable_all_groups',
             'delimiter',
             'min_duplicates_count',
             'default_icon',

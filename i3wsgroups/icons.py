@@ -57,6 +57,8 @@ class IconsResolver:
             if icon not in icon_to_count:
                 icon_to_count[icon] = 0
             icon_to_count[icon] += 1
+        if not icon_to_count:
+            return ''
         icons_texts = []
         delim = self.config['delimiter']
         for icon, count in icon_to_count.items():
@@ -65,4 +67,6 @@ class IconsResolver:
             else:
                 icon_text = '{}x{}'.format(count, icon)
             icons_texts.append(icon_text)
-        return delim.join(icons_texts)
+        prefix = self.config.get('prefix', '')
+        suffix = self.config.get('suffix', '')
+        return prefix + delim.join(icons_texts) + suffix

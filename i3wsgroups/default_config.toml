@@ -10,10 +10,14 @@ enable = false
 enable_all_groups = false
 # Delimiter for multiple icons.
 delimiter = ''
+# Prefix and suffix to add the the shown icons. Useful for adding spaces in
+# fonts that cause icons to overlap with nearby characters.
+prefix = ''
+suffix = ''
 # Minimum number of duplicate icons in a workspace for them to show as Nx<icon>
 min_duplicates_count = 3
-# The icon used when no rule matches. Set to the empty string to disable the
-# when no rule matches.
+# The icon used when no rule matches. Set to the empty string to disable showing
+# any icon when no rule matches.
 default_icon = ''
 # If true and none of the rules in the config match the window, will try a set
 # of fallback rules before finally falling back to the default icon.

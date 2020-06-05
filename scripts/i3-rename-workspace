@@ -39,8 +39,8 @@ get_tool() {
 error() {
   local error normal
   # Red color
-  error="$(tput setaf 1)"
-  normal="$(tput sgr0)"
+  error="$(tput setaf 1 2> /dev/null)" || true
+  normal="$(tput sgr0 2> /dev/null)" || true
   printf >&2 '%s\n' "${error}${*}${normal}"
 }
 

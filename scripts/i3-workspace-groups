@@ -86,7 +86,7 @@ def _create_args_parser() -> argparse.ArgumentParser:
     list_groups_parser.add_argument(
         '--focused-monitor-only',
         action='store_true',
-        help='List only workspaces on the current monitor.')
+        help='List only workspaces in the current monitor.')
     list_workspaces_parser = subparsers.add_parser(
         'list-workspaces', help='List workspaces and their group.')
     _add_list_workspaces_args(list_workspaces_parser)
@@ -113,12 +113,13 @@ def _create_args_parser() -> argparse.ArgumentParser:
     _add_group_args(move_to_number_parser)
     subparsers.add_parser(
         'move-to-next',
-        help='Move the focused container to the prev workspace in the focused '
+        help='Move the focused container to the next workspace in the focused '
         'group, similar to i3\'s "move container to workspace next" command')
     subparsers.add_parser(
         'move-to-prev',
-        help='Move the focused container to the prev workspace in the focused '
-        'group, similar to i3\'s "move container to workspace prev" command')
+        help='Move the focused container to the previous workspace in the '
+        'focused group, similar to i3\'s "move container to workspace prev" '
+        'command')
     switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
         help='Switches the active group to the one provided.')
@@ -127,12 +128,11 @@ def _create_args_parser() -> argparse.ArgumentParser:
                                             action='store_true')
     rename_workspace_parser = subparsers.add_parser(
         'rename-workspace',
-        help='Renames and optionally changes the group of the focused workspace'
-    )
+        help='Rename and optionally change the group of the focused workspace')
     _add_rename_workspace_args(rename_workspace_parser)
     subparsers.add_parser(
         'assign-workspace-to-group',
-        help='Assigns the focused workspace to the provided group.'
+        help='Assign the focused workspace to the provided group.'
     ).add_argument('group')
     # Deprecated commands, will be removed in a future release.
     subparsers.add_parser(

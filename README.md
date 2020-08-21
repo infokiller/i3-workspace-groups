@@ -137,7 +137,7 @@ possible options to configure, their meaning, and their default values.
 
 ## Usage
 
-The main operations that the CLI tool `i3-workspace-groups` supports are:
+The main operations the CLI tool `i3-workspace-groups` supports are:
 
 - Assign the focused workspace to a group with a given name (and creating the
   group if it doesn't exist).
@@ -147,8 +147,8 @@ The main operations that the CLI tool `i3-workspace-groups` supports are:
   examples below.
 
 The tools provided use i3 workspace names to store and read the group for each
-workspace. For example, if a user assigns the workspace "mail" to the group
-"work", it will be renamed to "work:mail".
+workspace. For example, if a user assigns the workspace `mail` to the group
+`work`, it will be renamed to `work:mail`.
 
 ### Example walk through
 
@@ -157,62 +157,61 @@ workspace. For example, if a user assigns the workspace "mail" to the group
 
 Say we start with the following workspace names:
 
-1. "1" with cat videos from YouTube.
-2. "2" with a news reader.
-3. "3" with a photo editor.
-4. "4" with an email client for work.
+1. `1` with cat videos from YouTube.
+2. `2` with a news reader.
+3. `3` with a photo editor.
+4. `4` with an email client for work.
 
 An important thing to understand here is that every i3 workspace is always
 assigned to a single group. And since we haven't assigned any workspace to a
 group yet, all the workspaces are implicitly in the
-[default group](#default-group), which is denoted as "&lt;default>".
+[default group](#default-group), which is denoted as `<default>`.
 
 After a few hours of leisure time, you decide to do some work, which requires
 opening a few windows on a few workspaces. In order to create a new group, first
-you switch to the workspace "4", and then you press `Super+Shift+g`, which will
-prompt you for a group to assign to the current workspace. You type "work" and
-press enter. Since there's no group named "work" yet, the tool will create it
+you switch to the workspace `4`, and then you press `Super+Shift+g`, which will
+prompt you for a group to assign to the current workspace. You type `work` and
+press enter. Since there's no group named `work` yet, the tool will create it
 and assign the focused workspace to it. You will then notice that the
-workspace name will change in i3bar to "work:4".
+workspace name will change in i3bar to `work:4`.
 Then, you press `Super+g` in order to switch the [active
 group](#active-group). You will be shown a list of existing groups, which will
-now be "work" and "&lt;default>".
+now be `work` and `<default>`.
 You should now see your workspaces in i3bar ordered as following:
-"work:4", "1", "2", "3".
+`work:4`, `1`, `2`, `3`.
 What happened here?
-When you switched to the "work" group, the first thing that the tool did was to
-move all the workspaces in the work group (only "work:mail") to be in the
+When you switched to the `work` group, the first thing that the tool did was to
+move all the workspaces in the work group (only `work:mail`) to be in the
 beginning of the workspace list. Then, it renamed the workspaces in the default
 group to include the group name, so that they can be differentiated from other
-workspaces in the "work" group with the same name.
+workspaces in the `work` group with the same name.
 
 Then, you decide that you want to open a new terminal window in a new workspace.
-So you press `Super+2`, which will move you to a new workspace named "work:2".
-Note that although there is already a workspace with the name "2" in the default
-group (now shown as "2" in the workspace list), using `Super+2` actually takes
-you to a new empty workspace in the group "work".
+So you press `Super+2`, which will move you to a new workspace named `work:2`.
+Note that although there is already a workspace with the name `2` in the default
+group (now shown as `2` in the workspace list), using `Super+2` actually takes
+you to a new empty workspace in the group `work`.
 
 After some time working, you become lazy and you want to get back to cat videos,
 but you promise yourself to get back to work in a few hours, and you don't want
 to lose your open windows. So you press `Super+g` to switch the active work back
 to the default one. You should now see your workspaces in i3bar ordered as
-following: "1", "2", "3", "work:4". The focus will also shift to the first
-workspace in the default group ("1" in this case).
+following: `1`, `2`, `3`, `work:4`. The focus will also shift to the first
+workspace in the default group (`1` in this case).
 Now that you're back in the default group, pressing `Super+2` will again lead
-you to the workspace "2" in the default group.
+you to the workspace `2` in the default group.
 
 ## Concepts
 
 ### Active workspace
 
-The active workspace is the workspace with the lowest number in i3. Typically,
-before you use the provided scripts to manage you workspaces, this will be the
-one that appears first in the workspace list in i3bar (by default the leftmost
-one).
+The active workspace is the workspace with the lowest number. Typically, this
+will be the workspace that appears first in the workspace list in i3bar (the
+leftmost one).
 
 > **NOTE:** In a multi-monitor setup, there is an active workspace per monitor.
 >
-> **NOTE:** The active workspace is not affected by whether its focused or not.
+> **NOTE:** The active workspace is not necessarily the focused workspace.
 
 ### Active group
 
@@ -224,9 +223,7 @@ Workspaces that are not in the active group can still be interacted with, but
 some commands provided are designed to make it easier to interact with the
 workspaces of the active group.
 
-> **NOTE:** In a multi-monitor setup, there is an active group per monitor (which
-> can be the same, depending on the group of the active workspace in that
-> monitor).
+> **NOTE:** In a multi-monitor setup, there is an active group per monitor.
 
 ### Focused group
 
@@ -235,25 +232,27 @@ The group of the focused workspace.
 ### Default group
 
 The group of workspaces that were not assigned to a group by the user. This
-group is usually displayed as "&lt;default>".
+group is displayed as `<default>`. When you start using i3-workspace-groups,
+none of your current workspaces will be assigned to a group yet, so they will
+all be in the default group.
 
 ## Limitations
 
 - **Interaction with other i3 tools**: workspace names are used for storing the
   group, so if another tool changes a workspace name without preserving the
-  format that this project uses, the tool can make a mistake about the group
-  assignment.
+  format that i3-workspace-groups uses, i3-workspace-groups can make a mistake
+  about the group assignment.
 - **Latency**: there can be noticeable latency in some machines for the script
   commands. On my high performance desktop this is not noticeable, but on my
   laptop it is. I measured the latency of commands to be around 100-200 ms,
   most of it coming from importing python libraries, so it's not possible to
   reduce it much without running it as a daemon (which will overcomplicate
-  things). In the long term, I'm considering rewriting it in go.
-- **Number of workspaces/groups/monitors**: Supports up to 10 monitors, each
+  things). In the long term, I plan to rewrite it in go.
+- **Number of monitors/groups/workspaces**: Supports up to 10 monitors, each
   containing up to 100 groups, each containing up to 100 workspaces.
 
 ### Sway compatibility
 
 This project depends on [i3ipc](https://github.com/acrisci/i3ipc-python) for its
-interaction with i3, so should also work the same on sway. That said, I didn't
-test it yet and i3 is my main window manager.
+interaction with i3, so should also work the same on sway. That said, I don't
+test it on sway and i3 is my main window manager.

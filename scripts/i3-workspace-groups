@@ -31,9 +31,8 @@ def _add_group_args(parser: argparse.ArgumentParser) -> None:
         '--group-active',
         action='store_true',
         default=None,
-        help=
-        'Use the active group for commands that implicitly assume a group, '
-        'such as workspace-next.')
+        help='Use the active group for commands that implicitly assume a '
+        'group, such as workspace-next.')
     group_arg_group.add_argument(
         '--group-focused',
         action='store_true',
@@ -134,10 +133,16 @@ def _create_args_parser() -> argparse.ArgumentParser:
         'rename-workspace',
         help='Rename and optionally change the group of the focused workspace')
     _add_rename_workspace_args(rename_workspace_parser)
-    subparsers.add_parser(
+    assign_workspace_subparser = subparsers.add_parser(
         'assign-workspace-to-group',
-        help='Assign the focused workspace to the provided group.'
-    ).add_argument('group')
+        help='Assign the focused workspace to the provided group.')
+    assign_workspace_subparser.add_argument(
+        '--use-next-available-number',
+        action='store_true',
+        help='If a workspace is moved to another group which already has a '
+        'workspace with the same number, use the next available number instead '
+        ' of failing.')
+    assign_workspace_subparser.add_argument('group')
     # Deprecated commands, will be removed in a future release.
     subparsers.add_parser(
         'workspace-back-and-forth',

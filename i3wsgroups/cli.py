@@ -4,11 +4,10 @@ from i3wsgroups import config
 
 
 def add_common_args(parser: argparse.ArgumentParser):
-    parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        default=False,
-        help='If true, only log what changed would be done.')
+    parser.add_argument('--dry-run',
+                        action='store_true',
+                        default=False,
+                        help='If true, only log what changed would be done.')
     parser.add_argument('--log-level',
                         choices=('debug', 'info', 'warning', 'error',
                                  'critical'),
@@ -41,6 +40,10 @@ def get_config_with_overrides(args: argparse.Namespace):
     config_dict = config.get_config_with_defaults()
     if args.renumber_workspaces is not None:
         config_dict['renumber_workspaces'] = args.renumber_workspaces
+    if hasattr(args,
+               'use_next_available_number') and args.use_next_available_number:
+        config_dict['workspace_moves']['use_next_available_number'] = (
+            args.use_next_available_number)
     if args.window_icons is not None:
         config_dict['icons']['enable'] = args.window_icons
     if args.window_icons_all_groups is not None:

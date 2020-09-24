@@ -1,8 +1,12 @@
 # Changelog for i3-workspace-groups
 
-## 0.4.7
+## 0.4.7 (pre-release)
 
 - Add `--no-auto-back-and-forth` option to `workspace-number` and `move-to-number` commands.
+- Add `--use-next-available-number` option to `assign-workspace-to-group`
+  command and `use_next_available_number` option to the config file for using
+  the first available relative number when assigning or renaming a workspace to
+  a group that already has another workspace with that relative number (see #33).
 
 ## 0.4.6
 

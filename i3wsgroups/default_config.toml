@@ -2,6 +2,11 @@
 # numerical order, similar to tmux's `renumber-windows` option.
 renumber_workspaces = false
 
+[workspace_moves]
+# If a workspace is moved to another group which already has a workspace with
+# the same number, use the next available number instead of failing.
+use_next_available_number = false
+
 [icons]
 # If true, show window icons in the workspace name.
 enable = false

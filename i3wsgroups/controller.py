@@ -202,15 +202,11 @@ class WorkspaceGroupsController:
             monitor_index, group_index, (local_number))
         return ws_names.create_name(metadata)
 
-    # If an existing workspace matches certain properties of the given metadata,
-    # return its name and id. Otherwise, create and return a new workspace name
-    # from the given metadata. In this case, if there is an existing conflicting
-    # workspace, i.e. with the same (group, local_number), return its id as
-    # well.
-    # Note that only the group, local number, and static name are considered.
-    def _derive_workspace(
-        self, metadata: ws_names.WorkspaceGroupingMetadata
-    ) -> Tuple[str, Optional[int]]:
+    # If there's an existing workspace in the given group with the given local
+    # number, return its (name, True). Otherwise, create a name and return
+    # (name, False).
+    def _get_workspace_by_local_number(self, group: str,
+                                       local_number: int) -> Tuple[str, bool]:
         # i3 commands like `workspace number n` will focus on an existing
         # workspace in another monitor if possible. To preserve this behavior,
         # we check the group workspaces in all monitors.
@@ -219,17 +215,12 @@ class WorkspaceGroupsController:
         # Every workspace must have a unique (group, local_number) pair. This
         # tracks whether we found a workspace that conflicts with the given
         # (group, local_number).
-        for workspace in group_to_all_workspaces.get(metadata.group, []):
-            if not ws_names.get_local_workspace_number(
-                    workspace) == metadata.local_number:
-                continue
-            static_name = ws_names.parse_name(workspace.name).static_name
-            if metadata.static_name is None or (metadata.static_name
-                                                == static_name):
-                return (workspace.name, workspace.id)
-            return (self._create_workspace_name(metadata), workspace.id)
-            # is_available = False
-        return (self._create_workspace_name(metadata), None)
+        for workspace in group_to_all_workspaces.get(group, []):
+            if ws_names.get_local_workspace_number(workspace) == local_number:
+                return workspace.name, True
+        return self._create_workspace_name(
+            ws_names.WorkspaceGroupingMetadata(
+                group=group, local_number=local_number)), False
 
     def _get_group_from_context(self, group_context):
         group_context = group_context or ActiveGroupContext()
@@ -243,10 +234,9 @@ class WorkspaceGroupsController:
 
     def focus_workspace_number(self, group_context,
                                target_local_number: int) -> None:
-        target_workspace_name, _ = self._derive_workspace(
-            ws_names.WorkspaceGroupingMetadata(
-                group=self._get_group_from_context(group_context),
-                local_number=target_local_number))
+        target_workspace_name, _ = self._get_workspace_by_local_number(
+            group=self._get_group_from_context(group_context),
+            local_number=target_local_number)
         logger.debug('Derived workspace name: "%s"', target_workspace_name)
         self.i3_proxy.focus_workspace(target_workspace_name)
 
@@ -254,10 +244,9 @@ class WorkspaceGroupsController:
                                  group_context,
                                  target_local_number: int,
                                  no_auto_back_and_forth: bool = False) -> None:
-        target_workspace_name, _ = self._derive_workspace(
-            ws_names.WorkspaceGroupingMetadata(
-                group=self._get_group_from_context(group_context),
-                local_number=target_local_number))
+        target_workspace_name, _ = self._get_workspace_by_local_number(
+            group=self._get_group_from_context(group_context),
+            local_number=target_local_number)
         flags = '--no-auto-back-and-forth' if no_auto_back_and_forth else ''
         self.i3_proxy.send_i3_command(
             f'move {flags} container to workspace "{target_workspace_name}"')
@@ -289,21 +278,31 @@ class WorkspaceGroupsController:
 
     def update_focused_workspace(
             self, metadata_updates: ws_names.WorkspaceGroupingMetadata) -> None:
-        focused_workspace = self.get_tree().find_focused().workspace()
-        metadata = ws_names.parse_name(focused_workspace.name)
         if metadata_updates.group is not None and (
                 not ws_names.is_valid_group_name(metadata_updates.group)):
             raise WorkspaceGroupsError(
                 'Invalid group name provided: "{}"'.format(
                     metadata_updates.group))
+        focused_workspace = self.get_tree().find_focused().workspace()
+        metadata = ws_names.parse_name(focused_workspace.name)
         for section in ['group', 'local_number', 'static_name']:
             value = getattr(metadata_updates, section)
             if value is not None:
                 setattr(metadata, section, value)
-        global_name, workspace_id = self._derive_workspace(metadata)
-        if workspace_id is not None and workspace_id != focused_workspace.id:
-            raise WorkspaceGroupsError(
-                'Workspace with local number "{}" already exists in group: '
-                '"{}": "{}"'.format(metadata.local_number, metadata.group,
-                                    global_name))
-        self.i3_proxy.rename_workspace(focused_workspace.name, global_name)
+        found_name, exists = self._get_workspace_by_local_number(
+            metadata.group, metadata.local_number)
+        if exists and focused_workspace.name != found_name:
+            if not self.config['workspace_moves']['use_next_available_number']:
+                raise WorkspaceGroupsError(
+                    'Workspace with local number "{}" already exists in group: '
+                    '"{}": "{}"'.format(metadata.local_number, metadata.group,
+                                        found_name))
+            group_to_all_workspaces = ws_names.get_group_to_workspaces(
+                self.get_tree().workspaces())
+            used_local_numbers = ws_names.get_used_local_numbers(
+                group_to_all_workspaces[metadata.group])
+            free_local_numbers = ws_names.get_lowest_free_local_numbers(
+                1, used_local_numbers)
+            metadata.local_number = next(iter(free_local_numbers))
+        self.i3_proxy.rename_workspace(focused_workspace.name,
+                                       self._create_workspace_name(metadata))

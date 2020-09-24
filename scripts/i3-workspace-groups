@@ -32,13 +32,13 @@ def _add_group_args(parser: argparse.ArgumentParser) -> None:
         action='store_true',
         default=None,
         help=
-        'Use the active group for any commands that implicitly assume a group, '
+        'Use the active group for commands that implicitly assume a group, '
         'such as workspace-next.')
     group_arg_group.add_argument(
         '--group-focused',
         action='store_true',
         default=None,
-        help='Use the focused group for any commands that implicitly assume a '
+        help='Use the focused group for commands that implicitly assume a '
         'group, such as workspace-next.')
     group_arg_group.add_argument('--group-name')
 
@@ -126,7 +126,7 @@ def _create_args_parser() -> argparse.ArgumentParser:
         'command')
     switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
-        help='Switches the active group to the one provided.')
+        help='Switch the active group to the one provided.')
     switch_active_group_parser.add_argument('--focused-monitor-only',
                                             action='store_true')
     switch_active_group_parser.add_argument('group')

@@ -1,6 +1,10 @@
 # Changelog for i3-workspace-groups
 
-## Unreleased
+## 0.4.7
+
+- Add `--no-auto-back-and-forth` option to `workspace-number` and `move-to-number` commands.
+
+## 0.4.6
 
 - Add configuration file with support for customizing icons
 

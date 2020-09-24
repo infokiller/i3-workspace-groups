@@ -154,8 +154,8 @@ class WorkspaceGroupsController:
         focused_monitor_name = self.i3_proxy.get_focused_monitor_name()
         monitor_to_workspaces = self.i3_proxy.get_monitor_to_workspaces()
         for monitor, workspaces in monitor_to_workspaces.items():
-            group_exists = (
-                target_group in ws_names.get_group_to_workspaces(workspaces))
+            group_exists = (target_group
+                            in ws_names.get_group_to_workspaces(workspaces))
             if monitor == focused_monitor_name:
                 logger.debug('Switching active group in focused monitor "%s"',
                              monitor)
@@ -186,9 +186,8 @@ class WorkspaceGroupsController:
                 focused_monitor_name, target_group)
         self.i3_proxy.focus_workspace(workspace_name, auto_back_and_forth=False)
 
-    def _create_workspace_name(self,
-                               metadata: ws_names.WorkspaceGroupingMetadata
-                              ) -> str:
+    def _create_workspace_name(
+            self, metadata: ws_names.WorkspaceGroupingMetadata) -> str:
         focused_monitor_name = self.i3_proxy.get_focused_monitor_name()
         monitor_index = self.i3_proxy.get_monitor_index(focused_monitor_name)
         group_to_monitor_workspaces = ws_names.get_group_to_workspaces(
@@ -209,8 +208,9 @@ class WorkspaceGroupsController:
     # workspace, i.e. with the same (group, local_number), return its id as
     # well.
     # Note that only the group, local number, and static name are considered.
-    def _derive_workspace(self, metadata: ws_names.WorkspaceGroupingMetadata
-                         ) -> Tuple[str, Optional[int]]:
+    def _derive_workspace(
+        self, metadata: ws_names.WorkspaceGroupingMetadata
+    ) -> Tuple[str, Optional[int]]:
         # i3 commands like `workspace number n` will focus on an existing
         # workspace in another monitor if possible. To preserve this behavior,
         # we check the group workspaces in all monitors.
@@ -224,8 +224,8 @@ class WorkspaceGroupsController:
                     workspace) == metadata.local_number:
                 continue
             static_name = ws_names.parse_name(workspace.name).static_name
-            if metadata.static_name is None or (
-                    metadata.static_name == static_name):
+            if metadata.static_name is None or (metadata.static_name
+                                                == static_name):
                 return (workspace.name, workspace.id)
             return (self._create_workspace_name(metadata), workspace.id)
             # is_available = False
@@ -250,14 +250,17 @@ class WorkspaceGroupsController:
         logger.debug('Derived workspace name: "%s"', target_workspace_name)
         self.i3_proxy.focus_workspace(target_workspace_name)
 
-    def move_to_workspace_number(self, group_context,
-                                 target_local_number: int) -> None:
+    def move_to_workspace_number(self,
+                                 group_context,
+                                 target_local_number: int,
+                                 no_auto_back_and_forth: bool = False) -> None:
         target_workspace_name, _ = self._derive_workspace(
             ws_names.WorkspaceGroupingMetadata(
                 group=self._get_group_from_context(group_context),
                 local_number=target_local_number))
+        flags = '--no-auto-back-and-forth' if no_auto_back_and_forth else ''
         self.i3_proxy.send_i3_command(
-            'move container to workspace "{}"'.format(target_workspace_name))
+            f'move {flags} container to workspace "{target_workspace_name}"')
 
     def _relative_workspace_in_group(self,
                                      offset_from_current: int = 1) -> i3ipc.Con:

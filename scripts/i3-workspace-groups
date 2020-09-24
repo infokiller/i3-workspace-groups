@@ -94,6 +94,8 @@ def _create_args_parser() -> argparse.ArgumentParser:
         'workspace-number',
         help='Focus on the workspace with the provided number in the focused '
         'group, similar to i3\'s "workspace number" command')
+    workspace_number_parser.add_argument('--no-auto-back-and-forth',
+                                         action='store_true')
     workspace_number_parser.add_argument('workspace_relative_number', type=int)
     _add_group_args(workspace_number_parser)
     subparsers.add_parser(
@@ -109,6 +111,8 @@ def _create_args_parser() -> argparse.ArgumentParser:
         help='Move the focused container to the workspace with the provided '
         'number in the focused group, similar to i3\'s "move container to '
         'workspace" command')
+    move_to_number_parser.add_argument('--no-auto-back-and-forth',
+                                       action='store_true')
     move_to_number_parser.add_argument('workspace_relative_number', type=int)
     _add_group_args(move_to_number_parser)
     subparsers.add_parser(
@@ -123,9 +127,9 @@ def _create_args_parser() -> argparse.ArgumentParser:
     switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
         help='Switches the active group to the one provided.')
-    switch_active_group_parser.add_argument('group')
     switch_active_group_parser.add_argument('--focused-monitor-only',
                                             action='store_true')
+    switch_active_group_parser.add_argument('group')
     rename_workspace_parser = subparsers.add_parser(
         'rename-workspace',
         help='Rename and optionally change the group of the focused workspace')
@@ -216,7 +220,8 @@ def main():
             controller.focus_workspace_relative(-1)
         elif args.command == 'move-to-number':
             controller.move_to_workspace_number(_create_group_context(args),
-                                                args.workspace_relative_number)
+                                                args.workspace_relative_number,
+                                                args.no_auto_back_and_forth)
         elif args.command == 'move-to-next':
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':

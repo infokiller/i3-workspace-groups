@@ -10,7 +10,6 @@ import os.path
 import pprint
 
 import i3ipc
-
 from i3wsgroups import cli, controller, i3_proxy, logger, workspace_names
 
 init_logger = logger.init_logger
@@ -23,8 +22,9 @@ class WorkspaceAutonamer:
         self.dry_run = dry_run
         self.config = config
 
-    def create_controller(self, i3_connection: i3ipc.Connection
-                         ) -> controller.WorkspaceGroupsController:
+    def create_controller(
+        self, i3_connection: i3ipc.Connection
+    ) -> controller.WorkspaceGroupsController:
         return controller.WorkspaceGroupsController(
             i3_proxy.I3Proxy(i3_connection, self.dry_run), self.config)
 
@@ -36,13 +36,13 @@ class WorkspaceAutonamer:
             list(group_to_workspaces.items()))
 
     def window_event_handler(self, i3_connection: i3ipc.Connection,
-                             event: i3ipc.Event) -> None:
+                             event: i3ipc.WindowEvent) -> None:
         logger.debug('Got window event with change: %s', event.change)
         if event.change in ['new', 'close', 'move']:
             self.update_workspace_names(i3_connection)
 
     def workspace_event_handler(self, i3_connection: i3ipc.Connection,
-                                event: i3ipc.Event):
+                                event: i3ipc.WorkspaceEvent):
         logger.debug('Got workspace event with change: %s', event.change)
         # We must update the workspace names on a focus event because the
         # workspace focus change may be due to navigating away from an empty
@@ -69,8 +69,9 @@ def main():
     autonamer = WorkspaceAutonamer(config, args.dry_run)
     i3_connection = i3ipc.Connection()
     autonamer.update_workspace_names(i3_connection)
-    i3_connection.on('window', autonamer.window_event_handler)
-    i3_connection.on('workspace', autonamer.workspace_event_handler)
+    i3_connection.on(i3ipc.Event.WINDOW, autonamer.window_event_handler)
+    i3_connection.on(i3ipc.Event.WORKSPACE_FOCUS,
+                     autonamer.workspace_event_handler)
     i3_connection.main()
 
 

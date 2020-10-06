@@ -105,6 +105,11 @@ def _create_args_parser() -> argparse.ArgumentParser:
         'workspace-prev',
         help='Focus on the prev workspace in the focused group, similar to '
         'i3\'s "workspace prev" command')
+    workspace_new_parser = subparsers.add_parser(
+        'workspace-new',
+        help='Create a new workspace in the focused group with the lowest '
+        'available number.')
+    _add_group_args(workspace_new_parser)
     move_to_number_parser = subparsers.add_parser(
         'move-to-number',
         help='Move the focused container to the workspace with the provided '
@@ -123,6 +128,11 @@ def _create_args_parser() -> argparse.ArgumentParser:
         help='Move the focused container to the previous workspace in the '
         'focused group, similar to i3\'s "move container to workspace prev" '
         'command')
+    move_to_new_parser = subparsers.add_parser(
+        'move-to-new',
+        help='Move the focused container to a new workspace in the focused '
+        'group with the lowest available number.')
+    _add_group_args(move_to_new_parser)
     switch_active_group_parser = subparsers.add_parser(
         'switch-active-group',
         help='Switch the active group to the one provided.')
@@ -223,6 +233,8 @@ def main():
             controller.focus_workspace_relative(+1)
         elif args.command == 'workspace-prev':
             controller.focus_workspace_relative(-1)
+        elif args.command == 'workspace-new':
+            controller.focus_new_workspace(_create_group_context(args))
         elif args.command == 'move-to-number':
             controller.move_to_workspace_number(_create_group_context(args),
                                                 args.workspace_relative_number,
@@ -231,6 +243,8 @@ def main():
             controller.move_workspace_relative(+1)
         elif args.command == 'move-to-prev':
             controller.move_workspace_relative(-1)
+        elif args.command == 'move-to-new':
+            controller.move_to_new_workspace(_create_group_context(args))
         elif args.command == 'switch-active-group':
             controller.switch_active_group(args.group,
                                            args.focused_monitor_only)

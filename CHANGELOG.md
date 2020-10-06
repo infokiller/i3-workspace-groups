@@ -2,7 +2,12 @@
 
 ## 0.4.7 (pre-release)
 
-- Add `--no-auto-back-and-forth` option to `workspace-number` and `move-to-number` commands.
+- Add `workspace-new` command to create a workspace with the first available
+  number.
+- Add `move-to-new` command to move the focused container to a new workspace
+  with the first available number.
+- Add `--no-auto-back-and-forth` option to `workspace-number` and
+  `move-to-number` commands.
 - Add `--use-next-available-number` option to `assign-workspace-to-group`
   command and `use_next_available_number` option to the config file for using
   the first available relative number when assigning or renaming a workspace to

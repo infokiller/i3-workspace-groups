@@ -117,14 +117,17 @@ class WorkspaceGroupsController:
         focused_workspace = self.get_tree().find_focused().workspace()
         return [ws for ws in group_workspaces if ws.id == focused_workspace.id]
 
-    def _create_new_active_group_workspace_name(self, monitor_name: str,
-                                                target_group: str) -> i3ipc.Con:
+    def _find_free_local_number(self, target_group: str):
         group_to_all_workspaces = ws_names.get_group_to_workspaces(
             self.get_tree().workspaces())
         used_local_numbers = ws_names.get_used_local_numbers(
             group_to_all_workspaces.get(target_group, []))
-        local_number = next(
+        return next(
             iter(ws_names.get_lowest_free_local_numbers(1, used_local_numbers)))
+
+    def _create_new_active_group_workspace_name(self, monitor_name: str,
+                                                target_group: str) -> i3ipc.Con:
+        local_number = self._find_free_local_number(target_group)
         global_number = ws_names.compute_global_number(
             monitor_index=self.i3_proxy.get_monitor_index(monitor_name),
             group_index=0,
@@ -177,10 +180,10 @@ class WorkspaceGroupsController:
             return
         group_to_monitor_workspaces = ws_names.get_group_to_workspaces(
             monitor_to_workspaces[focused_monitor_name])
-        # The focused monitor doesn't have any workspaces in the target group,
-        # so create one.
         if target_group in group_to_monitor_workspaces:
             workspace_name = group_to_monitor_workspaces[target_group][0].name
+        # The focused monitor doesn't have any workspaces in the target group,
+        # so create one.
         else:
             workspace_name = self._create_new_active_group_workspace_name(
                 focused_monitor_name, target_group)
@@ -275,6 +278,16 @@ class WorkspaceGroupsController:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
         self.i3_proxy.send_i3_command('move container to workspace "{}"'.format(
             next_workspace.name))
+
+    def focus_new_workspace(self, group_context) -> None:
+        target_group = self._get_group_from_context(group_context)
+        local_number = self._find_free_local_number(target_group)
+        self.focus_workspace_number(group_context, local_number)
+
+    def move_to_new_workspace(self, group_context) -> None:
+        target_group = self._get_group_from_context(group_context)
+        local_number = self._find_free_local_number(target_group)
+        self.move_to_workspace_number(group_context, local_number, False)
 
     def update_focused_workspace(
             self, metadata_updates: ws_names.WorkspaceGroupingMetadata) -> None:

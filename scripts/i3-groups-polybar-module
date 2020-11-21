@@ -1,0 +1,130 @@
+#!/bin/bash
+while getopts c:e:k: flag; do
+    case "${flag}" in
+    e) COLOR_EXTERNAL_MONITOR=${OPTARG} ;;
+    c) COLOR_CURRENT_WS=${OPTARG} ;;
+    k) HOOK=${OPTARG} ;;
+    esac
+done
+
+function ows() {
+    group=$2
+    if [ "$group" == "default" ]; then
+        group=""
+    fi
+    echo "i3-workspace-groups workspace-number $1 --group-name" \"${group}\"
+}
+
+function ch_gr() {
+    group=$1
+    if [ "$1" == "default" ]; then
+        group=""
+    fi
+    echo "i3-workspace-groups switch-active-group \"$group\"; polybar-msg hook "$HOOK
+}
+
+# $1: what to show in polybar
+# $2: group name
+# $3: ws number
+# $4: ws long number given by i3-workspace-groups
+function txt_item() {
+    ws_screen=$(($4 / 100000))
+    ws_click=$3
+    if [[ $ws_screen == 0 ]]; then
+        echo "%{A1:"$(ows $ws_click $2) ":}$1%{A}"
+    else
+        w=$(echo "$1" | sed -e $(echo "s/\([^0-9]*\)\([[:digit:]]\)\([^0-9]*\)/\1%{F""$COLOR_EXTERNAL_MONITOR""}\2%{F-}\3/"))
+        echo "%{A1:"$(ows $ws_click $2) ":}$w%{A}"
+    fi
+}
+
+fixed_wmctrl=$(
+    wmctrl -d |
+        sed -e "s/$(echo -ne '\u200b')//g" |
+        sed -e "s/\([[:digit:]]\+\):\([[:digit:]]\+\)/\1:default:\2/"
+)
+
+current_ws_name=$(
+    echo "$fixed_wmctrl" |
+        grep '\*' |
+        awk '{print $9}'
+)
+current_ws=$(
+    echo "$current_ws_name" |
+        cut -f 3 -d ":"
+)
+current_group=$(
+    echo "$current_ws_name" |
+        cut -f 2 -d ":"
+)
+wmctrl="$(
+    echo "$fixed_wmctrl" |
+        awk '{print $9}'
+)"
+
+groups=$(
+    echo "$wmctrl" |
+        cut -f 2 -d ":" |
+        nl |
+        sort -rk 2 |
+        uniq -f 1 |
+        sort -n |
+        cut -f 2
+)
+
+for group in $groups; do
+    text=$text"%{A1:"$(ch_gr $group)":}$group:%{A}"
+    i=1
+
+    open_ws=$(
+        echo "$wmctrl" |
+            grep "$group" |
+            cut -f 1 -d ':'
+    )
+    ws_prev=$(echo "$open_ws" | head -1)
+    ws_prev=${ws_prev: -1}
+    ws_last=$(echo "$open_ws" | tail -1)
+    ws_last=${ws_last: -1}
+
+    for ws_long in $open_ws; do
+        ws=${ws_long: -1}
+        # if this is the current window
+        if [ "$ws" == "$current_ws" ] && [ "$group" == "$current_group" ]; then
+            text=$text"%{u#a3be8c}%{+u} %{F"$COLOR_CURRENT_WS"}"$(txt_item $ws $group $ws $ws_long)"%{F-} %{-u}"
+        # if it is the curent group do not do shorthand
+        elif [ "$group" == "$current_group" ]; then
+            text=$text"$(txt_item " $ws " $group $ws $ws_long)"
+            # do shorthand notation
+        else
+            # if this is the first one
+            if [[ $ws == $ws_prev ]]; then
+                text=$text"$(txt_item " $ws" $group $ws $ws_long)"
+            # if its somewhere in the middle
+            elif [[ $ws > $(($ws_prev + 1)) ]]; then
+                if [[ $i > 2 ]]; then
+                    text=$text"$(txt_item "-$ws_prev" $group $ws $ws_long)"
+                elif [[ $i == 2 ]]; then
+                    text=$text"$(txt_item ", $ws_prev" $group $ws $ws_long)"
+                fi
+                text=$text"$(txt_item ", $ws" $group $ws $ws_long)"
+                i=1
+            # if it is the last one
+            elif [[ $ws == $ws_last ]]; then
+                if [[ $i > 1 ]] && [[ $ws_prev < $(($ws - 1)) ]]; then
+                    text=$text"$(txt_item "-$ws_prev" $group $ws $ws_long)"
+                    text=$text"$(txt_item ", $ws" $group $ws $ws_long)"
+                elif [[ $i > 1 ]]; then
+                    text=$text"$(txt_item "-$ws" $group $ws $ws_long)"
+                else
+                    text=$text"$(txt_item ", $ws" $group $ws $ws_long)"
+                fi
+            else
+                i=$(($i + 1))
+            fi
+            ws_prev=$ws
+        fi
+    done
+    text=$text" | "
+done
+text=${text::-3}
+echo "$text"

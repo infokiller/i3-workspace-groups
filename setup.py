@@ -42,5 +42,7 @@ setuptools.setup(
         'scripts/i3-select-workspace-group',
         'scripts/i3-switch-active-workspace-group',
         'scripts/i3-workspace-groups',
+        'scripts/i3-groups-polybar-module',
+        'scripts/i3-groups-polybar-module-updater'
     ],
 )

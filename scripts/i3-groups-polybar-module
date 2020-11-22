@@ -1,10 +1,14 @@
 #!/bin/bash
-while getopts c:e:k: flag; do
+while getopts c:e:k:s flag; do
     case "${flag}" in
     e) COLOR_EXTERNAL_MONITOR=${OPTARG} ;;
     c) COLOR_CURRENT_WS=${OPTARG} ;;
     k) HOOK=${OPTARG} ;;
-    *) echo "Check options: valid ones -c \"#HEXCOLOR\", -e \"#HEXCOLOR\", -k \"POLYBAR MODULE HOOK NAME\"" ;;
+    s) SHORTHAND_ENABLED=1 ;;
+    *) echo "Check options: valid ones\
+-c \"#HEXCOLOR\", -e \"#HEXCOLOR\",\
+-k \"POLYBAR MODULE HOOK NAME\",\
+-s Enable shorthand notation for workspaces" ;;
     esac
 done
 
@@ -96,6 +100,8 @@ for group in $groups; do
         elif [ "$group" == "$current_group" ]; then
             text=$text"$(txt_item " $ws " $group $ws $ws_long)"
             # do shorthand notation
+        elif [[ $SHORTHAND_ENABLED != "1" ]]; then
+            text=$text"$(txt_item " $ws " $group $ws $ws_long)"
         else
             # if this is the first one
             if [[ $ws == $ws_prev ]]; then

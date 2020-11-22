@@ -4,6 +4,7 @@ while getopts c:e:k: flag; do
     e) COLOR_EXTERNAL_MONITOR=${OPTARG} ;;
     c) COLOR_CURRENT_WS=${OPTARG} ;;
     k) HOOK=${OPTARG} ;;
+    *) echo "Check options: valid ones -c \"#HEXCOLOR\", -e \"#HEXCOLOR\", -k \"POLYBAR MODULE HOOK NAME\"" ;;
     esac
 done
 
@@ -33,7 +34,7 @@ function txt_item() {
     if [[ $ws_screen == 0 ]]; then
         echo "%{A1:"$(ows $ws_click $2) ":}$1%{A}"
     else
-        w=$(echo "$1" | sed -e $(echo "s/\([^0-9]*\)\([[:digit:]]\)\([^0-9]*\)/\1%{F""$COLOR_EXTERNAL_MONITOR""}\2%{F-}\3/"))
+        w=$(echo "$1" | sed -e "s/\([^0-9]*\)\([[:digit:]]\)\([^0-9]*\)/\1%{F""$COLOR_EXTERNAL_MONITOR""}\2%{F-}\3/")
         echo "%{A1:"$(ows $ws_click $2) ":}$w%{A}"
     fi
 }
@@ -90,7 +91,7 @@ for group in $groups; do
         ws=${ws_long: -1}
         # if this is the current window
         if [ "$ws" == "$current_ws" ] && [ "$group" == "$current_group" ]; then
-            text=$text"%{u#a3be8c}%{+u} %{F"$COLOR_CURRENT_WS"}"$(txt_item $ws $group $ws $ws_long)"%{F-} %{-u}"
+            text=$text"%{u#a3be8c}%{+u} %{F""$COLOR_CURRENT_WS""}""$(txt_item $ws $group $ws $ws_long)""%{F-} %{-u}"
         # if it is the curent group do not do shorthand
         elif [ "$group" == "$current_group" ]; then
             text=$text"$(txt_item " $ws " $group $ws $ws_long)"

@@ -3,7 +3,6 @@ while getopts c:e:k:s flag; do
     case "${flag}" in
     e) COLOR_EXTERNAL_MONITOR=${OPTARG} ;;
     c) COLOR_CURRENT_WS=${OPTARG} ;;
-    k) HOOK=${OPTARG} ;;
     s) SHORTHAND_ENABLED=1 ;;
     *) echo "Check options: valid ones\
 -c \"#HEXCOLOR\", -e \"#HEXCOLOR\",\
@@ -25,7 +24,7 @@ function ch_gr() {
     if [ "$1" == "default" ]; then
         group=""
     fi
-    echo "i3-workspace-groups switch-active-group \"$group\"; polybar-msg hook "$HOOK
+    echo "i3-workspace-groups switch-active-group \"$group\""
 }
 
 # $1: what to show in polybar

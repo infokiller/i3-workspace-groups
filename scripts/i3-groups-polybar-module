@@ -1,12 +1,11 @@
 #!/bin/bash
-while getopts c:e:k:s flag; do
+while getopts c:e:s flag; do
     case "${flag}" in
     e) COLOR_EXTERNAL_MONITOR=${OPTARG} ;;
     c) COLOR_CURRENT_WS=${OPTARG} ;;
     s) SHORTHAND_ENABLED=1 ;;
     *) echo "Check options: valid ones\
 -c \"#HEXCOLOR\", -e \"#HEXCOLOR\",\
--k \"POLYBAR MODULE HOOK NAME\",\
 -s Enable shorthand notation for workspaces" ;;
     esac
 done
@@ -44,14 +43,14 @@ function txt_item() {
 
 fixed_wmctrl=$(
     wmctrl -d |
-        sed -e "s/$(echo -ne '\u200b')//g" |
-        sed -e "s/\([[:digit:]]\+\):\([[:digit:]]\+\)/\1:default:\2/"
+        sed -e "s/$(echo -ne '\u200b')//g"
 )
 
 current_ws_name=$(
     echo "$fixed_wmctrl" |
         grep '\*' |
-        awk '{print $9}'
+        awk '{print $9}' |
+        sed -e "s/\(^[[:digit:]]\+\):\([[:digit:]]\+$\)/\1:default:\2/"
 )
 current_ws=$(
     echo "$current_ws_name" |
@@ -63,7 +62,8 @@ current_group=$(
 )
 wmctrl="$(
     echo "$fixed_wmctrl" |
-        awk '{print $9}'
+        awk '{print $9}' |
+        sed -e "s/\(^[[:digit:]]\+\):\([[:digit:]]\+$\)/\1:default:\2/"
 )"
 
 groups=$(
@@ -82,7 +82,7 @@ for group in $groups; do
 
     open_ws=$(
         echo "$wmctrl" |
-            grep "$group" |
+            grep ":$group:" |
             cut -f 1 -d ':'
     )
     ws_prev=$(echo "$open_ws" | head -1)

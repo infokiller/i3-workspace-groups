@@ -45,7 +45,7 @@ function txt_item() {
 fixed_wmctrl=$(
     wmctrl -d |
         sed -e "s/$(echo -ne '\u200b')//g" |
-        sed -e "s/\([[:digit:]]\+\):\([[:digit:]]\+\)/\1:default:\2/"
+        sed -e "s/\(^[[:digit:]]\+\):\([[:digit:]]\+$\)/\1:default:\2/"
 )
 
 current_ws_name=$(

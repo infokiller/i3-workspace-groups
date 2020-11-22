@@ -1,12 +1,11 @@
 #!/bin/bash
-while getopts c:e:k:s flag; do
+while getopts c:e:s flag; do
     case "${flag}" in
     e) COLOR_EXTERNAL_MONITOR=${OPTARG} ;;
     c) COLOR_CURRENT_WS=${OPTARG} ;;
     s) SHORTHAND_ENABLED=1 ;;
     *) echo "Check options: valid ones\
 -c \"#HEXCOLOR\", -e \"#HEXCOLOR\",\
--k \"POLYBAR MODULE HOOK NAME\",\
 -s Enable shorthand notation for workspaces" ;;
     esac
 done

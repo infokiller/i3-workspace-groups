@@ -10,6 +10,8 @@ while getopts c:e:s flag; do
     esac
 done
 
+# $1: workspace number
+# $2: group name
 function ows() {
     group=$2
     if [ "$group" == "default" ]; then
@@ -36,7 +38,7 @@ function txt_item() {
     if [[ $ws_screen == 0 ]]; then
         echo "%{A1:"$(ows $ws_click $2) ":}$1%{A}"
     else
-        w=$(echo "$1" | sed -e "s/\([^0-9]*\)\([[:digit:]]\)\([^0-9]*\)/\1%{F$COLOR_EXTERNAL_MONITOR}\2%{F-}\3/")
+        w=$(echo "$1" | sed -e "s/\([^0-9]*\)\([[:digit:]]\+\)\([^0-9]*\)/\1%{F$COLOR_EXTERNAL_MONITOR}\2%{F-}\3/")
         echo "%{A1:"$(ows $ws_click $2) ":}$w%{A}"
     fi
 }
@@ -80,54 +82,50 @@ for group in $groups; do
     text=$text"%{A1:$(ch_gr $group):}$group:%{A}"
     i=1
 
-    open_ws=$(
-        echo "$wmctrl" |
-            grep ":$group:" |
-            cut -f 1 -d ':'
-    )
-    ws_prev=$(echo "$open_ws" | head -1)
-    ws_prev=${ws_prev: -1}
-    ws_last=$(echo "$open_ws" | tail -1)
-    ws_last=${ws_last: -1}
+    ws_in_current_group=$(echo "$wmctrl" | grep ":$group:")
+    ws_prev=$(echo "$ws_in_current_group" | head -1 | cut -f 3 -d ':')
+    ws_last=$(echo "$ws_in_current_group" | tail -1 | cut -f 3 -d ':')
 
-    for ws_long in $open_ws; do
-        ws=${ws_long: -1}
+    for ws_full_name in $ws_in_current_group; do
+        ws_num=$(echo "$ws_full_name" | cut -f 3 -d ':')
+        ws_long=$(echo "$ws_full_name" | cut -f 1 -d ':')
         # if this is the current window
-        if [ "$ws" == "$current_ws" ] && [ "$group" == "$current_group" ]; then
-            text=$text"%{u#a3be8c}%{+u} %{F$COLOR_CURRENT_WS}$(txt_item $ws $group $ws $ws_long)%{F-} %{-u}"
+        if [ "$ws_num" == "$current_ws" ] && [ "$group" == "$current_group" ]; then
+            text=$text"%{u#a3be8c}%{+u} %{F$COLOR_CURRENT_WS}$(txt_item $ws_num $group $ws_num $ws_long)%{F-} %{-u}"
         # if it is the curent group do not do shorthand
         elif [ "$group" == "$current_group" ]; then
-            text=$text"$(txt_item " $ws " $group $ws $ws_long)"
+            text=$text"$(txt_item " $ws_num " $group $ws_num $ws_long)"
             # do shorthand notation
         elif [[ $SHORTHAND_ENABLED != "1" ]]; then
-            text=$text"$(txt_item " $ws " $group $ws $ws_long)"
+            text=$text"$(txt_item " $ws_num " $group $ws_num $ws_long)"
         else
             # if this is the first one
-            if [[ $ws == $ws_prev ]]; then
-                text=$text"$(txt_item " $ws" $group $ws $ws_long)"
-            # if its somewhere in the middle
-            elif [[ $ws > $(($ws_prev + 1)) ]]; then
+            if [[ $ws_num == $ws_prev ]]; then
+                text=$text"$(txt_item " $ws_num" $group $ws_num $ws_long)"
+                # if its somewhere in the middle
+            elif (($ws_num > $(($ws_prev + 1)))); then
                 if [[ $i > 2 ]]; then
-                    text=$text"$(txt_item "-$ws_prev" $group $ws $ws_long)"
+                    text=$text"$(txt_item "-$ws_prev" $group $ws_prev $ws_long_prev)"
                 elif [[ $i == 2 ]]; then
-                    text=$text"$(txt_item ", $ws_prev" $group $ws $ws_long)"
+                    text=$text"$(txt_item ", $ws_prev" $group $ws_prev $ws_long_prev)"
                 fi
-                text=$text"$(txt_item ", $ws" $group $ws $ws_long)"
+                text=$text"$(txt_item ", $ws_num" $group $ws_num $ws_long)"
                 i=1
             # if it is the last one
-            elif [[ $ws == $ws_last ]]; then
-                if [[ $i > 1 ]] && [[ $ws_prev < $(($ws - 1)) ]]; then
-                    text=$text"$(txt_item "-$ws_prev" $group $ws $ws_long)"
-                    text=$text"$(txt_item ", $ws" $group $ws $ws_long)"
+            elif [[ $ws_num == $ws_last ]]; then
+                if [[ $i > 1 ]] && [[ $ws_prev < $(($ws_num - 1)) ]]; then
+                    text=$text"$(txt_item "-$ws_prev" $group $ws_prev $ws_long_prev)"
+                    text=$text"$(txt_item ", $ws_num" $group $ws_num $ws_long)"
                 elif [[ $i > 1 ]]; then
-                    text=$text"$(txt_item "-$ws" $group $ws $ws_long)"
+                    text=$text"$(txt_item "-$ws_num" $group $ws_num $ws_long)"
                 else
-                    text=$text"$(txt_item ", $ws" $group $ws $ws_long)"
+                    text=$text"$(txt_item ", $ws_num" $group $ws_num $ws_long)"
                 fi
             else
                 i=$(($i + 1))
             fi
-            ws_prev=$ws
+            ws_prev=$ws_num
+            ws_long_prev=$ws_long
         fi
     done
     text=$text" | "

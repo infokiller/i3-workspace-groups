@@ -8,10 +8,11 @@ def on_workspace_focus(i3, e):
     subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'])
 
 
-subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'])
-i3.on('workspace::focus', on_workspace_focus)
-i3.on('workspace::init', on_workspace_focus)
-i3.on('workspace::rename', on_workspace_focus)
-i3.on('workspace::move', on_workspace_focus)
-i3.on('workspace::empty', on_workspace_focus)
-i3.main()
+if __name__ == '__main__':
+    subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'])
+    i3.on('workspace::focus', on_workspace_focus)
+    i3.on('workspace::init', on_workspace_focus)
+    i3.on('workspace::rename', on_workspace_focus)
+    i3.on('workspace::move', on_workspace_focus)
+    i3.on('workspace::empty', on_workspace_focus)
+    i3.main()

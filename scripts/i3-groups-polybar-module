@@ -103,7 +103,7 @@ for group in $groups; do
             if [[ $ws_num == $ws_prev ]]; then
                 text=$text"$(txt_item " $ws_num" $group $ws_num $ws_long)"
                 # if its somewhere in the middle
-            elif [[ $ws_num > $(($ws_prev + 1)) ]]; then
+            elif (( $ws_num > $(($ws_prev + 1)) )); then
                 if [[ $i > 2 ]]; then
                     text=$text"$(txt_item "-$ws_prev" $group $ws_num $ws_long)"
                 elif [[ $i == 2 ]]; then

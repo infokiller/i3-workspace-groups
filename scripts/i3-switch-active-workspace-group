@@ -19,7 +19,7 @@ command_exists() {
 get_tool() {
   filename="$1"
   local dir tool
-  dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+  dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
   tool="${dir}/${filename}"
   command_exists "${tool}" || tool="${filename}"
   printf '%s\n' "${tool}"

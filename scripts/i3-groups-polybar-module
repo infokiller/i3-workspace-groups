@@ -82,7 +82,7 @@ for group in $groups; do
     text=$text"%{A1:$(ch_gr $group):}$group:%{A}"
     i=1
 
-    ws_in_current_group=$(echo "$wmctrl" | grep ":$group:")
+    ws_in_current_group=$(echo "$wmctrl" | grep ":$group:" | sort -t : -k 3)
     ws_prev=$(echo "$ws_in_current_group" | head -1 | cut -f 3 -d ':')
     ws_last=$(echo "$ws_in_current_group" | tail -1 | cut -f 3 -d ':')
 

@@ -182,8 +182,8 @@ class WorkspaceGroupsController:
             if target_group in group_to_monitor_workspaces:
                 workspace_name = group_to_monitor_workspaces[target_group][
                     0].name
-            # The focused monitor doesn't have any workspaces in the target group,
-            # so create one.
+            # The focused monitor doesn't have any workspaces in the target
+            # group, so create one.
             else:
                 workspace_name = self._create_new_active_group_workspace_name(
                     focused_monitor_name, target_group)

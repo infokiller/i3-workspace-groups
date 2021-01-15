@@ -6,11 +6,9 @@ from i3wsgroups import logger
 
 logger = logger.logger
 
-class I3Proxy:
 
-    def __init__(self,
-                 i3_connection: i3ipc.Connection,
-                 dry_run: bool = True):
+class I3Proxy:
+    def __init__(self, i3_connection: i3ipc.Connection, dry_run: bool = True):
         self.i3_connection = i3_connection
         self.dry_run = dry_run
         # i3 tree is cached for performance. Timing the i3ipc get_tree function
@@ -42,11 +40,19 @@ class I3Proxy:
             con = con.parent
         return con.name
 
-    def get_monitor_workspaces(self, monitor_name: Optional[str] = None
-                              ) -> List[i3ipc.Con]:
+    def get_monitor_workspaces(self,
+                               monitor_name: Optional[str] = None
+                               ) -> List[i3ipc.Con]:
         if monitor_name is None:
             monitor_name = self.get_focused_monitor_name()
         return self.get_monitor_to_workspaces()[monitor_name]
+
+    def get_active_monitor_names(self) -> List[str]:
+        active_monitor_names = [
+            output.name for output in self.i3_connection.get_outputs()
+            if output.active
+        ]
+        return active_monitor_names
 
     def get_monitor_to_workspaces(self) -> Dict[str, List[i3ipc.Con]]:
         active_monitor_names = [
@@ -74,7 +80,8 @@ class I3Proxy:
             if not reply.success:
                 logger.warning('i3 command error: %s', reply.error)
 
-    def focus_workspace(self, name: str,
+    def focus_workspace(self,
+                        name: str,
                         auto_back_and_forth: bool = True) -> None:
         options = ''
         if not auto_back_and_forth:

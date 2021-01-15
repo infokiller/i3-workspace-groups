@@ -21,7 +21,6 @@ class WorkspaceGroupsError(Exception):
 
 
 class ActiveGroupContext:
-
     @staticmethod
     def get_group_name(_: i3ipc.Con,
                        group_to_workspaces: GroupToWorkspaces) -> str:
@@ -30,7 +29,6 @@ class ActiveGroupContext:
 
 
 class FocusedGroupContext:
-
     @staticmethod
     def get_group_name(tree: i3ipc.Con, _: GroupToWorkspaces) -> str:
         focused_workspace = tree.find_focused().workspace()
@@ -38,7 +36,6 @@ class FocusedGroupContext:
 
 
 class NamedGroupContext:
-
     def __init__(self, group_name: str):
         self.group_name = group_name
 
@@ -47,7 +44,6 @@ class NamedGroupContext:
 
 
 class WorkspaceGroupsController:
-
     def __init__(self, i3_proxy_: i3_proxy.I3Proxy, config):
         self.i3_proxy = i3_proxy_
         self.config = config
@@ -79,8 +75,8 @@ class WorkspaceGroupsController:
                 dynamic_name = ''
                 # Add window icons if needed.
                 if self.config['icons']['enable'] and (
-                        self.config['icons']['enable_all_groups'] or
-                        group_index == 0):
+                        self.config['icons']['enable_all_groups']
+                        or group_index == 0):
                     dynamic_name = self.icons_resolver.get_workspace_icons(
                         workspace)
                 ws_metadata.dynamic_name = dynamic_name
@@ -123,10 +119,11 @@ class WorkspaceGroupsController:
         used_local_numbers = ws_names.get_used_local_numbers(
             group_to_all_workspaces.get(target_group, []))
         return next(
-            iter(ws_names.get_lowest_free_local_numbers(1, used_local_numbers)))
+            iter(ws_names.get_lowest_free_local_numbers(1,
+                                                        used_local_numbers)))
 
-    def _create_new_active_group_workspace_name(self, monitor_name: str,
-                                                target_group: str) -> i3ipc.Con:
+    def _create_new_active_group_workspace_name(
+            self, monitor_name: str, target_group: str) -> i3ipc.Con:
         local_number = self._find_free_local_number(target_group)
         global_number = ws_names.compute_global_number(
             monitor_index=self.i3_proxy.get_monitor_index(monitor_name),
@@ -155,6 +152,7 @@ class WorkspaceGroupsController:
     def switch_active_group(self, target_group: str,
                             focused_monitor_only: bool) -> None:
         focused_monitor_name = self.i3_proxy.get_focused_monitor_name()
+        visible_monitors = self.i3_proxy.get_active_monitor_names()
         monitor_to_workspaces = self.i3_proxy.get_monitor_to_workspaces()
         for monitor, workspaces in monitor_to_workspaces.items():
             group_exists = (target_group
@@ -173,21 +171,24 @@ class WorkspaceGroupsController:
         # workspaces in all monitors and groups. Otherwise, if the previously
         # focused workspace was renamed, i3's `workspace back_and_forth` will
         # switch focus to a non-existant workspace name.
-        focused_group = ws_names.get_group(
-            self.get_tree().find_focused().workspace())
-        # The target group is already focused, no need to do anything.
-        if focused_group == target_group:
-            return
-        group_to_monitor_workspaces = ws_names.get_group_to_workspaces(
-            monitor_to_workspaces[focused_monitor_name])
-        if target_group in group_to_monitor_workspaces:
-            workspace_name = group_to_monitor_workspaces[target_group][0].name
-        # The focused monitor doesn't have any workspaces in the target group,
-        # so create one.
-        else:
-            workspace_name = self._create_new_active_group_workspace_name(
-                focused_monitor_name, target_group)
-        self.i3_proxy.focus_workspace(workspace_name, auto_back_and_forth=False)
+        for monitor in visible_monitors:
+            focused_group = ws_names.get_group(
+                self.get_tree().find_focused().workspace())
+            # The target group is already focused, no need to do anything.
+            if focused_group == target_group:
+                return
+            group_to_monitor_workspaces = ws_names.get_group_to_workspaces(
+                monitor_to_workspaces[monitor])
+            if target_group in group_to_monitor_workspaces:
+                workspace_name = group_to_monitor_workspaces[target_group][
+                    0].name
+            # The focused monitor doesn't have any workspaces in the target group,
+            # so create one.
+            else:
+                workspace_name = self._create_new_active_group_workspace_name(
+                    focused_monitor_name, target_group)
+            self.i3_proxy.focus_workspace(workspace_name,
+                                          auto_back_and_forth=False)
 
     def _create_workspace_name(
             self, metadata: ws_names.WorkspaceGroupingMetadata) -> str:
@@ -255,7 +256,8 @@ class WorkspaceGroupsController:
             f'move {flags} container to workspace "{target_workspace_name}"')
 
     def _relative_workspace_in_group(self,
-                                     offset_from_current: int = 1) -> i3ipc.Con:
+                                     offset_from_current: int = 1
+                                     ) -> i3ipc.Con:
         focused_workspace = self.get_tree().find_focused().workspace()
         focused_group = ws_names.get_group(focused_workspace)
         group_workspaces_all_monitors = ws_names.get_group_to_workspaces(
@@ -266,7 +268,7 @@ class WorkspaceGroupsController:
             if workspace.id == focused_workspace.id:
                 break
         next_workspace_index = (current_workspace_index + offset_from_current
-                               ) % len(group_workspaces_all_monitors)
+                                ) % len(group_workspaces_all_monitors)
         return group_workspaces_all_monitors[next_workspace_index]
 
     def focus_workspace_relative(self, offset_from_current: int) -> None:
@@ -276,8 +278,8 @@ class WorkspaceGroupsController:
 
     def move_workspace_relative(self, offset_from_current: int) -> None:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
-        self.i3_proxy.send_i3_command('move container to workspace "{}"'.format(
-            next_workspace.name))
+        self.i3_proxy.send_i3_command(
+            'move container to workspace "{}"'.format(next_workspace.name))
 
     def focus_new_workspace(self, group_context) -> None:
         target_group = self._get_group_from_context(group_context)
@@ -290,7 +292,8 @@ class WorkspaceGroupsController:
         self.move_to_workspace_number(group_context, local_number, False)
 
     def update_focused_workspace(
-            self, metadata_updates: ws_names.WorkspaceGroupingMetadata) -> None:
+            self,
+            metadata_updates: ws_names.WorkspaceGroupingMetadata) -> None:
         if metadata_updates.group is not None and (
                 not ws_names.is_valid_group_name(metadata_updates.group)):
             raise WorkspaceGroupsError(

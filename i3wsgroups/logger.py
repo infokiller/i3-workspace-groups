@@ -1,17 +1,20 @@
 import logging
 import logging.handlers
 
-_LOG_FMT = '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s'
+_LOG_FMT_STDERR = (
+    '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s')
+_LOG_FMT_SYSLOG = (
+    '%(levelname)s [%(filename)s:%(lineno)d] %(message)s')
 
-logger = logging.getLogger('i3-workspace-groups')
+logger = logging.getLogger()
+
 
 def init_logger(name: str) -> None:
+    stderr_handler = logging.StreamHandler()
+    stderr_formatter = logging.Formatter(_LOG_FMT_STDERR)
+    stderr_handler.setFormatter(stderr_formatter)
+    logger.addHandler(stderr_handler)
     syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
-    stdout_handler = logging.StreamHandler()
-    stdout_formatter = logging.Formatter(_LOG_FMT)
-    stdout_handler.setFormatter(stdout_formatter)
-    syslog_formatter = logging.Formatter('{}: {}'.format(name, _LOG_FMT))
-    syslog_formatter.ident = name
+    syslog_formatter = logging.Formatter(f'{name}: {_LOG_FMT_SYSLOG}')
     syslog_handler.setFormatter(syslog_formatter)
     logger.addHandler(syslog_handler)
-    logger.addHandler(stdout_handler)

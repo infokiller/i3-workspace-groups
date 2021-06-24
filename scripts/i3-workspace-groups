@@ -14,7 +14,7 @@ from i3wsgroups import controller as i3_groups_controller
 from i3wsgroups import i3_proxy, logger, workspace_names
 
 _LIST_WORKSPACES_FIELDS = workspace_names.WORKSPACE_NAME_SECTIONS + [
-    'window_icons', 'global_name', 'monitor'
+    'window_icons', 'global_name', 'monitor', 'focused'
 ]
 _LIST_WORKSPACES_FIELDS_HELP = (
     'Comma separated list of fields to output. Options: {}').format(
@@ -179,6 +179,8 @@ def _create_group_context(args):
 def _get_workspace_field(controller, workspace, field):
     if field == 'global_name':
         return workspace.name
+    if field == 'focused':
+        return 1 if workspace.find_focused() is not None else 0
     if field == 'monitor':
         con = workspace
         while con.type != 'output':

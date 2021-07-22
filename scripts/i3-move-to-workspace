@@ -9,6 +9,7 @@ Displayed table columns: group, number, window icons, and name.'
 readonly HELP_FORMAT='<span alpha="50%%" size="smaller"><b>%s</b>
 <i>%s</i></span>'
 # shellcheck disable=SC2059
+# shellcheck disable=SC2155
 readonly HELP_TEXT="$(printf "${HELP_FORMAT}" "${HELP_HEADING}" "${HELP_CONTENT}")"
 
 readonly DISPLAYED_FIELDS='group,local_number,window_icons,static_name'

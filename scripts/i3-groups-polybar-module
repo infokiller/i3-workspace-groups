@@ -1,11 +1,12 @@
 #!/bin/bash
-while getopts c:e:s flag; do
+while getopts c:e:m:s flag; do
     case "${flag}" in
     e) COLOR_EXTERNAL_MONITOR=${OPTARG} ;;
     c) COLOR_CURRENT_WS=${OPTARG} ;;
     s) SHORTHAND_ENABLED=1 ;;
+    m) CURRENT_MONITOR=${OPTARG} ;;
     *) echo "Check options: valid ones\
--c \"#HEXCOLOR\", -e \"#HEXCOLOR\",\
+-c \"#HEXCOLOR\", -e \"#HEXCOLOR\",\ -m \"#MONITOR_NAME\",\
 -s Enable shorthand notation for workspaces" ;;
     esac
 done
@@ -44,8 +45,9 @@ function txt_item() {
 }
 
 fixed_wmctrl=$(
+    export current_monitor_VP=$(polybar --list-monitors | grep $CURRENT_MONITOR | cut -f 2 -d ' ' | cut -f 2- -d '+' | tr + ,);
     wmctrl -d |
-        sed -e "s/$(echo -ne '\u200b')//g"
+        sed -e "s/$(echo -ne '\u200b')//g" | grep "$current_monitor_VP"
 )
 
 current_ws_name=$(

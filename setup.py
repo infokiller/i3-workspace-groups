@@ -6,7 +6,7 @@ from i3wsgroups import __version__
 
 README_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                            'README.md')
-with open(README_PATH) as f:
+with open(README_PATH, encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
 setuptools.setup(
@@ -25,7 +25,6 @@ setuptools.setup(
         'Operating System :: POSIX :: Linux',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
@@ -45,6 +44,7 @@ setuptools.setup(
             'pytest-cov ~= 3.0',
             'pytype ~= 2021.10',
             'pip-tools ~= 6.4',
+            'codecov ~= 2.1',
         ]
     },
     scripts=[

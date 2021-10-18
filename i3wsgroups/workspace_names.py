@@ -211,14 +211,14 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
 def create_name(ws_metadata: WorkspaceGroupingMetadata) -> str:
     assert ws_metadata.global_number is not None
     assert ws_metadata.group is not None
-    sections = ['{}:'.format(ws_metadata.global_number), ws_metadata.group]
+    sections = [f'{ws_metadata.global_number}:', ws_metadata.group]
     need_prefix_colons = bool(ws_metadata.group)
     for section in ['static_name', 'dynamic_name', 'local_number']:
         value = getattr(ws_metadata, section)
         if not value:
             value = ''
         elif need_prefix_colons:
-            value = ':{}'.format(value)
+            value = f':{value}'
         else:
             need_prefix_colons = True
         sections.append(str(value))

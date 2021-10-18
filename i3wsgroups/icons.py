@@ -65,7 +65,7 @@ class IconsResolver:
             if count < self.config['min_duplicates_count']:
                 icon_text = delim.join(icon for i in range(count))
             else:
-                icon_text = '{}x{}'.format(count, icon)
+                icon_text = f'{count}x{icon}'
             icons_texts.append(icon_text)
         prefix = self.config.get('prefix', '')
         suffix = self.config.get('suffix', '')

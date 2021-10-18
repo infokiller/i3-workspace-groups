@@ -79,13 +79,12 @@ class I3Proxy:
         options = ''
         if not auto_back_and_forth:
             options = '--no-auto-back-and-forth'
-        self.send_i3_command('workspace {} "{}"'.format(options, name))
+        self.send_i3_command(f'workspace {options} "{name}"')
 
     def rename_workspace(self, old_name: str, new_name: str) -> None:
         if old_name == new_name:
             return
-        self.send_i3_command('rename workspace "{}" to "{}"'.format(
-            old_name, new_name))
+        self.send_i3_command(f'rename workspace "{old_name}" to "{new_name}"')
 
     def get_unique_marked_workspace(self, mark) -> Optional[i3ipc.Con]:
         workspaces = self.get_tree().find_marked(mark)

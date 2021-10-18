@@ -276,8 +276,8 @@ class WorkspaceGroupsController:
 
     def move_workspace_relative(self, offset_from_current: int) -> None:
         next_workspace = self._relative_workspace_in_group(offset_from_current)
-        self.i3_proxy.send_i3_command('move container to workspace "{}"'.format(
-            next_workspace.name))
+        self.i3_proxy.send_i3_command(
+            f'move container to workspace "{next_workspace.name}"')
 
     def focus_new_workspace(self, group_context) -> None:
         target_group = self._get_group_from_context(group_context)
@@ -294,8 +294,7 @@ class WorkspaceGroupsController:
         if metadata_updates.group is not None and (
                 not ws_names.is_valid_group_name(metadata_updates.group)):
             raise WorkspaceGroupsError(
-                'Invalid group name provided: "{}"'.format(
-                    metadata_updates.group))
+                f'Invalid group name provided: "{metadata_updates.group}"')
         focused_workspace = self.get_tree().find_focused().workspace()
         metadata = ws_names.parse_name(focused_workspace.name)
         for section in ['group', 'local_number', 'static_name']:
@@ -307,9 +306,9 @@ class WorkspaceGroupsController:
         if exists and focused_workspace.name != found_name:
             if not self.config['workspace_moves']['use_next_available_number']:
                 raise WorkspaceGroupsError(
-                    'Workspace with local number "{}" already exists in group: '
-                    '"{}": "{}"'.format(metadata.local_number, metadata.group,
-                                        found_name))
+                    f'Workspace with local number "{metadata.local_number}" '
+                    'already exists in group: "{metadata.group}": '
+                    '"{found_name}"')
             group_to_all_workspaces = ws_names.get_group_to_workspaces(
                 self.get_tree().workspaces())
             used_local_numbers = ws_names.get_used_local_numbers(

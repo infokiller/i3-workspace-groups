@@ -17,8 +17,8 @@ _LIST_WORKSPACES_FIELDS = workspace_names.WORKSPACE_NAME_SECTIONS + [
     'window_icons', 'global_name', 'monitor', 'focused'
 ]
 _LIST_WORKSPACES_FIELDS_HELP = (
-    'Comma separated list of fields to output. Options: {}').format(
-        ', '.join(_LIST_WORKSPACES_FIELDS))
+    'Comma separated list of fields to output. '
+    f'Options: {", ".join(_LIST_WORKSPACES_FIELDS)}')
 
 init_logger = logger.init_logger
 logger = logger.logger
@@ -199,8 +199,8 @@ def _print_workspaces(controller, args):
     fields = args.fields.split(',')
     for field in fields:
         if field not in _LIST_WORKSPACES_FIELDS:
-            sys.exit('Invalid field: "{}". Valid fields: {}'.format(
-                field, _LIST_WORKSPACES_FIELDS))
+            sys.exit(f'Invalid field: "{field}". Valid fields: '
+                     f'{_LIST_WORKSPACES_FIELDS}')
     table = []
     for workspace in controller.list_workspaces(_create_group_context(args),
                                                 args.focused_only,

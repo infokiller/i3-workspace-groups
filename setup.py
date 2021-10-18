@@ -39,7 +39,8 @@ setuptools.setup(
             'yapf ~= 0.31',
             'virtualenv ~= 20.8',
             'tox ~= 3.24',
-            'tox-conda ~= 0.8',
+            # As of 2021-10-18, tests are done without conda
+            # 'tox-conda ~= 0.8',
             'pytest ~= 6.2',
             'pytest-cov ~= 3.0',
             'pytype ~= 2021.10',

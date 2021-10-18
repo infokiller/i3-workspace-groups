@@ -28,11 +28,25 @@ setuptools.setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     keywords='i3 i3wm extensions add-ons',
     packages=setuptools.find_packages(exclude=['tests']),
     package_data={'i3wsgroups': ['default_config.toml']},
-    install_requires=['i3ipc >= 2, < 3', 'toml >= 0.10, < 1'],
+    install_requires=['i3ipc ~= 2.2', 'toml ~= 0.10'],
+    extras_require={
+        'dev': [
+            'pylint ~= 2.11',
+            'yapf ~= 0.31',
+            'virtualenv ~= 20.8',
+            'tox ~= 3.24',
+            'tox-conda ~= 0.8',
+            'pytest ~= 6.2',
+            'pytest-cov ~= 3.0',
+            'pytype ~= 2021.10',
+            'pip-tools ~= 6.4',
+        ]
+    },
     scripts=[
         'scripts/i3-assign-workspace-to-group',
         'scripts/i3-autoname-workspaces',
@@ -43,6 +57,6 @@ setuptools.setup(
         'scripts/i3-switch-active-workspace-group',
         'scripts/i3-workspace-groups',
         'scripts/i3-groups-polybar-module',
-        'scripts/i3-groups-polybar-module-updater'
+        'scripts/i3-groups-polybar-module-updater',
     ],
 )

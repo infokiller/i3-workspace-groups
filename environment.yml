@@ -4,13 +4,12 @@ channels:
   - defaults
 dependencies:
   - python=3.7
-  - pylint
-  - yapf
-  - virtualenv
-  - tox
-  - tox-conda
+  # - pylint
+  # - yapf
+  # - virtualenv
+  # - tox
+  # - tox-conda
   - pip
   - pip:
-    - i3ipc
-    - toml
-    - pytype
+    - -r requirements.txt
+    - -r requirements-dev.txt

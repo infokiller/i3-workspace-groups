@@ -12,7 +12,7 @@ DEFAULT_GROUP_ITEM='<default>'
 # https://github.com/DaveDavenport/rofi/issues/597
 # DEFAULT_GROUP_ITEM='<span alpha="50%">(Default group)</span>'
 
-ROFI_ARGS=(rofi -dmenu -width 30 -lines 10)
+ROFI_CMD=(rofi -dmenu -p 'Workspace Group' -theme-str 'window {width: 60ch;} listview {lines: 10;}')
 
 command_exists() {
   type "$1" &> /dev/null
@@ -42,7 +42,7 @@ main() {
   if ! group="$(
     list_groups "${tool}" |
       sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |
-      "${ROFI_ARGS[@]}" -p 'Workspace Group' "$@"
+      "${ROFI_CMD[@]}" "$@"
   )"; then
     exit 1
   fi

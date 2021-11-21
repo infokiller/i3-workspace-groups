@@ -21,7 +21,8 @@ readonly HELP_EXAMPLES='
 readonly HELP_FORMAT='<span alpha="50%%" size="smaller"><b>%s</b>
 %s</span>'
 
-ROFI_ARGS=(rofi -dmenu -width 30)
+ROFI_CMD=(rofi -dmenu -p 'Rename' -theme-str
+  'window {width: 60ch;} listview {lines: 0;}')
 
 command_exists() {
   type "$1" &> /dev/null
@@ -96,8 +97,7 @@ main() {
     # shellcheck disable=SC2059
     mesg[2]="$(printf "${HELP_FORMAT}" "${help_heading}" "${help_content}")"
   fi
-  if ! new_name_pattern="$("${ROFI_ARGS[@]}" -lines 0 -p 'Rename' \
-    "${mesg[@]}")"; then
+  if ! new_name_pattern="$("${ROFI_CMD[@]}" "${mesg[@]}")"; then
     exit 1
   fi
   rename_workspace "${new_name_pattern}"

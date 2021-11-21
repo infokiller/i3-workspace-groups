@@ -14,7 +14,8 @@ readonly HELP_TEXT="$(printf "${HELP_FORMAT}" "${HELP_HEADING}" "${HELP_CONTENT}
 
 readonly DISPLAYED_FIELDS='group,local_number,window_icons,static_name'
 
-ROFI_ARGS=(rofi -dmenu -width 30)
+ROFI_CMD=(rofi -dmenu -p 'Workspace' -theme-str 'window {width: 60ch;}'
+  -mesg "${HELP_TEXT}")
 
 command_exists() {
   type "$1" &> /dev/null
@@ -37,7 +38,7 @@ main() {
     "${tool}" list-workspaces --fields "${DISPLAYED_FIELDS}"
   )
   if ! selected="$(printf '%s\n' "${displayed_workspaces[@]}" |
-    "${ROFI_ARGS[@]}" -p 'Workspace' -mesg "${HELP_TEXT}")"; then
+    "${ROFI_CMD[@]}")"; then
     exit 1
   fi
   local workspaces

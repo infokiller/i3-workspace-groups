@@ -11,7 +11,8 @@ readonly HELP_FORMAT='<span alpha="50%%" size="smaller"><b>%s</b>
 # shellcheck disable=SC2155
 readonly HELP_TEXT="$(printf "${HELP_FORMAT}" "${HELP_HEADING}" "${HELP_CONTENT}")"
 
-ROFI_ARGS=(rofi -dmenu -width 30)
+ROFI_CMD=(rofi -dmenu -p 'Workspace' -theme-str 'window {width: 60ch;}'
+  -mesg "${HELP_TEXT}")
 
 command_exists() {
   type "$1" &> /dev/null
@@ -33,7 +34,7 @@ main() {
   mapfile -t displayed_workspaces < <("${tool}" list-workspaces \
     --fields 'group,local_number,window_icons,static_name')
   if ! selected="$(printf '%s\n' "${displayed_workspaces[@]}" |
-    "${ROFI_ARGS[@]}" -p 'Workspace' -mesg "${HELP_TEXT}")"; then
+    "${ROFI_CMD[@]}")"; then
     exit 1
   fi
   for i in "${!displayed_workspaces[@]}"; do

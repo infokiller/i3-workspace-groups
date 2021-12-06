@@ -32,9 +32,9 @@ main() {
   tool="$(get_tool i3-workspace-groups)"
   mapfile -t workspaces < <("${tool}" list-workspaces --fields 'global_name')
   mapfile -t displayed_workspaces < <("${tool}" list-workspaces \
-    --fields 'group,local_number,window_icons,static_name')
+    --fields 'group,local_number,window_icons,static_name' |
+    column -t -s $'\t' -o '    ')
   if ! selected="$(printf '%s\n' "${displayed_workspaces[@]}" |
-    column -t -s $'\t' -o '    ' |
     "${ROFI_CMD[@]}")"; then
     exit 1
   fi

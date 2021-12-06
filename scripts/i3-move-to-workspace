@@ -38,6 +38,7 @@ main() {
     "${tool}" list-workspaces --fields "${DISPLAYED_FIELDS}"
   )
   if ! selected="$(printf '%s\n' "${displayed_workspaces[@]}" |
+    column -t -s $'\t' -o '    ' |
     "${ROFI_CMD[@]}")"; then
     exit 1
   fi

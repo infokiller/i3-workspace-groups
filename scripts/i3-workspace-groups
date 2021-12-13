@@ -220,7 +220,7 @@ def _print_workspaces(controller, args):
     return '\n'.join('\t'.join(str(e) for e in row) for row in table)
 
 
-def serve(controller, server_addr):
+def serve(i3_connection, server_addr):
     # Add the imports here to avoid having a negative effect on clients not
     # using the server.
     # pylint: disable-next=import-outside-toplevel
@@ -266,7 +266,7 @@ def serve(controller, server_addr):
         if client_args.command == 'server':
             logger.warning('Ignoring nested server command')
             continue
-        output = run_command(controller, client_args)
+        output = run_command(i3_connection, client_args)
         connection.sendall(output.encode('utf-8'))
         # Clean up the connection
         connection.close()
@@ -274,7 +274,11 @@ def serve(controller, server_addr):
 
 # pylint: disable=too-many-branches
 # pylint: disable-next=no-else-return
-def run_command(controller, args):
+def run_command(i3_connection, args):
+    config = cli.get_config_with_overrides(args)
+    logger.debug('Using merged config:\n%s', pprint.pformat(config))
+    controller = i3_groups_controller.WorkspaceGroupsController(
+        i3_proxy.I3Proxy(i3_connection, args.dry_run), config)
     if args.command == 'list-groups':
         return '\n'.join(controller.list_groups(args.focused_monitor_only))
     if args.command == 'list-workspaces':
@@ -309,7 +313,7 @@ def run_command(controller, args):
             group=args.group)
         controller.update_focused_workspace(metadata_updates)
     elif args.command == 'server':
-        serve(controller, args.server_addr)
+        serve(i3_connection, args.server_addr)
     # Deprecated commands, will be removed in a future release.
     elif args.command == 'workspace-back-and-forth':
         logger.warning(
@@ -328,14 +332,9 @@ def main():
     args = _create_args_parser().parse_args()
     init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
-
-    config = cli.get_config_with_overrides(args)
-    logger.debug('Using merged config:\n%s', pprint.pformat(config))
     i3_connection = i3ipc.Connection()
-    controller = i3_groups_controller.WorkspaceGroupsController(
-        i3_proxy.I3Proxy(i3_connection, args.dry_run), config)
     try:
-        output = run_command(controller, args)
+        output = run_command(i3_connection, args)
         if output:
             print(output)
     except i3_groups_controller.WorkspaceGroupsError as ex:

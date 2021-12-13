@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -o errexit -o errtrace -o nounset -o pipefail
+
+SOCKET="${I3_WORKSPACE_GROUPS_SOCKET:-${XDG_RUNTIME_DIR}/i3-workspace-groups.sock}"
+printf '%s\0' "$@" | socat "UNIX-CONNECT:${SOCKET}" -

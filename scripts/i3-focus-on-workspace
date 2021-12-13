@@ -29,7 +29,11 @@ get_tool() {
 
 main() {
   local tool
-  tool="$(get_tool i3-workspace-groups)"
+  if (($#)); then
+    tool="$(get_tool i3-workspace-groups-client)"
+  else
+    tool="$(get_tool i3-workspace-groups)"
+  fi
   mapfile -t workspaces < <("${tool}" list-workspaces --fields 'global_name')
   mapfile -t displayed_workspaces < <("${tool}" list-workspaces \
     --fields 'group,local_number,window_icons,static_name' |

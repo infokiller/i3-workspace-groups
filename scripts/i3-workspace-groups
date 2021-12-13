@@ -224,9 +224,10 @@ def serve(controller, server_addr):
     # Add the imports here to avoid having a negative effect on clients not
     # using the server.
     # pylint: disable-next=import-outside-toplevel
-    import socket
     # pylint: disable-next=import-outside-toplevel
     import shlex
+    import socket
+
     # Make sure the socket does not already exist
     try:
         os.unlink(server_addr)
@@ -253,7 +254,7 @@ def serve(controller, server_addr):
         logger.info(f'Command from client: [{data_str}]')
         try:
             client_args = _create_args_parser().parse_args(
-                shlex.split(data_str))
+                [s for s in data_str.split('\0') if s])
         # argparse can raise SystemExit
         except (ValueError, SystemExit) as e:
             msg = 'Failed parsing command'

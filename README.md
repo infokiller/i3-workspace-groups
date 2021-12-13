@@ -1,8 +1,7 @@
 # i3 Workspace Groups
 
-A Python library and set of command line tools for managing i3wm workspaces in groups
-that you define.
-I find this tool useful for managing many workspaces in i3.
+A Python library and set of command line tools for managing i3wm workspaces in
+groups. I find this tool useful for managing many workspaces in i3.
 
 [![PyPI version](https://badge.fury.io/py/i3-workspace-groups.svg)](https://badge.fury.io/py/i3-workspace-groups)
 [![pipeline status](https://gitlab.com/infokiller/i3-workspace-groups/badges/master/pipeline.svg)](https://gitlab.com/infokiller/i3-workspace-groups/commits/master)
@@ -41,7 +40,8 @@ few issues, for example:
 - Finding a free workspace for a new window (that can also be reached with my
   keybindings)
 
-This has led me to create the [i3-workspace-groups](https://github.com/infokiller/i3-workspace-groups)
+This has led me to create the
+[i3-workspace-groups](https://github.com/infokiller/i3-workspace-groups)
 project, which enables you to define and manage groups of workspaces, each with
 their own "namespace", and switch between them.
 
@@ -54,8 +54,8 @@ python3 -m pip install i3-workspace-groups
 ```
 
 Then you should be able to run the command line tool
-[`i3-workspace-groups`](scripts/i3-workspace-groups).
-There are also a few utility scripts provided that require
+[`i3-workspace-groups`](scripts/i3-workspace-groups). There are also a few
+utility scripts provided that require
 [rofi](https://github.com/DaveDavenport/rofi) and which are useful for
 interactively managing the groups, using rofi as the UI. They include:
 
@@ -64,6 +64,11 @@ interactively managing the groups, using rofi as the UI. They include:
 - [`i3-move-to-workspace`](scripts/i3-move-to-workspace)
 - [`i3-rename-workspace`](scripts/i3-rename-workspace)
 - [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
+
+If you want to use client/server mode for improved speed/latency, you also need
+to install [socat](http://www.dest-unreach.org/socat/) which is available in all
+major distros (support for ncat planned, see
+<https://github.com/infokiller/i3-workspace-groups/issues/53>).
 
 ## Configuration
 
@@ -130,10 +135,10 @@ bar {
 ### i3-workspace-groups configuration file
 
 i3-workspace-groups has an optional config file located at
-`$XDG_CONFIG_HOME/i3-workspace-groups/config.toml`
-(defaults to `~/.config/i3-workspace-groups/config.toml`).
-See the [default config file](./i3wsgroups/default_config.toml) for all the
-possible options to configure, their meaning, and their default values.
+`$XDG_CONFIG_HOME/i3-workspace-groups/config.toml` (defaults to
+`~/.config/i3-workspace-groups/config.toml`). See the
+[default config file](./i3wsgroups/default_config.toml) for all the possible
+options to configure, their meaning, and their default values.
 
 ## Usage
 
@@ -141,8 +146,8 @@ The main operations the CLI tool `i3-workspace-groups` supports are:
 
 - Assign the focused workspace to a group with a given name (and creating the
   group if it doesn't exist).
-- Switch the currently [active group](#active-group). Note that the active
-  group is not necessarily the same as the [focused group](#focused-group).
+- Switch the currently [active group](#active-group). Note that the active group
+  is not necessarily the same as the [focused group](#focused-group).
 - Navigation and movement within a group while ignoring the other groups. See
   examples below.
 
@@ -172,16 +177,13 @@ opening a few windows on a few workspaces. In order to create a new group, first
 you switch to the workspace `4`, and then you press `Super+Shift+g`, which will
 prompt you for a group to assign to the current workspace. You type `work` and
 press enter. Since there's no group named `work` yet, the tool will create it
-and assign the focused workspace to it. You will then notice that the
-workspace name will change in i3bar to `work:4`.
-Then, you press `Super+g` in order to switch the [active
-group](#active-group). You will be shown a list of existing groups, which will
-now be `work` and `<default>`.
-You should now see your workspaces in i3bar ordered as following:
-`work:4`, `1`, `2`, `3`.
-What happened here?
-When you switched to the `work` group, the first thing that the tool did was to
-move all the workspaces in the work group (only `work:mail`) to be in the
+and assign the focused workspace to it. You will then notice that the workspace
+name will change in i3bar to `work:4`. Then, you press `Super+g` in order to
+switch the [active group](#active-group). You will be shown a list of existing
+groups, which will now be `work` and `<default>`. You should now see your
+workspaces in i3bar ordered as following: `work:4`, `1`, `2`, `3`. What happened
+here? When you switched to the `work` group, the first thing that the tool did
+was to move all the workspaces in the work group (only `work:mail`) to be in the
 beginning of the workspace list. Then, it renamed the workspaces in the default
 group to include the group name, so that they can be differentiated from other
 workspaces in the `work` group with the same name.
@@ -197,9 +199,9 @@ but you promise yourself to get back to work in a few hours, and you don't want
 to lose your open windows. So you press `Super+g` to switch the active work back
 to the default one. You should now see your workspaces in i3bar ordered as
 following: `1`, `2`, `3`, `work:4`. The focus will also shift to the first
-workspace in the default group (`1` in this case).
-Now that you're back in the default group, pressing `Super+2` will again lead
-you to the workspace `2` in the default group.
+workspace in the default group (`1` in this case). Now that you're back in the
+default group, pressing `Super+2` will again lead you to the workspace `2` in
+the default group.
 
 ## Concepts
 
@@ -215,13 +217,12 @@ leftmost one).
 
 ### Active group
 
-The active group is the group of the [active workspace](#active-workspace).
-This group will normally contain workspaces related to the task you're doing at
-the time it's active. When you want to work on another task, you can switch the
-active group.
-Workspaces that are not in the active group can still be interacted with, but
-some commands provided are designed to make it easier to interact with the
-workspaces of the active group.
+The active group is the group of the [active workspace](#active-workspace). This
+group will normally contain workspaces related to the task you're doing at the
+time it's active. When you want to work on another task, you can switch the
+active group. Workspaces that are not in the active group can still be
+interacted with, but some commands provided are designed to make it easier to
+interact with the workspaces of the active group.
 
 > **NOTE:** In a multi-monitor setup, there is an active group per monitor.
 
@@ -244,12 +245,13 @@ all be in the default group.
   about the group assignment.
 - ~~**Latency**: there can be noticeable latency in some machines for the script
   commands. On my high performance desktop this is not noticeable, but on my
-  laptop it is. I measured the latency of commands to be around 100-200 ms,
-  most of it coming from importing python libraries, so it's not possible to
-  reduce it much without running it as a daemon (which will overcomplicate
-  things). In the long term, I plan to rewrite it in go.~~
-  **UPDATE**: there is a new experimental client/server mode which
-  significantly reduces latency. Documentation is still WIP (see #52).
+  laptop it is. I measured the latency of commands to be around 100-200 ms, most
+  of it coming from importing python libraries, so it's not possible to reduce
+  it much without running it as a daemon (which will overcomplicate things). In
+  the long term, I plan to rewrite it in go.~~ **UPDATE**: there is a new
+  experimental client/server mode which significantly reduces latency.
+  Documentation is still WIP (see
+  <https://github.com/infokiller/i3-workspace-groups/issues/52>).
 - **Number of monitors/groups/workspaces**: Supports up to 10 monitors, each
   containing up to 100 groups, each containing up to 100 workspaces.
 

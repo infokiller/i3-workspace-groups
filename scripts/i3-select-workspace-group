@@ -38,7 +38,7 @@ list_groups() {
 
 main() {
   local tool
-  tool="$(get_tool i3-workspace-groups)"
+  tool="$(get_tool "${I3_WORKSPACE_GROUPS_CLI:-i3-workspace-groups}")"
   if ! group="$(
     list_groups "${tool}" |
       sed -r 's|^$|'"${DEFAULT_GROUP_ITEM}"'|' |

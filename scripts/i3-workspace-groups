@@ -224,11 +224,12 @@ def serve(controller, server_addr):
     # Add the imports here to avoid having a negative effect on clients not
     # using the server.
     # pylint: disable-next=import-outside-toplevel
-    # pylint: disable-next=import-outside-toplevel
-    import shlex
+    # import shlex
     import socket
 
     # Make sure the socket does not already exist
+    # TODO: lock the socket to avoid multiple servers trying to use the same
+    # one.
     try:
         os.unlink(server_addr)
     except OSError:
@@ -238,7 +239,7 @@ def serve(controller, server_addr):
     sock.bind(server_addr)
     sock.listen(1)
     while True:
-        logger.info('Waiting for a connection')
+        logger.debug('Waiting for a connection')
         connection, addr = sock.accept()
         logger.debug(f'Connection from: {addr}')
         # Receive the data in small chunks and retransmit it

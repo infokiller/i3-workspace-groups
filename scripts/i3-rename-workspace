@@ -84,7 +84,7 @@ rename_workspace() {
 
 main() {
   local tool
-  tool="$(get_tool i3-workspace-groups)"
+  tool="$(get_tool "${I3_WORKSPACE_GROUPS_CLI:-i3-workspace-groups}")"
   mesg=()
   if current_name="$("${tool}" list-workspaces --fields static_name \
     --focused-only)"; then

@@ -32,7 +32,7 @@ get_tool() {
 
 main() {
   local tool
-  tool="$(get_tool i3-workspace-groups)"
+  tool="$(get_tool "${I3_WORKSPACE_GROUPS_CLI:-i3-workspace-groups}")"
   local displayed_workspaces
   mapfile -t displayed_workspaces < <(
     "${tool}" list-workspaces --fields "${DISPLAYED_FIELDS}" |

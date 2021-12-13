@@ -31,7 +31,8 @@ main() {
   if ! group="$("${select_groups}" -mesg "${HELP_TEXT}")"; then
     exit 1
   fi
-  "$(get_tool i3-workspace-groups)" "$@" assign-workspace-to-group "${group}"
+  tool="$(get_tool "${I3_WORKSPACE_GROUPS_CLI:-i3-workspace-groups}")"
+  "${tool}" "$@" assign-workspace-to-group "${group}"
 }
 
 main "$@"

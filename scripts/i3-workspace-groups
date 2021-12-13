@@ -248,14 +248,14 @@ def serve(controller, server_addr):
             logger.warning('Skipping unusually long command')
             continue
         try:
-            data_str = data.decode('utf-8')
+            # Args are split by the null byte
+            client_argv = [s.decode('utf-8') for s in data.split(b'\0') if s]
         except UnicodeError:
-            logger.warning('Failed decoding command as utf-8')
+            logger.warning('Failed decoding command args as utf-8')
             continue
-        logger.info(f'Command from client: [{data_str}]')
+        logger.info(f'Command from client: {client_argv}')
         try:
-            client_args = _create_args_parser().parse_args(
-                [s for s in data_str.split('\0') if s])
+            client_args = _create_args_parser().parse_args(client_argv)
         # argparse can raise SystemExit
         except (ValueError, SystemExit) as e:
             msg = 'Failed parsing command'

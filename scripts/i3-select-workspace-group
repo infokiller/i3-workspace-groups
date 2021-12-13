@@ -33,7 +33,7 @@ list_groups() {
   if ! echo "${groups}" | grep -qE '^$'; then
     echo ''
   fi
-  echo "${groups}"
+  printf '%s' "${groups}"
 }
 
 main() {
@@ -49,7 +49,7 @@ main() {
   if [[ "${group}" == "${DEFAULT_GROUP_ITEM}" ]]; then
     group=''
   fi
-  echo "${group}"
+  printf '%s' "${group}"
 }
 
 main "$@"

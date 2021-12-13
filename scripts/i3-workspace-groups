@@ -249,7 +249,7 @@ def serve(controller, server_addr):
             continue
         try:
             # Args are split by the null byte
-            client_argv = [s.decode('utf-8') for s in data.split(b'\0') if s]
+            client_argv = [s.decode('utf-8') for s in data.split(b'\n')]
         except UnicodeError:
             logger.warning('Failed decoding command args as utf-8')
             continue

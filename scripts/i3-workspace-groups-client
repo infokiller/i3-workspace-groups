@@ -4,4 +4,20 @@
 set -o errexit -o errtrace -o nounset -o pipefail
 
 SOCKET="${I3_WORKSPACE_GROUPS_SOCKET:-${XDG_RUNTIME_DIR}/i3-workspace-groups.sock}"
-printf '%s\0' "$@" | socat "UNIX-CONNECT:${SOCKET}" -
+
+join_by_null() {
+  # Head is used to remove the last null char
+  # TODO: use a pure-bash solution. POSIX head doesn't support -c (at least on
+  # alpine).
+  #  printf '%s\0' "$@" | head -c -1
+  # NOTE: Bash uses c-style strings, so they can't contain null chars.
+  printf '%s\0' "$@" | sed 's/.$//'
+}
+
+join_by() {
+  local IFS="$1"
+  shift
+  printf '%s' "$*"
+}
+
+join_by $'\n' "$@" | socat "UNIX-CONNECT:${SOCKET}" -

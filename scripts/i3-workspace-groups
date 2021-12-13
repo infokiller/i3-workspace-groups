@@ -11,7 +11,9 @@ import i3ipc
 
 from i3wsgroups import cli
 from i3wsgroups import controller as i3_groups_controller
-from i3wsgroups import i3_proxy, logger, workspace_names
+from i3wsgroups import i3_proxy
+from i3wsgroups import logger
+from i3wsgroups import workspace_names
 
 _LIST_WORKSPACES_FIELDS = workspace_names.WORKSPACE_NAME_SECTIONS + [
     'window_icons', 'global_name', 'monitor', 'focused'
@@ -153,6 +155,12 @@ def _create_args_parser() -> argparse.ArgumentParser:
         'workspace with the same number, use the next available number instead '
         ' of failing.')
     assign_workspace_subparser.add_argument('group')
+    server_subparser = subparsers.add_parser('server')
+    server_subparser.add_argument(
+        '--server-addr',
+        default=os.path.expandvars(
+            '${XDG_RUNTIME_DIR}/i3-workspace-groups.sock'),
+        help='Path for the unix domain socket used by the server')
     # Deprecated commands, will be removed in a future release.
     subparsers.add_parser(
         'workspace-back-and-forth',
@@ -209,10 +217,111 @@ def _print_workspaces(controller, args):
         for field in fields:
             row.append(_get_workspace_field(controller, workspace, field))
         table.append(row)
-    print('\n'.join('\t'.join(str(e) for e in row) for row in table))
+    return '\n'.join('\t'.join(str(e) for e in row) for row in table)
+
+
+def serve(controller, server_addr):
+    # Add the imports here to avoid having a negative effect on clients not
+    # using the server.
+    # pylint: disable-next=import-outside-toplevel
+    import socket
+    # pylint: disable-next=import-outside-toplevel
+    import shlex
+    # Make sure the socket does not already exist
+    try:
+        os.unlink(server_addr)
+    except OSError:
+        if os.path.exists(server_addr):
+            raise
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.bind(server_addr)
+    sock.listen(1)
+    while True:
+        logger.info('Waiting for a connection')
+        connection, addr = sock.accept()
+        logger.debug(f'Connection from: {addr}')
+        # Receive the data in small chunks and retransmit it
+        data = connection.recv(10000)
+        if len(data) == 10000:
+            logger.warning('Skipping unusually long command')
+            continue
+        try:
+            data_str = data.decode('utf-8')
+        except UnicodeError:
+            logger.warning('Failed decoding command as utf-8')
+            continue
+        logger.info(f'Command from client: [{data_str}]')
+        try:
+            client_args = _create_args_parser().parse_args(
+                shlex.split(data_str))
+        # argparse can raise SystemExit
+        except (ValueError, SystemExit) as e:
+            msg = 'Failed parsing command'
+            if not isinstance(e, SystemExit):
+                msg += f': {e}'
+            logger.warning(msg)
+            continue
+        if client_args.command == 'server':
+            logger.warning('Ignoring nested server command')
+            continue
+        output = run_command(controller, client_args)
+        connection.sendall(output.encode('utf-8'))
+        # Clean up the connection
+        connection.close()
 
 
 # pylint: disable=too-many-branches
+# pylint: disable-next=no-else-return
+def run_command(controller, args):
+    if args.command == 'list-groups':
+        return '\n'.join(controller.list_groups(args.focused_monitor_only))
+    if args.command == 'list-workspaces':
+        return _print_workspaces(controller, args)
+    if args.command == 'workspace-number':
+        controller.focus_workspace_number(_create_group_context(args),
+                                          args.workspace_relative_number)
+    elif args.command == 'workspace-next':
+        controller.focus_workspace_relative(+1)
+    elif args.command == 'workspace-prev':
+        controller.focus_workspace_relative(-1)
+    elif args.command == 'workspace-new':
+        controller.focus_new_workspace(_create_group_context(args))
+    elif args.command == 'move-to-number':
+        controller.move_to_workspace_number(_create_group_context(args),
+                                            args.workspace_relative_number,
+                                            args.no_auto_back_and_forth)
+    elif args.command == 'move-to-next':
+        controller.move_workspace_relative(+1)
+    elif args.command == 'move-to-prev':
+        controller.move_workspace_relative(-1)
+    elif args.command == 'move-to-new':
+        controller.move_to_new_workspace(_create_group_context(args))
+    elif args.command == 'switch-active-group':
+        controller.switch_active_group(args.group, args.focused_monitor_only)
+    elif args.command == 'rename-workspace':
+        metadata_updates = workspace_names.WorkspaceGroupingMetadata(
+            group=args.group, static_name=args.name, local_number=args.number)
+        controller.update_focused_workspace(metadata_updates)
+    elif args.command == 'assign-workspace-to-group':
+        metadata_updates = workspace_names.WorkspaceGroupingMetadata(
+            group=args.group)
+        controller.update_focused_workspace(metadata_updates)
+    elif args.command == 'server':
+        serve(controller, args.server_addr)
+    # Deprecated commands, will be removed in a future release.
+    elif args.command == 'workspace-back-and-forth':
+        logger.warning(
+            'workspace-back-and-forth is deprecated, please '
+            'migrate to the native i3 "workspace back_and_forth" command')
+        controller.i3_proxy.send_i3_command('workspace back_and_forth')
+    elif args.command == 'move-to-back-and-forth':
+        logger.warning(
+            'move-to-back-and-forth is deprecated, please '
+            'migrate to the native i3 "workspace back_and_forth" command')
+        controller.i3_proxy.send_i3_command('move workspace back_and_forth')
+    return ''
+
+
 def main():
     args = _create_args_parser().parse_args()
     init_logger(os.path.basename(__file__))
@@ -224,53 +333,9 @@ def main():
     controller = i3_groups_controller.WorkspaceGroupsController(
         i3_proxy.I3Proxy(i3_connection, args.dry_run), config)
     try:
-        if args.command == 'list-groups':
-            print('\n'.join(controller.list_groups(args.focused_monitor_only)))
-        elif args.command == 'list-workspaces':
-            _print_workspaces(controller, args)
-        elif args.command == 'workspace-number':
-            controller.focus_workspace_number(_create_group_context(args),
-                                              args.workspace_relative_number)
-        elif args.command == 'workspace-next':
-            controller.focus_workspace_relative(+1)
-        elif args.command == 'workspace-prev':
-            controller.focus_workspace_relative(-1)
-        elif args.command == 'workspace-new':
-            controller.focus_new_workspace(_create_group_context(args))
-        elif args.command == 'move-to-number':
-            controller.move_to_workspace_number(_create_group_context(args),
-                                                args.workspace_relative_number,
-                                                args.no_auto_back_and_forth)
-        elif args.command == 'move-to-next':
-            controller.move_workspace_relative(+1)
-        elif args.command == 'move-to-prev':
-            controller.move_workspace_relative(-1)
-        elif args.command == 'move-to-new':
-            controller.move_to_new_workspace(_create_group_context(args))
-        elif args.command == 'switch-active-group':
-            controller.switch_active_group(args.group,
-                                           args.focused_monitor_only)
-        elif args.command == 'rename-workspace':
-            metadata_updates = workspace_names.WorkspaceGroupingMetadata(
-                group=args.group,
-                static_name=args.name,
-                local_number=args.number)
-            controller.update_focused_workspace(metadata_updates)
-        elif args.command == 'assign-workspace-to-group':
-            metadata_updates = workspace_names.WorkspaceGroupingMetadata(
-                group=args.group)
-            controller.update_focused_workspace(metadata_updates)
-        # Deprecated commands, will be removed in a future release.
-        elif args.command == 'workspace-back-and-forth':
-            logger.warning(
-                'workspace-back-and-forth is deprecated, please '
-                'migrate to the native i3 "workspace back_and_forth" command')
-            controller.i3_proxy.send_i3_command('workspace back_and_forth')
-        elif args.command == 'move-to-back-and-forth':
-            logger.warning(
-                'move-to-back-and-forth is deprecated, please '
-                'migrate to the native i3 "workspace back_and_forth" command')
-            controller.i3_proxy.send_i3_command('move workspace back_and_forth')
+        output = run_command(controller, args)
+        if output:
+            print(output)
     except i3_groups_controller.WorkspaceGroupsError as ex:
         sys.exit(ex)
 

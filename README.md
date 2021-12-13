@@ -242,12 +242,14 @@ all be in the default group.
   group, so if another tool changes a workspace name without preserving the
   format that i3-workspace-groups uses, i3-workspace-groups can make a mistake
   about the group assignment.
-- **Latency**: there can be noticeable latency in some machines for the script
+- ~~**Latency**: there can be noticeable latency in some machines for the script
   commands. On my high performance desktop this is not noticeable, but on my
   laptop it is. I measured the latency of commands to be around 100-200 ms,
   most of it coming from importing python libraries, so it's not possible to
   reduce it much without running it as a daemon (which will overcomplicate
-  things). In the long term, I plan to rewrite it in go.
+  things). In the long term, I plan to rewrite it in go.~~
+  **UPDATE**: there is a new experimental client/server mode which
+  significantly reduces latency. Documentation is still WIP (see #52).
 - **Number of monitors/groups/workspaces**: Supports up to 10 monitors, each
   containing up to 100 groups, each containing up to 100 workspaces.
 

@@ -66,6 +66,7 @@ confidence=
 # --disable=W".
 disable=fixme,
         logging-format-interpolation,
+        logging-fstring-interpolation,
         missing-docstring,
         too-few-public-methods,
 

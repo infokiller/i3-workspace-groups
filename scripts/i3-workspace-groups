@@ -253,7 +253,7 @@ def serve(i3_connection, server_addr):
         except UnicodeError:
             logger.warning('Failed decoding command args as utf-8')
             continue
-        logger.info(f'Command from client: {client_argv}')
+        logger.info(f'Argv from client: {client_argv}')
         try:
             client_args = _create_args_parser().parse_args(client_argv)
         # argparse can raise SystemExit

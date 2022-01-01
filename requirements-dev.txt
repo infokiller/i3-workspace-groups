@@ -4,9 +4,9 @@
 #
 #    pip-compile --allow-unsafe --extra=dev --generate-hashes --output-file=requirements-dev.txt
 #
-astroid==2.9.0 \
-    --hash=sha256:5939cf55de24b92bda00345d4d0659d01b3c7dafb5055165c330bc7c568ba273 \
-    --hash=sha256:776ca0b748b4ad69c00bfe0fff38fa2d21c338e12c84aa9715ee0d473c422778
+astroid==2.9.1 \
+    --hash=sha256:bfd6c41149d1a368e9b7d3cc90470528e080efdd57fbc0c95426794e0be91c5b \
+    --hash=sha256:f973b3622700431b6e8734ce66f6c18503922a13fb8eb8592e78bd4506823efb
     # via pylint
 attrs==21.4.0 \
     --hash=sha256:2d27e3784d7a565d36ab851fe94887c5eccd6a463168875832a1be79c82828b4 \
@@ -370,9 +370,9 @@ urllib3==1.26.7 \
     --hash=sha256:4987c65554f7a2dbf30c18fd48778ef124af6fab771a377103da0585e2336ece \
     --hash=sha256:c4fdf4019605b6e5423637e01bc9fe4daef873709a7973e195ceba0a62bbc844
     # via requests
-virtualenv==20.12.0 \
-    --hash=sha256:03dbbd4b2a85872a859dfabafc351d702a0b8ace8603da6eb2b90afdfb8fb91b \
-    --hash=sha256:e41ee6238f7f857c75041d069b0f6e4084752d1ecc2d96b2e2614626a8337062
+virtualenv==20.12.1 \
+    --hash=sha256:a5bb9afc076462ea736b0c060829ed6aef707413d0e5946294cc26e3c821436a \
+    --hash=sha256:d51ae01ef49e7de4d2b9d85b4926ac5aabc3f3879a4b4e4c4a8027fa2f0e4f6a
     # via
     #   i3-workspace-groups (setup.py)
     #   tox

@@ -370,9 +370,9 @@ urllib3==1.26.7 \
     --hash=sha256:4987c65554f7a2dbf30c18fd48778ef124af6fab771a377103da0585e2336ece \
     --hash=sha256:c4fdf4019605b6e5423637e01bc9fe4daef873709a7973e195ceba0a62bbc844
     # via requests
-virtualenv==20.12.1 \
-    --hash=sha256:a5bb9afc076462ea736b0c060829ed6aef707413d0e5946294cc26e3c821436a \
-    --hash=sha256:d51ae01ef49e7de4d2b9d85b4926ac5aabc3f3879a4b4e4c4a8027fa2f0e4f6a
+virtualenv==20.13.0 \
+    --hash=sha256:339f16c4a86b44240ba7223d0f93a7887c3ca04b5f9c8129da7958447d079b09 \
+    --hash=sha256:d8458cf8d59d0ea495ad9b34c2599487f8a7772d796f9910858376d1600dd2dd
     # via
     #   i3-workspace-groups (setup.py)
     #   tox

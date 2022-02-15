@@ -79,9 +79,9 @@ distlib==0.3.4 \
     --hash=sha256:6564fe0a8f51e734df6333d08b8b94d4ea8ee6b99b5ed50613f731fd4089f34b \
     --hash=sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579
     # via virtualenv
-filelock==3.4.2 \
-    --hash=sha256:38b4f4c989f9d06d44524df1b24bd19e167d851f19b50bf3e3559952dddc5b80 \
-    --hash=sha256:cf0fc6a2f8d26bd900f19bf33915ca70ba4dd8c56903eeb14e1e7a2fd7590146
+filelock==3.5.0 \
+    --hash=sha256:137b661e657f7850eec9def2a001efadba3414be523b87cd3f9a037372d80a15 \
+    --hash=sha256:a7141afb4feca60925cfc090b411fb9faaf542d06d58ece4f93d940265e6b995
     # via
     #   tox
     #   virtualenv
@@ -96,9 +96,9 @@ idna==3.3 \
 importlab==0.7 \
     --hash=sha256:744bd75d4410744962d203bd1eb71a950b19e8fb8eb5f0b805461dc0a2da329b
     # via pytype
-importlib-metadata==4.11.0 \
-    --hash=sha256:6affcdb3aec542dd98df8211e730bba6c5f2bec8288d47bacacde898f548c9ad \
-    --hash=sha256:9e5e553bbba1843cb4a00823014b907616be46ee503d2b9ba001d214a8da218f
+importlib-metadata==4.11.1 \
+    --hash=sha256:175f4ee440a0317f6e8d81b7f8d4869f93316170a65ad2b007d2929186c8052c \
+    --hash=sha256:e0bc84ff355328a4adfc5240c4f211e0ab386f80aa640d1b11f0618a1d282094
     # via
     #   click
     #   pep517
@@ -475,9 +475,9 @@ pip==22.0.3 \
     --hash=sha256:c146f331f0805c77017c6bb9740cec4a49a0d4582d0c3cc8244b057f83eca359 \
     --hash=sha256:f29d589df8c8ab99c060e68ad294c4a9ed896624f6368c5349d70aa581b333d0
     # via pip-tools
-setuptools==60.9.0 \
-    --hash=sha256:716f9d20b4c3513d1720245eb1dac009b40c9694c88e940e54b67b8b65d09493 \
-    --hash=sha256:d181db00651bce5268b8f559795053d5e8f645e4dbafac6d262b22d7e72e19eb
+setuptools==60.9.1 \
+    --hash=sha256:1bc2725f0b4d6eb054ee29a0e05fda9c7c0921a6bdc0cf6dd2204da746872b49 \
+    --hash=sha256:71b2b3a334d6fcd2e472fb18d0ff530dc585d62da1494e75d001058f33153257
     # via
     #   astroid
     #   pip-tools

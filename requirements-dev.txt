@@ -79,9 +79,9 @@ distlib==0.3.4 \
     --hash=sha256:6564fe0a8f51e734df6333d08b8b94d4ea8ee6b99b5ed50613f731fd4089f34b \
     --hash=sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579
     # via virtualenv
-filelock==3.5.0 \
-    --hash=sha256:137b661e657f7850eec9def2a001efadba3414be523b87cd3f9a037372d80a15 \
-    --hash=sha256:a7141afb4feca60925cfc090b411fb9faaf542d06d58ece4f93d940265e6b995
+filelock==3.5.1 \
+    --hash=sha256:7b23620a293cf3e19924e469cb96672dc72b36c26e8f80f85668310117fcbe4e \
+    --hash=sha256:d1eccb164ed020bc84edd9e45bf6cdb177f64749f6b8fe066648832d2e98726d
     # via
     #   tox
     #   virtualenv
@@ -475,9 +475,9 @@ pip==22.0.3 \
     --hash=sha256:c146f331f0805c77017c6bb9740cec4a49a0d4582d0c3cc8244b057f83eca359 \
     --hash=sha256:f29d589df8c8ab99c060e68ad294c4a9ed896624f6368c5349d70aa581b333d0
     # via pip-tools
-setuptools==60.9.1 \
-    --hash=sha256:1bc2725f0b4d6eb054ee29a0e05fda9c7c0921a6bdc0cf6dd2204da746872b49 \
-    --hash=sha256:71b2b3a334d6fcd2e472fb18d0ff530dc585d62da1494e75d001058f33153257
+setuptools==60.9.2 \
+    --hash=sha256:80743e57120665fa65665286369a0734bce0e7a629ad36507fb7a4b65e7d2e3b \
+    --hash=sha256:93b1a3037230bf9aa07327b9fc58f527d5f4e22d36705b55d55ba3ece8606ca6
     # via
     #   astroid
     #   pip-tools

@@ -226,9 +226,9 @@ pip-tools==6.5.1 \
     --hash=sha256:80f1cfc7156e4a4465b1a46a6bb3599587909537db1a149cf3a6b73eed979ee4 \
     --hash=sha256:80f562aa699fc76a424539697e0bef41e490a050e57a6a21468531981a9d419e
     # via i3-workspace-groups (setup.py)
-platformdirs==2.5.0 \
-    --hash=sha256:30671902352e97b1eafd74ade8e4a694782bd3471685e78c32d0fdfd3aa7e7bb \
-    --hash=sha256:8ec11dfba28ecc0715eb5fb0147a87b1bf325f349f3da9aab2cd6b50b96b692b
+platformdirs==2.5.1 \
+    --hash=sha256:7535e70dfa32e84d4b34996ea99c5e432fa29a708d0f4e394bbcb2a8faa4f16d \
+    --hash=sha256:bcae7cab893c2d310a711b70b24efb93334febe65f8de776ee320b517471e227
     # via
     #   pylint
     #   virtualenv

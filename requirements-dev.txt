@@ -396,9 +396,9 @@ urllib3==1.26.8 \
     --hash=sha256:000ca7f471a233c2251c6c7023ee85305721bfdf18621ebff4fd17a8653427ed \
     --hash=sha256:0e7c33d9a63e7ddfcb86780aac87befc2fbddf46c58dbb487e0855f7ceec283c
     # via requests
-virtualenv==20.13.2 \
-    --hash=sha256:01f5f80744d24a3743ce61858123488e91cb2dd1d3bdf92adaf1bba39ffdedf0 \
-    --hash=sha256:e7b34c9474e6476ee208c43a4d9ac1510b041c68347eabfe9a9ea0c86aa0a46b
+virtualenv==20.13.3 \
+    --hash=sha256:dd448d1ded9f14d1a4bfa6bfc0c5b96ae3be3f2d6c6c159b23ddcfd701baa021 \
+    --hash=sha256:e9dd1a1359d70137559034c0f5433b34caf504af2dc756367be86a5a32967134
     # via
     #   i3-workspace-groups (setup.py)
     #   tox
@@ -471,9 +471,9 @@ zipp==3.7.0 \
     #   pep517
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==22.0.3 \
-    --hash=sha256:c146f331f0805c77017c6bb9740cec4a49a0d4582d0c3cc8244b057f83eca359 \
-    --hash=sha256:f29d589df8c8ab99c060e68ad294c4a9ed896624f6368c5349d70aa581b333d0
+pip==22.0.4 \
+    --hash=sha256:b3a9de2c6ef801e9247d1527a4b16f92f2cc141cd1489f3fffaf6a9e96729764 \
+    --hash=sha256:c6aca0f2f081363f689f041d90dab2a07a9a07fb840284db2218117a52da800b
     # via pip-tools
 setuptools==60.9.3 \
     --hash=sha256:2347b2b432c891a863acadca2da9ac101eae6169b1d3dfee2ec605ecd50dbfe5 \

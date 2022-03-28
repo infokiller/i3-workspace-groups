@@ -492,9 +492,9 @@ pip==22.0.4 \
     --hash=sha256:b3a9de2c6ef801e9247d1527a4b16f92f2cc141cd1489f3fffaf6a9e96729764 \
     --hash=sha256:c6aca0f2f081363f689f041d90dab2a07a9a07fb840284db2218117a52da800b
     # via pip-tools
-setuptools==61.1.1 \
-    --hash=sha256:89eef7b71423ab7fccc7dfafdc145410ef170c4a89567427f932448135e08cdf \
-    --hash=sha256:92b15f45ab164eb0c410d2bf661a6e9d15e3b78c0dffb0325f2bf0f313071cae
+setuptools==61.2.0 \
+    --hash=sha256:8f4813dd6a4d6cc17bde85fb2e635fe19763f96efbb0ddf5575562e5ee0bc47a \
+    --hash=sha256:c3d4e2ab578fbf83775755cd76dae73627915a22832cf4ea5de895978767833b
     # via
     #   astroid
     #   pip-tools

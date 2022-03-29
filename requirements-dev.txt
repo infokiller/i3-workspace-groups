@@ -22,9 +22,9 @@ charset-normalizer==2.0.12 \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
     --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
     # via requests
-click==8.0.4 \
-    --hash=sha256:6a7a62563bbfabfda3a38f3023a1db4a35978c0abd76f6c9605ecd6554d6d9b1 \
-    --hash=sha256:8458d7b1287c5fb128c90e23381cf99dcde74beaf6c7ff6384ce84d6fe090adb
+click==8.1.0 \
+    --hash=sha256:19a4baa64da924c5e0cd889aba8e947f280309f1a2ce0947a3e3a7bcb7cc72d6 \
+    --hash=sha256:977c213473c7665d3aa092b41ff12063227751c41d7b17165013e10069cc5cd2
     # via pip-tools
 codecov==2.1.12 \
     --hash=sha256:585dc217dc3d8185198ceb402f85d5cb5dbfa0c5f350a5abcdf9e347776a5b47 \
@@ -248,9 +248,9 @@ py==1.11.0 \
     # via
     #   pytest
     #   tox
-pylint==2.13.2 \
-    --hash=sha256:0c6dd0e53e6e17f2d0d62660905f3868611e734e9d9b310dc651a4b9f3dc70da \
-    --hash=sha256:3cd8eb401c6aa6c66b614d72cf0c54a02d6bf7752aa9890fc41de71030f3c81a
+pylint==2.13.3 \
+    --hash=sha256:12ed2520510c40db647e4ec7f747b07e0d669b33ab41479c2a07bb89b92877db \
+    --hash=sha256:c8837b6ec6440e3490ab8f066054b0645a516a29ca51ce442f16f7004f711a70
     # via i3-workspace-groups (setup.py)
 pyparsing==3.0.7 \
     --hash=sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea \

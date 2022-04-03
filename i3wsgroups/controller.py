@@ -307,8 +307,8 @@ class WorkspaceGroupsController:
             if not self.config['workspace_moves']['use_next_available_number']:
                 raise WorkspaceGroupsError(
                     f'Workspace with local number "{metadata.local_number}" '
-                    'already exists in group: "{metadata.group}": '
-                    '"{found_name}"')
+                    f'already exists in group: "{metadata.group}": '
+                    f'"{found_name}"')
             group_to_all_workspaces = ws_names.get_group_to_workspaces(
                 self.get_tree().workspaces())
             used_local_numbers = ws_names.get_used_local_numbers(

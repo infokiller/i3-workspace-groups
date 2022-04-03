@@ -22,9 +22,9 @@ charset-normalizer==2.0.12 \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
     --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
     # via requests
-click==8.1.0 \
-    --hash=sha256:19a4baa64da924c5e0cd889aba8e947f280309f1a2ce0947a3e3a7bcb7cc72d6 \
-    --hash=sha256:977c213473c7665d3aa092b41ff12063227751c41d7b17165013e10069cc5cd2
+click==8.1.2 \
+    --hash=sha256:24e1a4a9ec5bf6299411369b208c1df2188d9eb8d916302fe6bf03faed227f1e \
+    --hash=sha256:479707fe14d9ec9a0757618b7a100a0ae4c4e236fac5b7f80ca68028141a1a72
     # via pip-tools
 codecov==2.1.12 \
     --hash=sha256:585dc217dc3d8185198ceb402f85d5cb5dbfa0c5f350a5abcdf9e347776a5b47 \
@@ -248,9 +248,9 @@ py==1.11.0 \
     # via
     #   pytest
     #   tox
-pylint==2.13.3 \
-    --hash=sha256:12ed2520510c40db647e4ec7f747b07e0d669b33ab41479c2a07bb89b92877db \
-    --hash=sha256:c8837b6ec6440e3490ab8f066054b0645a516a29ca51ce442f16f7004f711a70
+pylint==2.13.4 \
+    --hash=sha256:7cc6d0c4f61dff440f9ed8b657f4ecd615dcfe35345953eb7b1dc74afe901d7a \
+    --hash=sha256:8672cf7441b81410f5de7defdf56e2d559c956fd0579652f2e0a0a35bea2d546
     # via i3-workspace-groups (setup.py)
 pyparsing==3.0.7 \
     --hash=sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea \
@@ -480,9 +480,9 @@ yapf==0.32.0 \
     --hash=sha256:8fea849025584e486fd06d6ba2bed717f396080fd3cc236ba10cb97c4c51cf32 \
     --hash=sha256:a3f5085d37ef7e3e004c4ba9f9b3e40c54ff1901cd111f05145ae313a7c67d1b
     # via i3-workspace-groups (setup.py)
-zipp==3.7.0 \
-    --hash=sha256:9f50f446828eb9d45b267433fd3e9da8d801f614129124863f9c51ebceafb87d \
-    --hash=sha256:b47250dd24f92b7dd6a0a8fc5244da14608f3ca90a5efcd37a3b1642fac9a375
+zipp==3.8.0 \
+    --hash=sha256:56bf8aadb83c24db6c4b577e13de374ccfb67da2078beba1d037c17980bf43ad \
+    --hash=sha256:c4f6e5bbf48e74f7a38e7cc5b0480ff42b0ae5178957d564d18932525d5cf099
     # via
     #   importlib-metadata
     #   pep517
@@ -492,9 +492,9 @@ pip==22.0.4 \
     --hash=sha256:b3a9de2c6ef801e9247d1527a4b16f92f2cc141cd1489f3fffaf6a9e96729764 \
     --hash=sha256:c6aca0f2f081363f689f041d90dab2a07a9a07fb840284db2218117a52da800b
     # via pip-tools
-setuptools==61.2.0 \
-    --hash=sha256:8f4813dd6a4d6cc17bde85fb2e635fe19763f96efbb0ddf5575562e5ee0bc47a \
-    --hash=sha256:c3d4e2ab578fbf83775755cd76dae73627915a22832cf4ea5de895978767833b
+setuptools==61.3.1 \
+    --hash=sha256:41aface2e85b517c3a466b4689b8055c02cd2e623461f09af7d93f3da65c4709 \
+    --hash=sha256:88fafba4abc2f047e08a188fd4bbc10b0e464592c37b514c19f8f8f88d94450b
     # via
     #   astroid
     #   pip-tools

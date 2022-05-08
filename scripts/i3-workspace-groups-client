@@ -5,6 +5,45 @@ set -o errexit -o errtrace -o nounset -o pipefail
 
 SOCKET="${I3_WORKSPACE_GROUPS_SOCKET:-${XDG_RUNTIME_DIR}/i3-workspace-groups.sock}"
 
+command_exists() {
+  command -v -- "$1" &> /dev/null
+}
+
+# Only BSD netcat supports unix sockets, not the GNU one
+has_bsd_netcat() {
+  command_exists nc || return 1
+  shopt -s nocasematch
+  mapfile -t output < <(nc -h 2>&1)
+  if [[ "${output[0]}" == *gnu* ]]; then
+    return 1
+  fi
+  [[ "${output[0]}" == *openbsd* ]]
+}
+
+get_tool() {
+  filename="$1"
+  local dir tool
+  dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+  tool="${dir}/${filename}"
+  command_exists "${tool}" || tool="${filename}"
+  printf '%s\n' "${tool}"
+}
+
+get_socket_cmd() {
+  local cmd=()
+  if command_exists socat; then
+    cmd=(socat "UNIX-CONNECT:${SOCKET}" -)
+  elif has_bsd_netcat; then
+    cmd=(nc -U "${SOCKET}")
+  elif command_exists ncat; then
+    cmd=(ncat -U "${SOCKET}")
+  else
+    echo >&2 'Warning: socat/ncat not installed, the client will run slower'
+    cmd=("$(get_tool i3-workspace-groups-nc)" "${SOCKET}")
+  fi
+  printf '%s\0' "${cmd[@]}"
+}
+
 join_by_null() {
   # Head is used to remove the last null char
   # TODO: use a pure-bash solution. POSIX head doesn't support -c (at least on
@@ -20,4 +59,11 @@ join_by() {
   printf '%s' "$*"
 }
 
-join_by $'\n' "$@" | socat "UNIX-CONNECT:${SOCKET}" -
+main() {
+  local socket_cmd
+  mapfile -t -d '' socket_cmd < <(get_socket_cmd)
+  join_by $'\n' "$@" | "${socket_cmd[@]}"
+  # join_by $'\n' "$@" | socat "UNIX-CONNECT:${SOCKET}" -
+}
+
+main "$@"

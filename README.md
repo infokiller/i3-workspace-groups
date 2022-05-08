@@ -65,10 +65,12 @@ interactively managing the groups, using rofi as the UI. They include:
 - [`i3-rename-workspace`](scripts/i3-rename-workspace)
 - [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
 
-If you want to use client/server mode for improved speed/latency, you also need
-to install [socat](http://www.dest-unreach.org/socat/) which is available in all
-major distros (support for ncat planned, see
-<https://github.com/infokiller/i3-workspace-groups/issues/53>).
+If you want to use client/server mode for improved speed/latency, it's
+recommended to install one of the following tools to further improve speed:
+
+- [socat](http://www.dest-unreach.org/socat/): available in all major distros
+- BSD netcat (GNU version not supported)
+- [ncat](https://nmap.org/ncat/)
 
 ## Configuration
 

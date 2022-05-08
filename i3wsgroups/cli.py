@@ -3,6 +3,19 @@ import argparse
 from i3wsgroups import config
 
 
+# argparse calls sys.exit on errors, without even passing the error message to
+# the exception. This wrapper class avoids this behavior. Python 3.9 has built
+# in support for this behavior:
+# https://docs.python.org/3/library/argparse.html#exit-on-error
+class ArgumentParserNoExit(argparse.ArgumentParser):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def error(self, message):
+        raise ValueError(message)
+
+
 def add_common_args(parser: argparse.ArgumentParser):
     parser.add_argument('--dry-run',
                         action='store_true',

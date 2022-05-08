@@ -62,7 +62,14 @@ join_by() {
 main() {
   local socket_cmd
   mapfile -t -d '' socket_cmd < <(get_socket_cmd)
-  join_by $'\n' "$@" | "${socket_cmd[@]}"
+  local output
+  output="$(join_by $'\n' "$@" | "${socket_cmd[@]}")"
+  local s=0
+  if [[ "${output}" == error:* ]]; then
+    s=1
+  fi
+  printf '%s\n' "${output}"
+  exit "${s}"
   # join_by $'\n' "$@" | socat "UNIX-CONNECT:${SOCKET}" -
 }
 

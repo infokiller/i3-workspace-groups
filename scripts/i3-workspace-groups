@@ -76,8 +76,9 @@ def _add_rename_workspace_args(parser: argparse.ArgumentParser) -> None:
         'the existing group assignment.')
 
 
-def _create_args_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description='Control i3 workspace groups.')
+def _create_args_parser() -> cli.ArgumentParserNoExit:
+    parser = cli.ArgumentParserNoExit(
+        description='Control i3 workspace groups.')
     cli.add_common_args(parser)
     cli.add_workspace_naming_args(parser)
     subparsers = parser.add_subparsers(dest='command')
@@ -261,12 +262,12 @@ def serve(i3_connection, server_addr):
                 continue
             output = run_command(i3_connection, client_args)
             connection.sendall(output.encode('utf-8'))
-        # argparse can raise SystemExit
-        except (ValueError, SystemExit) as e:
-            msg = 'Failed parsing command'
-            if not isinstance(e, SystemExit):
-                msg += f': {e}'
+        # argparse can raise SystemExit, but we use a wrapper over
+        # ArgumentParser to avoid it.
+        except (argparse.ArgumentError, ValueError) as e:
+            msg = f'error: failed parsing command: {e}'
             logger.warning(msg)
+            connection.sendall(msg.encode('utf-8'))
             continue
         finally:
             # Clean up the connection

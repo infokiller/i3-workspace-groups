@@ -256,6 +256,11 @@ def serve(i3_connection, server_addr):
         logger.info(f'Argv from client: {client_argv}')
         try:
             client_args = _create_args_parser().parse_args(client_argv)
+            if client_args.command == 'server':
+                logger.warning('Ignoring nested server command')
+                continue
+            output = run_command(i3_connection, client_args)
+            connection.sendall(output.encode('utf-8'))
         # argparse can raise SystemExit
         except (ValueError, SystemExit) as e:
             msg = 'Failed parsing command'
@@ -263,13 +268,9 @@ def serve(i3_connection, server_addr):
                 msg += f': {e}'
             logger.warning(msg)
             continue
-        if client_args.command == 'server':
-            logger.warning('Ignoring nested server command')
-            continue
-        output = run_command(i3_connection, client_args)
-        connection.sendall(output.encode('utf-8'))
-        # Clean up the connection
-        connection.close()
+        finally:
+            # Clean up the connection
+            connection.close()
 
 
 # pylint: disable=too-many-branches

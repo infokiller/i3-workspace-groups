@@ -572,3 +572,5 @@ min-public-methods=2
 # Exceptions that will emit a warning when being caught. Defaults to
 # "Exception".
 overgeneral-exceptions=Exception
+
+# vim: set ft=conf :

@@ -14,9 +14,9 @@ attrs==21.4.0 \
     # via
     #   pytest
     #   pytype
-certifi==2021.10.8 \
-    --hash=sha256:78884e7c1d4b00ce3cea67b44566851c4343c120abd683433ce934a68ea58872 \
-    --hash=sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569
+certifi==2022.5.18.1 \
+    --hash=sha256:9c5705e395cd70084351dd8ad5c41e65655e08ce46f2ec9cf6c2c08390f71eb7 \
+    --hash=sha256:f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a
     # via requests
 charset-normalizer==2.0.12 \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
@@ -75,9 +75,9 @@ coverage[toml]==6.3.3 \
     # via
     #   codecov
     #   pytest-cov
-dill==0.3.4 \
-    --hash=sha256:7e40e4a70304fd9ceab3535d36e58791d9c4a776b38ec7f7ec9afc8d3dca4d4f \
-    --hash=sha256:9f9734205146b2b353ab3fec9af0070237b6ddae78452af83d2fca84d739e675
+dill==0.3.5.1 \
+    --hash=sha256:33501d03270bbe410c72639b350e941882a8b0fd55357580fbc873fba0c59302 \
+    --hash=sha256:d75e41f3eff1eee599d738e76ba8f4ad98ea229db8b085318aa2b3333a208c86
     # via pylint
 distlib==0.3.4 \
     --hash=sha256:6564fe0a8f51e734df6333d08b8b94d4ea8ee6b99b5ed50613f731fd4089f34b \
@@ -483,13 +483,13 @@ zipp==3.8.0 \
     #   pep517
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==22.1 \
-    --hash=sha256:2debf847016cfe643fa1512e2d781d3ca9e5c878ba0652583842d50cc2bcc605 \
-    --hash=sha256:802e797fb741be1c2d475533d4ea951957e4940091422bd4a24848a7ac95609d
+pip==22.1.1 \
+    --hash=sha256:8dfb15d8a1c3d3085a4cbe11f29e19527dfaf2ba99354326fd62cec013eaee81 \
+    --hash=sha256:e7bcf0b2cbdec2af84cc1b7b79b25fdbd7228fbdb61a4dca0b82810d0ba9d18b
     # via pip-tools
-setuptools==62.3.1 \
-    --hash=sha256:28c79c24d83c42a5e6d6cc711e5e9a6c1b89326229feaa5807fc277040658600 \
-    --hash=sha256:588ffd1dc6e20e9f4f7057aa9873fcdc26e0270362602735d32476bad67d82c5
+setuptools==62.3.2 \
+    --hash=sha256:68e45d17c9281ba25dc0104eadd2647172b3472d9e01f911efa57965e8d51a36 \
+    --hash=sha256:a43bdedf853c670e5fed28e5623403bad2f73cf02f9a2774e91def6bda8265a7
     # via
     #   astroid
     #   pip-tools

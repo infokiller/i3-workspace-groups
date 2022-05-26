@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.7
+  - python=3.8
   # - pylint
   # - yapf
   # - virtualenv
@@ -11,4 +11,5 @@ dependencies:
   # - tox-conda
   - pip
   - pip:
+    - -r requirements.txt
     - -r requirements-dev.txt

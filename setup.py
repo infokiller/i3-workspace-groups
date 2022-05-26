@@ -28,6 +28,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     keywords='i3 i3wm extensions add-ons',
     packages=setuptools.find_packages(exclude=['tests']),

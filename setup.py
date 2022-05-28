@@ -36,16 +36,15 @@ setuptools.setup(
     install_requires=['i3ipc ~= 2.2', 'toml ~= 0.10'],
     extras_require={
         'dev': [
-            'pylint ~= 2.11',
-            'yapf ~= 0.31',
-            'virtualenv ~= 20.8',
-            'tox ~= 3.24',
+            'pylint ~= 2.13',
+            'yapf ~= 0.32',
+            'tox ~= 3.25',
             # As of 2021-10-18, tests are done without conda
             # 'tox-conda ~= 0.8',
-            'pytest ~= 6.2',
+            'pytest ~= 7.1',
             'pytest-cov ~= 3.0',
-            'pytype ~= 2021.10',
-            'pip-tools ~= 6.4',
+            'pytype ~= 2022.5',
+            'pip-tools ~= 6.6',
             'codecov ~= 2.1',
         ]
     },

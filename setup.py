@@ -36,7 +36,7 @@ setuptools.setup(
     install_requires=['i3ipc ~= 2.2', 'toml ~= 0.10'],
     extras_require={
         'dev': [
-            'pylint ~= 2.13',
+            'pylint ~= 2.14',
             'yapf ~= 0.32',
             'tox ~= 3.25',
             # As of 2021-10-18, tests are done without conda

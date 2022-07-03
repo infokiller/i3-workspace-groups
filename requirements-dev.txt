@@ -22,9 +22,9 @@ certifi==2022.6.15 \
     --hash=sha256:84c85a9078b11105f04f3036a9482ae10e4621616db313fe045dd24743a0820d \
     --hash=sha256:fe86415d55e84719d75f8b69414f6438ac3547d2078ab91b67e779ef69378412
     # via requests
-charset-normalizer==2.0.12 \
-    --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
-    --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
+charset-normalizer==2.1.0 \
+    --hash=sha256:5189b6f22b01957427f35b6a08d9a0bc45b46d3788ef5a92e978433c7a35f8a5 \
+    --hash=sha256:575e708016ff3a5e3681541cb9d79312c416835686d054a23accb873b254f413
     # via requests
 click==8.1.3 \
     --hash=sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e \
@@ -229,9 +229,9 @@ pep517==0.12.0 \
     --hash=sha256:931378d93d11b298cf511dd634cf5ea4cb249a28ef84160b3247ee9afb4e8ab0 \
     --hash=sha256:dd884c326898e2c6e11f9e0b64940606a93eb10ea022a2e067959f3a110cf161
     # via build
-pip-tools==6.7.0 \
-    --hash=sha256:0aeedc28c0316a30c561893a1f41c3611b46ac536bc271082ffdbdbd1d26924c \
-    --hash=sha256:bae093c36dab6460e9b400e6b8e0b544a89d8bee1904e5698a3e645eb4e9dc36
+pip-tools==6.8.0 \
+    --hash=sha256:39e8aee465446e02278d80dbebd4325d1dd8633248f43213c73a25f58e7d8a55 \
+    --hash=sha256:3e5cd4acbf383d19bdfdeab04738b6313ebf4ad22ce49bf529c729061eabfab8
     # via i3-workspace-groups (setup.py)
 platformdirs==2.5.2 \
     --hash=sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788 \
@@ -255,9 +255,9 @@ pydot==1.4.2 \
     --hash=sha256:248081a39bcb56784deb018977e428605c1c758f10897a339fce1dd728ff007d \
     --hash=sha256:66c98190c65b8d2e2382a441b4c0edfdb4f4c025ef9cb9874de478fb0793a451
     # via pytype
-pylint==2.14.3 \
-    --hash=sha256:4e1378f815c63e7e44590d0d339ed6435f5281d0a0cc357d29a86ea0365ef868 \
-    --hash=sha256:6757a027e15816be23625b079ebc45464e4c9d9dde0c826d18beee53fe22a2e7
+pylint==2.14.4 \
+    --hash=sha256:47705453aa9dce520e123a7d51843d5f0032cbfa06870f89f00927aa1f735a4a \
+    --hash=sha256:89b61867db16eefb7b3c5b84afc94081edaf11544189e2b238154677529ad69f
     # via i3-workspace-groups (setup.py)
 pyparsing==3.0.9 \
     --hash=sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb \
@@ -279,20 +279,20 @@ python-xlib==0.31 \
     --hash=sha256:1ec6ce0de73d9e6592ead666779a5732b384e5b8fb1f1886bd0a81cafa477759 \
     --hash=sha256:74d83a081f532bc07f6d7afcd6416ec38403d68f68b9b9dc9e1f28fbf2d799e9
     # via i3ipc
-pytype==2022.6.23 \
-    --hash=sha256:01e757a2683f3e33c70e7efe9a47038022e669d04bd1be42339ac9f8470b10c5 \
-    --hash=sha256:1b9876941e540f0b3d0460b0bf64908dc8050d41ebb9094823b0e3f9f5aefd4f \
-    --hash=sha256:2aca9227c15aa1efbcf1c216bb6f13ccfcd9881de44c4794bef58716df45ec21 \
-    --hash=sha256:69e7bddce6e86741692192debf4acc872260527074f71b373e52704a9caeec31 \
-    --hash=sha256:7d2f5ae429ff9af9495ec4a1874cd5031e409862f7fdcac312baca2af2935c76 \
-    --hash=sha256:8b47f5682c41bd176138e1984e7fa3ebe25fa31ffc1acca14e67a67e2ec0250d \
-    --hash=sha256:951548b21f5e13e57e6fa1f2c33e9ff9a5f2093651a8a46f86081778ba43e1ea \
-    --hash=sha256:99d218c3b8de15d56c2dd8cc249d12727ced1d2c420ea2c73f53c5bb153c6821 \
-    --hash=sha256:a5fda226f4b8471a73944af9af259933c0d7d48aa8740bb347dc2c4b36c912f8 \
-    --hash=sha256:ae128211ae23f629406b6f6ae1234b793376bf9d545d99d42d2a240d71c79ca2 \
-    --hash=sha256:cc2f0037f50bca68108f426e687405a1426964e7afc31100f4f4ddc5cd95cc1b \
-    --hash=sha256:ed610b5a7bd32b0eed95fe64c251deba5cd43b93aa4f06fd1c96ada6eb9d7bea \
-    --hash=sha256:fab1e03db9b8df3c3e8743f43578cc95b7533799a01ec813c0367adc6b7601d5
+pytype==2022.6.30 \
+    --hash=sha256:06305dc61dea81463548d901b5fb0be1bb036751ce7ce3dabd03dec3201fdea6 \
+    --hash=sha256:1c8c425e8bb40117322be06476080d132466fab72e7d199af2de5c55285b6d4f \
+    --hash=sha256:20c2b35bd563752d224cc9d4a7f14512fd20f0a193aec6c2c8c06e7306e7d750 \
+    --hash=sha256:4449aa567603c7ca043a83293720c94ac272ed9946a992c17dfaf98d06e1f471 \
+    --hash=sha256:5fe3f0ccc5e6b044887a06f2303c4868e4a9a37b747dc224948968f1caeed147 \
+    --hash=sha256:63afdf665d4e9cd329a95363127cc35cdec7b34ca96c53a7ac8e42f40132795c \
+    --hash=sha256:65950a7426e420dfdb164dd9691f208405490142f6ed7f66facaf53b93b61523 \
+    --hash=sha256:79a624b8eace17d14d8d19880b478679f7b6b2bafb5c80261ced0c115a46cba4 \
+    --hash=sha256:b39bce7b0a563ead26d9c609f0e075f1d4098d291ef5f3a791f3d5968900a43f \
+    --hash=sha256:cd93c231244dd6642144054e153a969897877c033e7b21e8b639b20eae8db126 \
+    --hash=sha256:db0c7467a4090adbe30be2becd7d6b62569f7f6beeab38ceb2bc20cae36966e4 \
+    --hash=sha256:e23558a132ee62a5611e21d38d2e5157b5f699fd2ac139b3c1c46b30b76d5bf7 \
+    --hash=sha256:fc7d056d5786dc094fc188aeefa4c6e838f2cb3da6f35c46dccc64fd46a6ad74
     # via i3-workspace-groups (setup.py)
 pyyaml==6.0 \
     --hash=sha256:0283c35a6a9fbf047493e3a0ce8d79ef5030852c51e9d911a27badfde0605293 \
@@ -329,9 +329,9 @@ pyyaml==6.0 \
     --hash=sha256:e61ceaab6f49fb8bdfaa0f92c4b57bcfbea54c09277b1b4f7ac376bfb7a7c174 \
     --hash=sha256:f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5
     # via libcst
-requests==2.28.0 \
-    --hash=sha256:bc7861137fbce630f17b03d3ad02ad0bf978c844f3536d0edda6499dafce2b6f \
-    --hash=sha256:d568723a7ebd25875d8d1eaf5dfa068cd2fc8194b2e483d7b1f7c81918dbec6b
+requests==2.28.1 \
+    --hash=sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983 \
+    --hash=sha256:8fefa2a1a1365bf5520aac41836fbee479da67864514bdb821f31ce07ce65349
     # via codecov
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
@@ -364,9 +364,9 @@ tomlkit==0.11.0 \
     --hash=sha256:0f4050db66fd445b885778900ce4dd9aea8c90c4721141fde0d6ade893820ef1 \
     --hash=sha256:71ceb10c0eefd8b8f11fe34e8a51ad07812cb1dc3de23247425fbc9ddc47b9dd
     # via pylint
-tox==3.25.0 \
-    --hash=sha256:0805727eb4d6b049de304977dfc9ce315a1938e6619c3ab9f38682bb04662a5a \
-    --hash=sha256:37888f3092aa4e9f835fc8cc6dadbaaa0782651c41ef359e3a5743fcb0308160
+tox==3.25.1 \
+    --hash=sha256:c138327815f53bc6da4fe56baec5f25f00622ae69ef3fe4e1e385720e22486f9 \
+    --hash=sha256:c38e15f4733683a9cc0129fba078633e07eb0961f550a010ada879e95fb32632
     # via i3-workspace-groups (setup.py)
 typed-ast==1.5.4 \
     --hash=sha256:0261195c2062caf107831e92a76764c81227dae162c4f75192c0d489faf751a2 \
@@ -396,9 +396,9 @@ typed-ast==1.5.4 \
     # via
     #   astroid
     #   pytype
-typing-extensions==4.2.0 \
-    --hash=sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708 \
-    --hash=sha256:f1c24655a0da0d1b67f07e17a5e6b2a105894e6824b92096378bb3668ef02376
+typing-extensions==4.3.0 \
+    --hash=sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02 \
+    --hash=sha256:e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6
     # via
     #   astroid
     #   importlib-metadata

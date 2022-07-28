@@ -279,20 +279,20 @@ python-xlib==0.31 \
     --hash=sha256:1ec6ce0de73d9e6592ead666779a5732b384e5b8fb1f1886bd0a81cafa477759 \
     --hash=sha256:74d83a081f532bc07f6d7afcd6416ec38403d68f68b9b9dc9e1f28fbf2d799e9
     # via i3ipc
-pytype==2022.7.18 \
-    --hash=sha256:0bf5fcee002d4734f4a4d94a1988bb40a78de219c67228cd75d45e29b5aa0520 \
-    --hash=sha256:1275b695b5b8dec27a618dc3b22abcea11806a7ae0e0769dc1d4b01552b33d4d \
-    --hash=sha256:1b5ccc49d508ecf6d4608a0ce8ee1da1c09784f8909d537086a00078d52114da \
-    --hash=sha256:1f111abb70778a60a53823e9926d544f7867591df0b3dcc5029a6aab40d29b3d \
-    --hash=sha256:48e971edf29e996a5b6356903d879bb1003fc9db00364bd0d33d5e7d55dd4d3d \
-    --hash=sha256:4fefe209d124fcec4e9728e7627f8e1dc667a28f41b94d4b96aced4049ae022c \
-    --hash=sha256:5562bca4b4373e93e486442afa5076b7ebdc8d2da9afc3b52aa3c760140cb22f \
-    --hash=sha256:65181cb47b2ea4bf61171233f5c9c861a6871a9abd8460e37bda61f3e36a0f59 \
-    --hash=sha256:89e21d6bcb90440b89d4cb6313b547515ac2619799cc2e9ab84fb72d0d1c77ca \
-    --hash=sha256:9ab2c1f231adbf99719dfcdad0923c95af130185ebd55e311311236ea3445ddc \
-    --hash=sha256:c705d2a83970a5547d2072e681c4d998d3fdb812c7ec865fec44f76ccfbbc5cd \
-    --hash=sha256:ea0d327c6a3dcc759b1cd0a9a8ab5d7fb79cc95722cf29c9d5ffe01117fdb3b2 \
-    --hash=sha256:ea550e5dd6e25d3af36ca762f215d4020c244323b8583979fe906bb8c42c9783
+pytype==2022.7.26 \
+    --hash=sha256:072fa4d1ea7e81e89ce7429e08384f17c7d59c3bec12bf6e962c5174b575ecfd \
+    --hash=sha256:27b9155609c0356505a51df37eec8968f4c23225a329fc1230d78512f912a309 \
+    --hash=sha256:2be0b8ced9c74f056143a12dc11ea1331a3ff9437a72eec7337d07380ee2d5d3 \
+    --hash=sha256:36c08f2dcc1f3f2de82c71b14bd40a9573bf1ac08cc4df2bf0acd80f61779996 \
+    --hash=sha256:4c16dccf380ca4c8418fee32f45084126ad6dbb896318d25fc39746dc9785049 \
+    --hash=sha256:4ce8038e326ce29376f3ffda2905dd66bc623361c63d84294828c3f6961eb7da \
+    --hash=sha256:7fb9c2dc28d427809d2ef0fe48d4b1e419a7bda8bb729394c2f729a38af2eef7 \
+    --hash=sha256:9172e39972d158a0efe7d08a5c9a667e47139f2c8e678459096170983f785222 \
+    --hash=sha256:a5501c074f021b9bdd11fb8c4c84b465b0febf853fd8423683fc5dcb79e7a8b9 \
+    --hash=sha256:ac7b6c4ec932855bb143c472b8628a72c045b5b293b5ad6309dfe887b02ec806 \
+    --hash=sha256:ca444b5f06761353c6c4f393f155e1756b9e0dfd37c556fa63e005d9d75666e0 \
+    --hash=sha256:e24a8e32697adbb4391e451ec3ae19d278eeba9f83293f5069a4cf109f9003b0 \
+    --hash=sha256:f75e0d78777463637d12c9bf065b0c343126ea5edd8054668870a5d5ceecf92b
     # via i3-workspace-groups (setup.py)
 pyyaml==6.0 \
     --hash=sha256:0283c35a6a9fbf047493e3a0ce8d79ef5030852c51e9d911a27badfde0605293 \
@@ -339,7 +339,6 @@ six==1.16.0 \
     # via
     #   python-xlib
     #   tox
-    #   virtualenv
 tabulate==0.8.10 \
     --hash=sha256:0ba055423dbaa164b9e456abe7920c5e8ed33fcc16f6d1b2f2d152c8e1e8b4fc \
     --hash=sha256:6c57f3f3dd7ac2782770155f3adb2db0b1a269637e42f27599925e64b114f519
@@ -410,13 +409,13 @@ typing-inspect==0.7.1 \
     --hash=sha256:3cd7d4563e997719a710a3bfe7ffb544c6b72069b6812a02e9b414a8fa3aaa6b \
     --hash=sha256:b1f56c0783ef0f25fb064a01be6e5407e54cf4a4bf4f3ba3fe51e0bd6dcea9e5
     # via libcst
-urllib3==1.26.10 \
-    --hash=sha256:8298d6d56d39be0e3bc13c1c97d133f9b45d797169a0e11cdd0e0489d786f7ec \
-    --hash=sha256:879ba4d1e89654d9769ce13121e0f94310ea32e8d2f8cf587b77c08bbcdb30d6
+urllib3==1.26.11 \
+    --hash=sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc \
+    --hash=sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a
     # via requests
-virtualenv==20.15.1 \
-    --hash=sha256:288171134a2ff3bfb1a2f54f119e77cd1b81c29fc1265a2356f3e8d14c7d58c4 \
-    --hash=sha256:b30aefac647e86af6d82bfc944c556f8f1a9c90427b2fb4e3bfbf338cb82becf
+virtualenv==20.16.2 \
+    --hash=sha256:0ef5be6d07181946891f5abc8047fda8bc2f0b4b9bf222c64e6e8963baee76db \
+    --hash=sha256:635b272a8e2f77cb051946f46c60a54ace3cb5e25568228bd6b57fc70eca9ff3
     # via tox
 wheel==0.37.1 \
     --hash=sha256:4bdcd7d840138086126cd09254dc6195fb4fc6f01c050a1d7236f2630db1d22a \
@@ -500,9 +499,9 @@ zipp==3.8.1 \
     #   pep517
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==22.2 \
-    --hash=sha256:8d63fcd4ee293e30b644827268a0a973d080e5c7425ef26d427f5eb2126c7681 \
-    --hash=sha256:9abf423d5d64f3289ab9d5bf31da9e6234f2e9c5d8dcf1423bcb46b809a02c2c
+pip==22.2.1 \
+    --hash=sha256:0bbbc87dfbe6eed217beff0021f8b7dea04c8f4a0baa9d31dc4cff281ffc5b2b \
+    --hash=sha256:50516e47a2b79e77446f0d05649f0d53772c192571486236b1905492bfc24bac
     # via pip-tools
 setuptools==63.2.0 \
     --hash=sha256:0d33c374d41c7863419fc8f6c10bfe25b7b498aa34164d135c622e52580c6b16 \

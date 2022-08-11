@@ -87,9 +87,9 @@ distlib==0.3.5 \
     --hash=sha256:a7f75737c70be3b25e2bee06288cec4e4c221de18455b2dd037fe2a795cab2fe \
     --hash=sha256:b710088c59f06338ca514800ad795a132da19fda270e3ce4affc74abf955a26c
     # via virtualenv
-filelock==3.7.1 \
-    --hash=sha256:37def7b658813cda163b56fc564cdc75e86d338246458c4c28ae84cabefa2404 \
-    --hash=sha256:3a0fd85166ad9dbab54c9aec96737b744106dc5f15c0b09a6744a445299fcf04
+filelock==3.8.0 \
+    --hash=sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc \
+    --hash=sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4
     # via
     #   tox
     #   virtualenv
@@ -359,9 +359,9 @@ tomli==2.0.1 \
     #   pep517
     #   pylint
     #   pytest
-tomlkit==0.11.2 \
-    --hash=sha256:69e0675671a2eed1c08a53f342c955c4ead5d373a10f756219bf39f3d4f0018a \
-    --hash=sha256:d1b49c3e460f5910b22d799b13513504acb4f5fcaee01660ee66f07bd45a271c
+tomlkit==0.11.3 \
+    --hash=sha256:0ace4c975e0f3e6f71be8a2d61fe568777f1634bc80abff642cd3323ce709a0d \
+    --hash=sha256:800628e7705ff7c7cc4395c29836c7073e55b9ec820e1fc696080f9c5591a789
     # via pylint
 tox==3.25.1 \
     --hash=sha256:c138327815f53bc6da4fe56baec5f25f00622ae69ef3fe4e1e385720e22486f9 \
@@ -503,9 +503,9 @@ pip==22.2.2 \
     --hash=sha256:3fd1929db052f056d7a998439176d3333fa1b3f6c1ad881de1885c0717608a4b \
     --hash=sha256:b61a374b5bc40a6e982426aede40c9b5a08ff20e640f5b56977f4f91fed1e39a
     # via pip-tools
-setuptools==63.4.2 \
-    --hash=sha256:73bfae4791da7c1c56882ab17577d00f7a37a0347162aeb9360058de0dc25083 \
-    --hash=sha256:abcb76aa4decd7a17cbe0e4b31bdf549d106ba7f668e87e0860f5f7b84b9b3fe
+setuptools==63.4.3 \
+    --hash=sha256:521c833d1e5e1ef0869940e7f486a83de7773b9f029010ad0c2fe35453a9dad9 \
+    --hash=sha256:7f61f7e82647f77d4118eeaf43d64cbcd4d87e38af9611694d4866eb070cd10d
     # via
     #   astroid
     #   pip-tools

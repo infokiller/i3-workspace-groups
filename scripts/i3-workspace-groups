@@ -226,6 +226,7 @@ def serve(i3_connection, server_addr):
     # using the server.
     # pylint: disable-next=import-outside-toplevel
     # import shlex
+    # pylint: disable-next=import-outside-toplevel
     import socket
 
     # Make sure the socket does not already exist

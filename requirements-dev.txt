@@ -4,9 +4,9 @@
 #
 #    pip-compile --allow-unsafe --extra=dev --generate-hashes --output-file=requirements-dev.txt
 #
-astroid==2.12.9 \
-    --hash=sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56 \
-    --hash=sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918
+astroid==2.12.10 \
+    --hash=sha256:81f870105d892e73bf535da77a8261aa5bde838fa4ed12bb2f435291a098c581 \
+    --hash=sha256:997e0c735df60d4a4caff27080a3afc51f9bdd693d3572a4a0b7090b645c36c5
     # via pylint
 attrs==22.1.0 \
     --hash=sha256:29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6 \

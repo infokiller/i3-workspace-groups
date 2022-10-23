@@ -265,9 +265,9 @@ pydot==1.4.2 \
     --hash=sha256:248081a39bcb56784deb018977e428605c1c758f10897a339fce1dd728ff007d \
     --hash=sha256:66c98190c65b8d2e2382a441b4c0edfdb4f4c025ef9cb9874de478fb0793a451
     # via pytype
-pylint==2.15.4 \
-    --hash=sha256:5441e9294335d354b7bad57c1044e5bd7cce25c433475d76b440e53452fa5cb8 \
-    --hash=sha256:629cf1dbdfb6609d7e7a45815a8bb59300e34aa35783b5ac563acaca2c4022e9
+pylint==2.15.5 \
+    --hash=sha256:3b120505e5af1d06a5ad76b55d8660d44bf0f2fc3c59c2bdd94e39188ee3a4df \
+    --hash=sha256:c2108037eb074334d9e874dc3c783752cc03d0796c88c9a9af282d0f161a1004
     # via i3-workspace-groups (setup.py)
 pyparsing==3.0.9 \
     --hash=sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb \

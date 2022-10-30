@@ -10,23 +10,20 @@ groups. I find this tool useful for managing many workspaces in i3.
 
 ## Table of Contents
 
-- [i3 Workspace Groups](#i3-workspace-groups)
-  - [Table of Contents](#table-of-contents)
-  - [Background](#background)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-    - [i3 config](#i3-config)
-    - [i3-workspace-groups configuration file](#i3-workspace-groups-configuration-file)
-  - [Usage](#usage)
-    - [Example walk through](#example-walk-through)
-  - [Concepts](#concepts)
-    - [Active workspace](#active-workspace)
-    - [Active group](#active-group)
-    - [Focused group](#focused-group)
-    - [Default group](#default-group)
-  - [Limitations](#limitations)
-    - [Sway compatibility](#sway-compatibility)
-    - [Polybar](#polybar)
+- [Background](#background)
+- [Installation](#installation)
+- [Configuration](#configuration)
+  - [i3 config](#i3-config)
+  - [i3-workspace-groups configuration file](#i3-workspace-groups-configuration-file)
+- [Usage](#usage)
+  - [Example walk through](#example-walk-through)
+- [Concepts](#concepts)
+  - [Active workspace](#active-workspace)
+  - [Active group](#active-group)
+  - [Focused group](#focused-group)
+  - [Default group](#default-group)
+- [Limitations](#limitations)
+  - [Sway compatibility](#sway-compatibility)
 
 ## Background
 

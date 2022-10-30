@@ -85,13 +85,12 @@ def _create_args_parser() -> cli.ArgumentParserNoExit:
     subparsers.required = True
 
     polybar_hook_parser = subparsers.add_parser(
-        'polybar-hook', help='Return text for displaying to polybar i3-mod module')
-    polybar_hook_parser.add_argument(
-        '--line-color', type=str, default="#ff9900"
-    )
-    polybar_hook_parser.add_argument(
-        '--monitor', type=str
-    )
+        'polybar-hook',
+        help='Return text for displaying to polybar i3-mod module')
+    polybar_hook_parser.add_argument('--line-color',
+                                     type=str,
+                                     default="#ff9900")
+    polybar_hook_parser.add_argument('--monitor', type=str)
 
     list_groups_parser = subparsers.add_parser(
         'list-groups', help='List the groups of the current workspaces.')
@@ -284,22 +283,26 @@ def serve(i3_connection, server_addr):
             # Clean up the connection
             connection.close()
 
+
 def get_monitor_active_group(controller, groups_to_workspaces, monitor):
     active_group = ""
     min_global = float('inf')
     for (group, workspaces) in groups_to_workspaces.items():
         for ws in workspaces:
             if _get_workspace_field(controller, ws, 'monitor') == monitor:
-                global_number = _get_workspace_field(controller, ws, 'global_number')
+                global_number = _get_workspace_field(controller, ws,
+                                                     'global_number')
                 if global_number and global_number < min_global:
                     active_group = group
                     min_global = global_number
     return active_group
 
+
 def _print_polybar_hook(controller, args):
     workspaces = controller.get_tree().workspaces()
     group_to_workspaces = workspace_names.get_group_to_workspaces(workspaces)
-    active_group = get_monitor_active_group(controller, group_to_workspaces, args.monitor)
+    active_group = get_monitor_active_group(controller, group_to_workspaces,
+                                            args.monitor)
     res = []
     for group in sorted(group_to_workspaces.keys()):
         workspaces = group_to_workspaces[group]
@@ -307,16 +310,24 @@ def _print_polybar_hook(controller, args):
         parsed_names_dict = {}
         for ws in workspaces:
             if _get_workspace_field(controller, ws, 'monitor') == args.monitor:
-                local_number = _get_workspace_field(controller, ws, 'local_number')
+                local_number = _get_workspace_field(controller, ws,
+                                                    'local_number')
                 focused = _get_workspace_field(controller, ws, 'focused')
                 parsed_names_dict[local_number] = {"focused": focused}
-        
+
         if len(parsed_names_dict) != 0:
-            parsed_names = "".join([f"%{{u{args.line_color}}}%{{+u}} {local_number} %{{-u}}" if parsed_names_dict[local_number]["focused"] else f" {local_number} " for local_number in sorted(parsed_names_dict.keys())])
+            parsed_names = "".join([
+                f"%{{u{args.line_color}}}%{{+u}} {local_number} %{{-u}}"
+                if parsed_names_dict[local_number]["focused"] else
+                f" {local_number} "
+                for local_number in sorted(parsed_names_dict.keys())
+            ])
+
             formatted_group = f"%{{o{args.line_color}}}%{{+o}}{group}:%{{-o}}" if active_group == group else f"{group}:"
             res.append(f"{formatted_group}{parsed_names}")
 
     print(" | ".join(res))
+
 
 # pylint: disable=too-many-branches
 # pylint: disable-next=no-else-return

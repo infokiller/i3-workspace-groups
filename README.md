@@ -10,20 +10,23 @@ groups. I find this tool useful for managing many workspaces in i3.
 
 ## Table of Contents
 
-- [Background](#background)
-- [Installation](#installation)
-- [Configuration](#configuration)
-  - [i3 config](#i3-config)
-  - [i3-workspace-groups configuration file](#i3-workspace-groups-configuration-file)
-- [Usage](#usage)
-  - [Example walk through](#example-walk-through)
-- [Concepts](#concepts)
-  - [Active workspace](#active-workspace)
-  - [Active group](#active-group)
-  - [Focused group](#focused-group)
-  - [Default group](#default-group)
-- [Limitations](#limitations)
-  - [Sway compatibility](#sway-compatibility)
+- [i3 Workspace Groups](#i3-workspace-groups)
+  - [Table of Contents](#table-of-contents)
+  - [Background](#background)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+    - [i3 config](#i3-config)
+    - [i3-workspace-groups configuration file](#i3-workspace-groups-configuration-file)
+  - [Usage](#usage)
+    - [Example walk through](#example-walk-through)
+  - [Concepts](#concepts)
+    - [Active workspace](#active-workspace)
+    - [Active group](#active-group)
+    - [Focused group](#focused-group)
+    - [Default group](#default-group)
+  - [Limitations](#limitations)
+    - [Sway compatibility](#sway-compatibility)
+    - [Polybar](#polybar)
 
 ## Background
 
@@ -262,3 +265,25 @@ all be in the default group.
 This project depends on [i3ipc](https://github.com/acrisci/i3ipc-python) for its
 interaction with i3, so should also work the same on sway. That said, I don't
 test it on sway and i3 is my main window manager.
+
+### Polybar
+
+The official `internal/i3` module does not support workspace groups.
+
+In order to display workspace information in polybar, create an `i3-mod` module as follows:
+
+```
+[module/i3-mod]
+type = custom/ipc
+hook-0 = ${env:I3_MOD_HOOK}
+initial = 1
+```
+
+Then when launching polybar do something like the following:
+```bash
+    for m in $(polybar --list-monitors | cut -d":" -f1); do
+        export MONITOR=$m;
+        export I3_MOD_HOOK="i3-workspace-groups polybar-hook --monitor \"$MONITOR\""
+        polybar -q main -c "$dir/$style/config.ini" &
+    done
+```

@@ -269,9 +269,9 @@ pytest-cov==3.0.0 \
     --hash=sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6 \
     --hash=sha256:e7f0f5b1617d2210a2cabc266dfe2f4c75a8d32fb89eafb7ad9d06f6d076d470
     # via i3-workspace-groups (setup.py)
-python-xlib==0.31 \
-    --hash=sha256:1ec6ce0de73d9e6592ead666779a5732b384e5b8fb1f1886bd0a81cafa477759 \
-    --hash=sha256:74d83a081f532bc07f6d7afcd6416ec38403d68f68b9b9dc9e1f28fbf2d799e9
+python-xlib==0.32 \
+    --hash=sha256:20e1382f8a98d8ed0facfa45415c46fd0c8eeb6f9996e58c22d3382a4ed6e37b \
+    --hash=sha256:522dc1ec9fef20a7968532766cdb84155e5ef428751754a9443837094092be46
     # via i3ipc
 pytype==2022.10.26 \
     --hash=sha256:09092519a7c3eb71f0a039ae48caed7feb45a1d129786e5e639f67effee65220 \

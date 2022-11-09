@@ -208,10 +208,12 @@ ninja==1.11.1 \
     --hash=sha256:642cb64d859276998f14972724850e0c5b7febbc1bce3d2065b7e0cb7d3a0b79 \
     --hash=sha256:6f6465a7efe6473a2a34edab83633594de19d59406a727316e1367ebcc528908 \
     --hash=sha256:779f228e407c54a8b6e4cbf8f835489998dd250f67bf1b9bd7b8a8ab6bdcdc7b \
+    --hash=sha256:817e2aee2a4d28a708a67bcfba1817ae502c32c6d8ef80e50d63b0f23adf3a08 \
     --hash=sha256:a7a564fe755ddfbdbccb07b0b758e3f8460e5f8ba1adaab40a5eaa2f8c01ce68 \
     --hash=sha256:ba50a32424912e5f3ee40d791b506a160dc0eeda7de5ad8faebe7aa8006244dc \
     --hash=sha256:c833a47d39b2d1eee3f9ca886fa1581efd5be6068b82734ac229961ee8748f90 \
     --hash=sha256:df11b8afea0501883e33faeb1c43d2ef67f466d5f4bd85f9c376e9a93a43a277 \
+    --hash=sha256:edec1053e141253076b2df7ec03a246ff581e9270aa1ca9759397b21e2760e57 \
     --hash=sha256:f48c3c6eea204062f6bbf089dfc63e1ad41a08640e1da46ef2b30fa426f7ce23
     # via pytype
 packaging==21.3 \
@@ -229,9 +231,9 @@ pip-tools==6.9.0 \
     --hash=sha256:16ea0ced6a1d8a7dfbd5e14d5bf659acffa63f3efd0702233dc685f066c00a6b \
     --hash=sha256:b4762359978fd81a2b4b666e6dca15266bdc65680d06900c4da34243f35e4b5d
     # via i3-workspace-groups (setup.py)
-platformdirs==2.5.2 \
-    --hash=sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788 \
-    --hash=sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19
+platformdirs==2.5.3 \
+    --hash=sha256:0cb405749187a194f444c25c82ef7225232f11564721eabffc6ec70df83b11cb \
+    --hash=sha256:6e52c21afff35cb659c6e52d8b4d61b9bd544557180440538f255d9382c8cbe0
     # via
     #   pylint
     #   virtualenv
@@ -418,9 +420,9 @@ virtualenv==20.16.6 \
     --hash=sha256:186ca84254abcbde98180fd17092f9628c5fe742273c02724972a1d8a2035108 \
     --hash=sha256:530b850b523c6449406dfba859d6345e48ef19b8439606c5d74d7d3c9e14d76e
     # via tox
-wheel==0.38.2 \
-    --hash=sha256:3d492ef22379a156ec923d2a77051cedfd4df4b667864e9e41ba83f0b70b7149 \
-    --hash=sha256:7a5a3095dceca97a3cac869b8fef4e89b83fafde21b6688f47b6fda7600eb441
+wheel==0.38.3 \
+    --hash=sha256:4066646ef77d0e56cc44004c100381ee1957955cfc3151345dda96886f9896a5 \
+    --hash=sha256:f3c99240da8d26989dca2d67a7a431015eb91fb301eecacc6e452133689d9d59
     # via pip-tools
 wrapt==1.14.1 \
     --hash=sha256:00b6d4ea20a906c0ca56d84f93065b398ab74b927a7a3dbd470f6fc503f95dc3 \

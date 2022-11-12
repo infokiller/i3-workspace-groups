@@ -285,7 +285,7 @@ def serve(i3_connection, server_addr):
 
 
 def get_monitor_active_group(controller, groups_to_workspaces, monitor):
-    active_group = ""
+    active_group = ''
     min_global = float('inf')
     for (group, workspaces) in groups_to_workspaces.items():
         for ws in workspaces:
@@ -313,20 +313,20 @@ def _print_polybar_hook(controller, args):
                 local_number = _get_workspace_field(controller, ws,
                                                     'local_number')
                 focused = _get_workspace_field(controller, ws, 'focused')
-                parsed_names_dict[local_number] = {"focused": focused}
+                parsed_names_dict[local_number] = {'focused': focused}
 
         if len(parsed_names_dict) != 0:
-            parsed_names = "".join([
-                f"%{{u{args.line_color}}}%{{+u}} {local_number} %{{-u}}"
-                if parsed_names_dict[local_number]["focused"] else
-                f" {local_number} "
+            parsed_names = ''.join([
+                f'%{{u{args.line_color}}}%{{+u}} {local_number} %{{-u}}'
+                if parsed_names_dict[local_number]['focused'] else
+                f' {local_number} '
                 for local_number in sorted(parsed_names_dict.keys())
             ])
 
-            formatted_group = f"%{{o{args.line_color}}}%{{+o}}{group}:%{{-o}}" if active_group == group else f"{group}:"
-            res.append(f"{formatted_group}{parsed_names}")
+            formatted_group = f'%{{o{args.line_color}}}%{{+o}}{group}:%{{-o}}' if active_group == group else f'{group}:'
+            res.append(f'{formatted_group}{parsed_names}')
 
-    print(" |  ".join(res))
+    print(' |  '.join(res))
 
 
 # pylint: disable=too-many-branches

@@ -289,7 +289,8 @@ def get_monitor_active_group(controller, groups_to_workspaces, monitor):
     min_global = float('inf')
     for (group, workspaces) in groups_to_workspaces.items():
         for ws in workspaces:
-            if _get_workspace_field(controller, ws, 'monitor') == monitor:
+            if not monitor or _get_workspace_field(controller, ws,
+                                                   'monitor') == monitor:
                 global_number = _get_workspace_field(controller, ws,
                                                      'global_number')
                 if global_number and global_number < min_global:
@@ -309,7 +310,8 @@ def _print_polybar_hook(controller, args):
 
         parsed_names_dict = {}
         for ws in workspaces:
-            if _get_workspace_field(controller, ws, 'monitor') == args.monitor:
+            if not args.monitor or _get_workspace_field(
+                    controller, ws, 'monitor') == args.monitor:
                 local_number = _get_workspace_field(controller, ws,
                                                     'local_number')
                 focused = _get_workspace_field(controller, ws, 'focused')

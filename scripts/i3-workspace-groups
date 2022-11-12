@@ -316,8 +316,7 @@ def _print_polybar_hook(controller, args):
                                                     'local_number')
                 focused = _get_workspace_field(controller, ws, 'focused')
                 parsed_names_dict[local_number] = {'focused': focused}
-
-        if len(parsed_names_dict) != 0:
+        if parsed_names_dict:
             parsed_names = ''.join([
                 f'%{{u{args.line_color}}}%{{+u}} {local_number} %{{-u}}'
                 if parsed_names_dict[local_number]['focused'] else

@@ -24,6 +24,7 @@ groups. I find this tool useful for managing many workspaces in i3.
   - [Default group](#default-group)
 - [Limitations](#limitations)
   - [Sway compatibility](#sway-compatibility)
+  - [Polybar](#polybar)
 
 ## Background
 
@@ -267,7 +268,8 @@ test it on sway and i3 is my main window manager.
 
 The official `internal/i3` module does not support workspace groups.
 
-In order to display workspace information in polybar, create an `i3-mod` module as follows:
+In order to display workspace information in polybar, create an `i3-mod` module
+as follows:
 
 ```
 [module/i3-mod]
@@ -277,6 +279,7 @@ initial = 1
 ```
 
 Then when launching polybar do something like the following:
+
 ```bash
     for m in $(polybar --list-monitors | cut -d":" -f1); do
         export MONITOR=$m;

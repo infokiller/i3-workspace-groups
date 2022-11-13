@@ -1,18 +1,23 @@
-#!/bin/python
-import i3ipc
+#!/usr/bin/env python3
 import subprocess
-i3 = i3ipc.Connection()
+
+import i3ipc
 
 
-def on_workspace_focus(i3, e):
-    subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'])
+def _update_polybar(*_):
+    subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'], check=False)
+
+
+def main():
+    _update_polybar()
+    i3 = i3ipc.Connection()
+    i3.on('workspace::focus', _update_polybar)
+    i3.on('workspace::init', _update_polybar)
+    i3.on('workspace::rename', _update_polybar)
+    i3.on('workspace::move', _update_polybar)
+    i3.on('workspace::empty', _update_polybar)
+    i3.main()
 
 
 if __name__ == '__main__':
-    subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'])
-    i3.on('workspace::focus', on_workspace_focus)
-    i3.on('workspace::init', on_workspace_focus)
-    i3.on('workspace::rename', on_workspace_focus)
-    i3.on('workspace::move', on_workspace_focus)
-    i3.on('workspace::empty', on_workspace_focus)
-    i3.main()
+    main()

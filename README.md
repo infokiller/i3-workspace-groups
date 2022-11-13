@@ -295,11 +295,10 @@ Then, when launching polybar, do something like the following to configure the
 `I3_MOD_HOOK`:
 
 ```bash
-    for m in $(polybar --list-monitors | cut -d":" -f1); do
-        export MONITOR=$m;
-        export I3_MOD_HOOK="i3-workspace-groups polybar-hook --monitor \"$MONITOR\""
-        polybar -q main -c "$dir/$style/config.ini" &
-    done
+while IFS='' read -r monitor; do
+    i3_mod_hook="i3-workspace-groups polybar-hook --monitor '${monitor}'"
+    I3_MOD_HOOK="${i3_mod_hook}" polybar your-bar-name &
+done < <(polybar --list-monitors | cut -d':' -f1)
 ```
 
 #### 2. Run a background script to update polybar's on i3 events

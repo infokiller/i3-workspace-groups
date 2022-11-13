@@ -269,10 +269,12 @@ test it on sway and i3 is my main window manager.
 The official `internal/i3` module does not support workspace groups.
 
 In order to display workspace information in polybar, there are two steps:
-1. Add the custom i3 workspace groups module to your polybar
-2. Run a script in the background to update polybar's display whenever an i3 window event occurs 
 
-#### 1. Add the custom i3 workspace groups module to your polybar
+1. Add the custom i3 workspace groups module to your polybar
+2. Run a script in the background to update polybar's display whenever an i3
+   window event occurs
+
+#### 1. Add the custom i3 workspace groups module to your polybar config
 
 Create an `i3-mod` module by adding the following to your polybar config:
 
@@ -289,7 +291,8 @@ Then, add the `i3-mod` module to your modules:
 modules-center = i3-mod
 ```
 
-Then, when launching polybar, do something like the following to configure the `I3_MOD_HOOK`:
+Then, when launching polybar, do something like the following to configure the
+`I3_MOD_HOOK`:
 
 ```bash
     for m in $(polybar --list-monitors | cut -d":" -f1); do
@@ -299,6 +302,9 @@ Then, when launching polybar, do something like the following to configure the `
     done
 ```
 
-#### 2. Run a script in the background to update polybar's display whenever a relevant i3 window event occurs 
+#### 2. Run a background script to update polybar's on i3 events
 
-Run the [i3-groups-polybar-module-updater](./scripts/i3-groups-polybar-module-updater) script. This script is responsible for calling the hook to update polybar whenever a relevant i3 window event occurs.
+Run the
+[i3-groups-polybar-module-updater](./scripts/i3-groups-polybar-module-updater)
+script. This script is responsible for calling the hook to update polybar
+whenever a relevant i3 window event occurs.

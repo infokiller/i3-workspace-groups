@@ -308,7 +308,7 @@ def _print_polybar_hook(controller, args):
 
     # Lambdas for formatting polybar text with overline and underline
     def polybar_overline_format(text, color):
-        return f'%{{o{color}}}%{{+o}}{text}:%{{-o}}' if color else text
+        return f'%{{o{color}}}%{{+o}}{text}%{{-o}}' if color else text
 
     def polybar_underline_format(text, color):
         return f'%{{u{color}}}%{{+u}}{text}%{{-u}}' if color else text

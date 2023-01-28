@@ -43,7 +43,10 @@ setuptools.setup(
             # 'tox-conda ~= 0.8',
             'pytest ~= 7.1',
             'pytest-cov ~= 3.0',
-            'pytype ~= 2022.5',
+            # Pytype doesn't use semantic versioning, default to upgrade to the
+            # latest version (but note that a specific version is still pinned
+            # in requirements-dev.txt).
+            'pytype',
             'pip-tools ~= 6.6',
             'codecov ~= 2.1',
         ]

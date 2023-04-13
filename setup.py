@@ -42,13 +42,17 @@ setuptools.setup(
             # As of 2021-10-18, tests are done without conda
             # 'tox-conda ~= 0.8',
             'pytest ~= 7.1',
-            'pytest-cov ~= 3.0',
+            # pytest-cov is developed with pytest, so default to the latest
+            # version.
+            'pytest-cov',
             # Pytype doesn't use semantic versioning, default to upgrade to the
             # latest version (but note that a specific version is still pinned
             # in requirements-dev.txt).
             'pytype',
             'pip-tools ~= 6.6',
-            'codecov ~= 2.1',
+            # The pip package for codecov was deprecated:
+            # https://docs.codecov.com/docs/deprecated-uploader-migration-guide#python-uploader
+            # 'codecov ~= 2.1',
         ]
     },
     scripts=[

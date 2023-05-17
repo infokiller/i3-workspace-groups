@@ -4,9 +4,9 @@
 #
 #    pip-compile --allow-unsafe --extra=dev --generate-hashes --output-file=requirements-dev.txt --resolver=backtracking
 #
-astroid==2.15.4 \
-    --hash=sha256:a1b8543ef9d36ea777194bc9b17f5f8678d2c56ee6a45b2c2f17eec96f242347 \
-    --hash=sha256:c81e1c7fbac615037744d067a9bb5f9aeb655edf59b63ee8b59585475d6f80d8
+astroid==2.15.5 \
+    --hash=sha256:078e5212f9885fa85fbb0cf0101978a336190aadea6e13305409d099f71b2324 \
+    --hash=sha256:1039262575027b441137ab4a62a793a9b43defb42c32d5670f38686207cd780f
     # via pylint
 attrs==23.1.0 \
     --hash=sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04 \

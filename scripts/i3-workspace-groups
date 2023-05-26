@@ -185,7 +185,10 @@ def _create_args_parser() -> cli.ArgumentParserNoExit:
 
 
 def _create_group_context(args):
-    if args.group_name:
+    # Checking for args.group_name == "" allows to use a command like
+    # workspace-number --group "" <number>
+    # to go to a workspace in the default group
+    if args.group_name == "" or args.group_name:
         return i3_groups_controller.NamedGroupContext(args.group_name)
     if args.group_active:
         return i3_groups_controller.ActiveGroupContext()

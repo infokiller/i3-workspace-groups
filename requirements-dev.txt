@@ -4,9 +4,9 @@
 #
 #    pip-compile --allow-unsafe --extra=dev --generate-hashes --output-file=requirements-dev.txt --resolver=backtracking
 #
-astroid==2.15.5 \
-    --hash=sha256:078e5212f9885fa85fbb0cf0101978a336190aadea6e13305409d099f71b2324 \
-    --hash=sha256:1039262575027b441137ab4a62a793a9b43defb42c32d5670f38686207cd780f
+astroid==2.15.6 \
+    --hash=sha256:389656ca57b6108f939cf5d2f9a2a825a3be50ba9d589670f393236e0a03b91c \
+    --hash=sha256:903f024859b7c7687d7a7f3a3f73b17301f8e42dfd9cc9df9d4418172d3e2dbd
     # via pylint
 attrs==23.1.0 \
     --hash=sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04 \
@@ -108,9 +108,9 @@ importlab==0.8 \
     --hash=sha256:a009ccde7b549b16f3e6b034fea748febc8d45ded9e8a09370a8f994acfda25b \
     --hash=sha256:b24b3aac3b073966ae42fb2d3a7764f3377b30bb72c0d411fe29134cc9276e86
     # via pytype
-importlib-metadata==6.7.0 \
-    --hash=sha256:1aaf550d4f73e5d6783e7acb77aec43d49da8017410afae93822cc9cca98c4d4 \
-    --hash=sha256:cb52082e659e97afc5dac71e79de97d8681de3aa07ff18578330904a9d18e5b5
+importlib-metadata==6.8.0 \
+    --hash=sha256:3ebb78df84a805d7698245025b975d9d67053cd94c79245ba4b3eb694abe68bb \
+    --hash=sha256:dbace7892d8c0c4ac1ad096662232f831d4e64f4c4545bd53016a3e9d4654743
     # via yapf
 iniconfig==2.0.0 \
     --hash=sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3 \
@@ -531,9 +531,9 @@ yapf==0.40.1 \
     --hash=sha256:958587eb5c8ec6c860119a9c25d02addf30a44f75aa152a4220d30e56a98037c \
     --hash=sha256:b8bfc1f280949153e795181768ca14ef43d7312629a06c43e7abd279323af313
     # via i3-workspace-groups (setup.py)
-zipp==3.15.0 \
-    --hash=sha256:112929ad649da941c23de50f356a2b5570c954b65150642bccdd66bf194d224b \
-    --hash=sha256:48904fc76a60e542af151aded95726c1a5c34ed43ab4134b597665c86d7ad556
+zipp==3.16.0 \
+    --hash=sha256:1876cb065531855bbe83b6c489dcf69ecc28f1068d8e95959fe8bbc77774c941 \
+    --hash=sha256:5dadc3ad0a1f825fe42ce1bce0f2fc5a13af2e6b2d386af5b0ff295bc0a287d3
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

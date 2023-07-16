@@ -11,26 +11,21 @@ pylint:
 
 pytype_py38:
   image: python:3.8
-  script: pytype i3wsgroups
+  script:
+    - python3 -m pip install pytype
+    - pytype i3wsgroups
 
 pytype_py39:
   image: python:3.9
-  script: pytype i3wsgroups
+  script:
+    - python3 -m pip install pytype
+    - pytype i3wsgroups
 
 pytype_py310:
   image: python:3.10
-  script: pytype i3wsgroups
-
-test_py37:
-  image: python:3.7
-  # Override the before_script for python 3.7 deps which are different than more
-  # recent versions.
-  before_script:
-    - apt-get update -qq && apt-get install -y -qq python3-pip shellcheck
-    - which python3
-    - python3 --version
-    - python3 -m pip install -r requirements-py37.txt -r requirements-py37-dev.txt
-  script: tox -e py37
+  script:
+    - python3 -m pip install pytype
+    - pytype i3wsgroups
 
 test_py38:
   image: python:3.8
@@ -44,8 +39,12 @@ test_py310:
   image: python:3.10
   script: tox -e py310
 
+test_py311:
+  image: python:3.11
+  script: tox -e py311
+
 shellcheck:
-  script: 
+  script:
     - shellcheck scripts/i3-assign-workspace-to-group
     - shellcheck scripts/i3-focus-on-workspace
     - shellcheck scripts/i3-move-to-workspace

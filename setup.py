@@ -25,10 +25,10 @@ setuptools.setup(
         'Operating System :: POSIX :: Linux',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
     ],
     keywords='i3 i3wm extensions add-ons',
     packages=setuptools.find_packages(exclude=['tests']),
@@ -48,8 +48,10 @@ setuptools.setup(
             # Pytype doesn't use semantic versioning, default to upgrade to the
             # latest version (but note that a specific version is still pinned
             # in requirements-dev.txt).
-            'pytype',
-            'pip-tools ~= 6.6',
+            # NOTE: pytype doesn't support python 3.11 yet, so it's disabled:
+            # https://github.com/google/pytype/issues/1308
+            # 'pytype',
+            'pip-tools ~= 7.0',
             # The pip package for codecov was deprecated:
             # https://docs.codecov.com/docs/deprecated-uploader-migration-guide#python-uploader
             # 'codecov ~= 2.1',

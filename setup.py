@@ -52,6 +52,8 @@ setuptools.setup(
             # https://github.com/google/pytype/issues/1308
             # 'pytype',
             'pip-tools ~= 7.0',
+            # typing-extensions is required for Python 3.10 and below.
+            'typing-extensions ~= 4.0'
             # The pip package for codecov was deprecated:
             # https://docs.codecov.com/docs/deprecated-uploader-migration-guide#python-uploader
             # 'codecov ~= 2.1',

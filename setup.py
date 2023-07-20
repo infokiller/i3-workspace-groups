@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 import setuptools
@@ -33,7 +35,14 @@ setuptools.setup(
     keywords='i3 i3wm extensions add-ons',
     packages=setuptools.find_packages(exclude=['tests']),
     package_data={'i3wsgroups': ['default_config.toml']},
-    install_requires=['i3ipc ~= 2.2', 'toml ~= 0.10'],
+    install_requires=[
+        'i3ipc ~= 2.2',
+        'toml ~= 0.10',
+        # typing-extensions and exceptiongroup are required for Python 3.10
+        # and below.
+        'typing-extensions',
+        'exceptiongroup',
+    ],
     extras_require={
         'dev': [
             'pylint ~= 2.14',
@@ -52,10 +61,6 @@ setuptools.setup(
             # https://github.com/google/pytype/issues/1308
             # 'pytype',
             'pip-tools ~= 7.0',
-            # typing-extensions and exceptiongroup are required for Python 3.10
-            # and below.
-            'typing-extensions',
-            'exceptiongroup',
             # The pip package for codecov was deprecated:
             # https://docs.codecov.com/docs/deprecated-uploader-migration-guide#python-uploader
             # 'codecov ~= 2.1',

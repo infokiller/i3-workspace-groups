@@ -318,13 +318,13 @@ wrapt==1.15.0 \
     --hash=sha256:fbec11614dba0424ca72f4e8ba3c420dba07b4a7c206c8c8e4e73f2e98f4c559 \
     --hash=sha256:fd69666217b62fa5d7c6aa88e507493a34dec4fa20c5bd925e4bc12fce586639
     # via astroid
-yapf==0.40.1 \
-    --hash=sha256:958587eb5c8ec6c860119a9c25d02addf30a44f75aa152a4220d30e56a98037c \
-    --hash=sha256:b8bfc1f280949153e795181768ca14ef43d7312629a06c43e7abd279323af313
+yapf==0.40.2 \
+    --hash=sha256:4dab8a5ed7134e26d57c1647c7483afb3f136878b579062b786c9ba16b94637b \
+    --hash=sha256:adc8b5dd02c0143108878c499284205adb258aad6db6634e5b869e7ee2bd548b
     # via i3-workspace-groups (setup.py)
-zipp==3.16.2 \
-    --hash=sha256:679e51dd4403591b2d6838a48de3d283f3d188412a9782faadf845f298736ba0 \
-    --hash=sha256:ebc15946aa78bd63458992fc81ec3b6f7b1e92d51c35e6de1c3804e73b799147
+zipp==3.17.0 \
+    --hash=sha256:0e923e726174922dce09c53c59ad483ff7bbb8e572e00c7f7c46b88556409f31 \
+    --hash=sha256:84e64a1c28cf7e91ed2078bb8cc8c259cb19b76942096c8d7b84947690cabaf0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

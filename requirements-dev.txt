@@ -4,9 +4,9 @@
 #
 #    pip-compile --allow-unsafe --constraint=requirements.txt --extra=dev --generate-hashes --output-file=requirements-dev.txt --strip-extras setup.py
 #
-astroid==2.15.7 \
-    --hash=sha256:958f280532e36ca84a13023f15cb1556fb6792d193acb87e1f3ca536b6fa6bd2 \
-    --hash=sha256:c522f2832a900e27a7d284b9b6ef670d2495f760ede3c8c0b004a5641d3c5987
+astroid==2.15.8 \
+    --hash=sha256:1aa149fc5c6589e3d0ece885b4491acd80af4f087baafa3fb5203b113e68cd3c \
+    --hash=sha256:6c107453dffee9055899705de3c9ead36e74119cee151e5a9aaf7f0b0e020a6a
     # via pylint
 build==1.0.3 \
     --hash=sha256:538aab1b64f9828977f84bc63ae570b060a8ed1be419e7870b8b4fc5e6ea553b \
@@ -178,9 +178,9 @@ py==1.11.0 \
     --hash=sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719 \
     --hash=sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378
     # via tox
-pylint==2.17.5 \
-    --hash=sha256:73995fb8216d3bed149c8d51bba25b2c52a8251a2c8ac846ec668ce38fab5413 \
-    --hash=sha256:f7b601cbc06fef7e62a754e2b41294c2aa31f1cb659624b9a85bcba29eaf8252
+pylint==2.17.6 \
+    --hash=sha256:18a1412e873caf8ffb56b760ce1b5643675af23e6173a247b502406b24c716af \
+    --hash=sha256:be928cce5c76bf9acdc65ad01447a1e0b1a7bccffc609fb7fc40f2513045bd05
     # via i3-workspace-groups (setup.py)
 pyproject-hooks==1.0.0 \
     --hash=sha256:283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8 \

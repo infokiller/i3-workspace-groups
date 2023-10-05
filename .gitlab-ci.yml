@@ -4,7 +4,9 @@ before_script:
   - apt-get update -qq && apt-get install -y -qq python3-pip shellcheck
   - which python3
   - python3 --version
-  - python3 -m pip install -r requirements.txt -r requirements-dev.txt
+  # --no-deps is needed to avoid errors like:
+  # https://github.com/pypa/pip/issues/9644#issuecomment-788108944
+  - python3 -m pip install --no-deps -r requirements.txt -r requirements-dev.txt
 
 pylint:
   script: pylint i3wsgroups scripts/i3-workspace-groups

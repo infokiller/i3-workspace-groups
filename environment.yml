@@ -6,5 +6,10 @@ dependencies:
   - python=3.11
   - pip
   - pip:
-    - -r requirements.txt
-    - -r requirements-dev.txt
+    # NOTE: I previously put every requirements file in a separate list item, but that
+    # caused a require hashes error [1] which is fixed by putting all of them in the
+    # same line. A better solution would be to use the pip flag --no-deps, but this is
+    # not supported in conda [2].
+    # [1] https://github.com/pypa/pip/issues/9644
+    # [2] https://github.com/conda/conda/issues/6805
+    - -r requirements.txt -r requirements-dev.txt

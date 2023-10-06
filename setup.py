@@ -45,7 +45,7 @@ setuptools.setup(
         'dev': [
             'pylint ~= 2.14',
             'yapf ~= 0.32',
-            'tox ~= 4.0',
+            'tox ~= 3.25',
             # As of 2021-10-18, tests are done without conda
             # 'tox-conda ~= 0.8',
             'pytest ~= 7.1',

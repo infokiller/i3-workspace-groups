@@ -38,10 +38,8 @@ setuptools.setup(
     install_requires=[
         'i3ipc ~= 2.2',
         'toml ~= 0.10',
-        # typing-extensions and exceptiongroup are required for Python 3.10
-        # and below.
-        'typing-extensions',
-        'exceptiongroup',
+        'typing-extensions; python_version < "3.11"',
+        'exceptiongroup; python_version < "3.11"',
     ],
     extras_require={
         'dev': [

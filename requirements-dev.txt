@@ -86,9 +86,9 @@ exceptiongroup==1.1.3 \
     # via
     #   -c requirements.txt
     #   i3-workspace-groups (setup.py)
-filelock==3.12.4 \
-    --hash=sha256:08c21d87ded6e2b9da6728c3dff51baf1dcecf973b768ef35bcbc3447edb9ad4 \
-    --hash=sha256:2e6f249f1f3654291606e046b09f1fd5eac39b360664c27f5aad072012f8bcbd
+filelock==3.13.0 \
+    --hash=sha256:63c6052c82a1a24c873a549fbd39a26982e8f35a3016da231ead11a5be9dad44 \
+    --hash=sha256:a552f4fde758f4eab33191e9548f671970f8b06d436d31388c9aa1e5861a710f
     # via
     #   tox
     #   virtualenv

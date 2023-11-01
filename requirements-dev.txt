@@ -86,9 +86,9 @@ exceptiongroup==1.1.3 \
     # via
     #   -c requirements.txt
     #   i3-workspace-groups (setup.py)
-filelock==3.13.0 \
-    --hash=sha256:63c6052c82a1a24c873a549fbd39a26982e8f35a3016da231ead11a5be9dad44 \
-    --hash=sha256:a552f4fde758f4eab33191e9548f671970f8b06d436d31388c9aa1e5861a710f
+filelock==3.13.1 \
+    --hash=sha256:521f5f56c50f8426f5e03ad3b281b490a87ef15bc6c526f168290f0c7148d44e \
+    --hash=sha256:57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c
     # via
     #   tox
     #   virtualenv
@@ -239,9 +239,9 @@ virtualenv==20.24.6 \
     --hash=sha256:02ece4f56fbf939dbbc33c0715159951d6bf14aaf5457b092e4548e1382455af \
     --hash=sha256:520d056652454c5098a00c0f073611ccbea4c79089331f60bf9d7ba247bb7381
     # via tox
-wheel==0.41.2 \
-    --hash=sha256:0c5ac5ff2afb79ac23ab82bab027a0be7b5dbcf2e54dc50efe4bf507de1f7985 \
-    --hash=sha256:75909db2664838d015e3d9139004ee16711748a52c8f336b52882266540215d8
+wheel==0.41.3 \
+    --hash=sha256:488609bc63a29322326e05560731bf7bfea8e48ad646e1f5e40d366607de0942 \
+    --hash=sha256:4d4987ce51a49370ea65c0bfd2234e8ce80a12780820d9dc462597a6e60d0841
     # via pip-tools
 wrapt==1.15.0 \
     --hash=sha256:02fce1852f755f44f95af51f69d22e45080102e9d00258053b79367d07af39c0 \

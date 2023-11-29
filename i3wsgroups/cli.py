@@ -1,19 +1,30 @@
+from __future__ import annotations
+
 import argparse
 
 from i3wsgroups import config
+
+
+class ExitCalledError(Exception):
+
+    def __init__(self, status: int, message: str):
+        super().__init__(status, message)
+        self.status = status
+        self.message = message
 
 
 # argparse calls sys.exit on errors, without even passing the error message to
 # the exception. This wrapper class avoids this behavior. Python 3.9 has built
 # in support for this behavior:
 # https://docs.python.org/3/library/argparse.html#exit-on-error
+# Additionally, we don't want the help flag to exit, so we handle that as well.
 class ArgumentParserNoExit(argparse.ArgumentParser):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def error(self, message):
-        raise ValueError(message)
+    def exit(self, status=0, message=None):
+        raise ExitCalledError(status, message)
 
 
 def add_common_args(parser: argparse.ArgumentParser):

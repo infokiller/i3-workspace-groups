@@ -251,6 +251,7 @@ def serve(i3_connection, server_addr):
     sock.bind(server_addr)
     sock.listen(1)
     while True:
+        parser = _create_args_parser()
         logger.debug('Waiting for a connection')
         connection, addr = sock.accept()
         logger.debug(f'Connection from: {addr}')
@@ -267,7 +268,7 @@ def serve(i3_connection, server_addr):
             continue
         logger.info(f'Argv from client: {client_argv}')
         try:
-            client_args = _create_args_parser().parse_args(client_argv)
+            client_args = parser.parse_args(client_argv)
             if client_args.command == 'server':
                 logger.warning('Ignoring nested server command')
                 continue
@@ -275,8 +276,17 @@ def serve(i3_connection, server_addr):
             connection.sendall(output.encode('utf-8'))
         # argparse can raise SystemExit, but we use a wrapper over
         # ArgumentParser to avoid it.
-        except (argparse.ArgumentError, ValueError) as e:
+        except argparse.ArgumentError as e:
             msg = f'error: failed parsing command: {e}'
+            logger.warning(msg)
+            connection.sendall(msg.encode('utf-8'))
+            continue
+        except cli.ExitCalledError as e:
+            msg = e.message
+            if e.status == 0 and not msg:
+                msg = parser.format_help()
+            elif e.status != 0:
+                msg = f'error: {msg}'
             logger.warning(msg)
             connection.sendall(msg.encode('utf-8'))
             continue
@@ -414,7 +424,12 @@ def run_command(i3_connection, args):
 
 
 def main():
-    args = _create_args_parser().parse_args()
+    try:
+        args = _create_args_parser().parse_args()
+    except cli.ExitCalledError as e:
+        if e.message:
+            sys.stderr.write(f'{e.message}\n')
+        sys.exit(e.status)
     init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
     i3_connection = i3ipc.Connection()
@@ -422,8 +437,8 @@ def main():
         output = run_command(i3_connection, args)
         if output:
             print(output)
-    except i3_groups_controller.WorkspaceGroupsError as ex:
-        sys.exit(ex)
+    except i3_groups_controller.WorkspaceGroupsError as e:
+        sys.exit(e)
 
 
 if __name__ == '__main__':

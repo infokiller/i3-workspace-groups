@@ -82,7 +82,7 @@ keybindings. For example, my i3 config contains the following exerts:
 
 <!-- markdownlint-disable fenced-code-language -->
 
-```
+```ini
 set $mod Mod4
 
 set $exec_i3_groups exec --no-startup-id i3-workspace-groups

@@ -11,7 +11,7 @@ import pprint
 
 import i3ipc
 
-from i3wsgroups import cli
+from i3wsgroups import cli_util
 from i3wsgroups import controller
 from i3wsgroups import i3_proxy
 from i3wsgroups import logger
@@ -59,13 +59,13 @@ def main():
     parser = argparse.ArgumentParser(
         description='Runs in the background and automatically renames i3 '
         'workspaces according to the running apps.')
-    cli.add_common_args(parser)
-    cli.add_workspace_naming_args(parser)
+    cli_util.add_common_args(parser)
+    cli_util.add_workspace_naming_args(parser)
     args = parser.parse_args()
     init_logger(os.path.basename(__file__))
     logger.setLevel(getattr(logging, args.log_level.upper(), None))
 
-    config = cli.get_config_with_overrides(args)
+    config = cli_util.get_config_with_overrides(args)
     logger.debug('Using merged config:\n%s', pprint.pformat(config))
 
     autonamer = WorkspaceAutonamer(config, args.dry_run)

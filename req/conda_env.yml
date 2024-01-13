@@ -12,4 +12,4 @@ dependencies:
     # not supported in conda [2].
     # [1] https://github.com/pypa/pip/issues/9644
     # [2] https://github.com/conda/conda/issues/6805
-    - -r requirements.txt -r requirements-dev.txt
+    - -r base.txt -r dev.txt -r dev-extra.txt

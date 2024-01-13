@@ -1,0 +1,18 @@
+# pip-compile doesn't support contraints when using pyproject.toml [1], so this file
+# must either be compiled by pointing pip-compile to pyproject.toml, or manually adding
+# constraints in the invocation.
+# [1] https://github.com/jazzband/pip-tools/issues/1092#issuecomment-1256423806
+# -c base.txt
+# -c dev.txt
+ipython~=8.14
+jupytext~=1.0
+rich[jupyter]
+pyflyby~=1.7
+jupyterlab~=4.0
+# ipykernel is required for the VSCode interactive window
+ipykernel~=6.13
+# ipywidgets is required for rich to run in Jupyter Notebook or the VSCode
+# interactive window.
+ipywidgets~=7.7
+
+# vim: set ft=requirements :

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -o errexit -o errtrace -o nounset -o pipefail
+
+DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+_print_bold() {
+  local bold normal
+  bold="$(tput bold 2> /dev/null)" || true
+  normal="$(tput sgr0 2> /dev/null)" || true
+  printf '%s' "${bold}"
+  printf '%s' "${@}"
+  printf '%s\n' "${normal}"
+}
+
+main() {
+  cd -- "${DIR}/.."
+  local s=0
+  _print_bold 'Running ruff...'
+  ruff check . || s=$?
+  _print_bold 'Running yapf...'
+  yapf -d -r -p . || s=$?
+  _print_bold 'Running isort...'
+  isort --check --diff . || s=$?
+  _print_bold 'Running pylint...'
+  pylint -j 8 --recursive=y . || s=$?
+  _print_bold 'Running pyright...'
+  pyright || s=$?
+  return "${s}"
+}
+
+main "$@"

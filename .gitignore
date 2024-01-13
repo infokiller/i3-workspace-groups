@@ -1,3 +1,10 @@
+/logs
+/cache
+/repos
+/bazel-*
+/data/*
+/i3wsgroups/__version__.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,6 @@
+i3ipc~=2.2
+# TODO: switch to tomli
+toml~=0.10
+# typing-extensions and exceptiongroup are required for Python 3.10 and below.
+typing-extensions
+exceptiongroup

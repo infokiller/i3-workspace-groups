@@ -13,8 +13,8 @@ groups. I find this tool useful for managing many workspaces in i3.
 - [Background](#background)
 - [Installation](#installation)
 - [Configuration](#configuration)
-  - [i3 config](#i3-config)
-  - [i3-workspace-groups configuration file](#i3-workspace-groups-configuration-file)
+  - [i3](#i3)
+  - [i3-workspace-groups](#i3-workspace-groups)
 - [Usage](#usage)
   - [Example walk through](#example-walk-through)
 - [Concepts](#concepts)
@@ -55,16 +55,16 @@ python3 -m pip install i3-workspace-groups
 ```
 
 Then you should be able to run the command line tool
-[`i3-workspace-groups`](scripts/i3-workspace-groups). There are also a few
-utility scripts provided that require
-[rofi](https://github.com/DaveDavenport/rofi) and which are useful for
-interactively managing the groups, using rofi as the UI. They include:
+[`i3-workspace-groups`](bin/i3-workspace-groups). There are also a few utility
+scripts provided that require [rofi](https://github.com/DaveDavenport/rofi) and
+which are useful for interactively managing the groups, using rofi as the UI.
+They include:
 
-- [`i3-assign-workspace-to-group`](scripts/i3-assign-workspace-to-group)
-- [`i3-focus-on-workspace`](scripts/i3-focus-on-workspace)
-- [`i3-move-to-workspace`](scripts/i3-move-to-workspace)
-- [`i3-rename-workspace`](scripts/i3-rename-workspace)
-- [`i3-switch-active-workspace-group`](scripts/i3-switch-active-workspace-group)
+- [`i3-assign-workspace-to-group`](bin/i3-assign-workspace-to-group)
+- [`i3-focus-on-workspace`](bin/i3-focus-on-workspace)
+- [`i3-move-to-workspace`](bin/i3-move-to-workspace)
+- [`i3-rename-workspace`](bin/i3-rename-workspace)
+- [`i3-switch-active-workspace-group`](bin/i3-switch-active-workspace-group)
 
 If you want to use client/server mode for improved speed/latency, it's
 recommended to install one of the following tools to further improve speed:
@@ -75,7 +75,7 @@ recommended to install one of the following tools to further improve speed:
 
 ## Configuration
 
-### i3 config
+### i3
 
 In order to use these tools effectively, commands need to be bound to
 keybindings. For example, my i3 config contains the following exerts:
@@ -135,7 +135,7 @@ bar {
 }
 ```
 
-### i3-workspace-groups configuration file
+### i3-workspace-groups
 
 i3-workspace-groups has an optional config file located at
 `$XDG_CONFIG_HOME/i3-workspace-groups/config.toml` (defaults to
@@ -161,7 +161,7 @@ workspace. For example, if a user assigns the workspace `mail` to the group
 ### Example walk through
 
 > **NOTE:** This walk through assumes that you configured keybindings like the
-> [example i3 config](#i3-config).
+> [example i3 config](#i3).
 
 Say we start with the following workspace names:
 
@@ -304,6 +304,6 @@ done < <(polybar --list-monitors | cut -d':' -f1)
 #### 2. Run a background script to update polybar's on i3 events
 
 Run the
-[i3-groups-polybar-module-updater](./scripts/i3-groups-polybar-module-updater)
+[i3-groups-polybar-module-updater](./bin/i3-groups-polybar-module-updater)
 script. This script is responsible for calling the hook to update polybar
 whenever a relevant i3 window event occurs.

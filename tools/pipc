@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -o errexit -o errtrace -o nounset -o pipefail
+
+DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+_pip_compile() {
+  pip-compile -q --strip-extras --generate-hashes --allow-unsafe pyproject.toml "$@"
+}
+
+main() {
+  cd -- "${DIR}/.."
+  echo 'Compiling base deps...'
+  _pip_compile -o req/base.txt "$@"
+  echo 'Compiling dev deps...'
+  _pip_compile --extra dev -c req/base.txt -o req/dev.txt "$@"
+  echo 'Compiling dev-extra deps...'
+  _pip_compile --extra dev_extra -c req/base.txt -c req/dev.txt -o req/dev-extra.txt "$@"
+  echo 'Syncing deps...'
+  pip-sync req/*.txt
+}
+
+main "$@"

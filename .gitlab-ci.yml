@@ -6,10 +6,10 @@ before_script:
   - python3 --version
   # --no-deps is needed to avoid errors like:
   # https://github.com/pypa/pip/issues/9644#issuecomment-788108944
-  - python3 -m pip install --no-deps -r requirements.txt -r requirements-dev.txt
+  - python3 -m pip install --no-deps -r req/base.txt -r req/dev.txt
 
 pylint:
-  script: pylint i3wsgroups scripts/i3-workspace-groups
+  script: pylint -j 8 --recursive=y .
 
 pytype_py38:
   image: python:3.8
@@ -47,11 +47,11 @@ test_py311:
 
 shellcheck:
   script:
-    - shellcheck scripts/i3-assign-workspace-to-group
-    - shellcheck scripts/i3-focus-on-workspace
-    - shellcheck scripts/i3-move-to-workspace
-    - shellcheck scripts/i3-rename-workspace
-    - shellcheck scripts/i3-switch-active-workspace-group
+    - shellcheck bin/i3-assign-workspace-to-group
+    - shellcheck bin/i3-focus-on-workspace
+    - shellcheck bin/i3-move-to-workspace
+    - shellcheck bin/i3-rename-workspace
+    - shellcheck bin/i3-switch-active-workspace-group
 
 setup_develop:
   script: python3 setup.py develop

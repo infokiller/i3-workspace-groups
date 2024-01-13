@@ -50,6 +50,7 @@ join_by_null() {
   # alpine).
   #  printf '%s\0' "$@" | head -c -1
   # NOTE: Bash uses c-style strings, so they can't contain null chars.
+  # shellcheck disable=SC2317
   printf '%s\0' "$@" | sed 's/.$//'
 }
 

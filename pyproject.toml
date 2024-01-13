@@ -1,0 +1,189 @@
+[project]
+name = 'i3-workspace-groups'
+readme = 'README.md'
+dynamic = ['version', 'dependencies', 'optional-dependencies']
+# dynamic = ['dependencies']
+requires-python = '>=3.9'
+license = {file = 'LICENSE'}
+classifiers = [
+  'Development Status :: 3 - Alpha',
+  'Intended Audience :: Developers',
+  'Operating System :: POSIX :: Linux',
+  'License :: OSI Approved :: MIT License',
+  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+]
+
+[build-system]
+requires = ['setuptools>=68.0', 'setuptools-scm>=7.0']
+build-backend = 'setuptools.build_meta'
+# requires = ['hatchling']
+# build-backend = 'hatchling.build'
+
+[tool.setuptools]
+packages = ['i3wsgroups']
+
+[tool.setuptools_scm]
+write_to = 'i3wsgroups/__version__.py'
+
+[tool.setuptools.dynamic]
+dependencies = { file = ['req/base.in'] }
+optional-dependencies.dev = { file = ['req/dev.in'] }
+optional-dependencies.dev_extra = { file = ['req/dev-extra.in'] }
+
+[tool.pip-tools]
+generate-hashes = true
+allow-unsafe = true
+strip-extras = true
+
+[tool.yapf]
+based_on_style = 'google'
+column_limit = 100
+
+[tool.yapfignore]
+ignore_patterns = [
+  'build',
+  'cache',
+  'assets',
+  'data',
+  'refs',
+  'logs',
+  'repos',
+  '.tox',
+  '.pytype',
+  'bazel-*/**',
+]
+
+[tool.isort]
+profile = 'google'
+line_length = 100
+# src_paths = ['i3wsgroups', 'tests', 'bin', 'tools']
+extend_skip = [
+  'build',
+  'cache',
+  'assets',
+  'data',
+  'refs',
+  'logs',
+  'repos',
+  '.tox',
+  '.pytype',
+]
+extend_skip_glob = [
+  'bazel-*',
+  '**/__version__.py',
+]
+
+[tool.pyright]
+# TODO: fix pyright errors
+include = ['i3wsgroups', 'tests', 'bin', 'tools']
+ignore = [
+]
+
+# https://beta.ruff.rs/docs/settings
+[tool.ruff]
+# Enable pycodestyle warnings (`W`)
+extend-select = ['W']
+# include = ['i3wsgroups', 'tests', 'bin', 'tools']
+extend-exclude = [
+  'build',
+  'cache',
+  'assets',
+  'data',
+  'refs',
+  'logs',
+  'repos',
+  'bazel-*',
+  '.tox',
+  '.pytype',
+  '**/__version__.py',
+]
+# Force ruff to exclude files even if they are explicitly passed in a CLI invocation.
+# This is required for Vim ALE to not show errors for these files, since it passes them
+# via stdin, which is considered as an explicit invocation.
+# https://github.com/astral-sh/ruff/discussions/5857#discussioncomment-6583943
+force-exclude = true
+# Consistent with yapf
+line-length = 100
+
+[tool.pylint.main]
+# A comma-separated list of package or module names from where C extensions may
+# be loaded. Extensions are loading into the active Python interpreter and may
+# run arbitrary code.
+# extension-pkg-allow-list = ['lxml']
+# Minimum line length for functions/classes that require docstrings, shorter ones
+# are exempt.
+docstring-min-length = 10
+# Good variable names which should always be accepted, separated by a comma.
+good-names = ['i', 'j', 'k', 'e', 'f', 'ex', 'fd', 'fp', 'logger', '_']
+# Good variable names regexes, separated by a comma. If names match any regex,
+# they will always be accepted
+good-names-rgxs = ['_?[a-z]']
+# Regular expression matching correct module names. Overrides module-naming-
+# style. If left empty, module names will be checked with the set naming style.
+module-rgx = '[a-z_][a-z0-9_-]{2,30}$'
+# Lone comment lines URLs are OK
+ignore-long-lines = 'https?://\S{10,}|nosemgrep'
+# Disable the message, report, category or checker with the given id(s). You can
+# either give multiple identifiers separated by comma (,) or put this option
+# multiple times (only on the command line, not in the configuration file where
+# it should appear only once). You can also use "--disable=all" to disable
+# everything first and then re-enable specific checks. For example, if you want
+# to run only the similarities checker, you can use "--disable=all
+# --enable=similarities". If you want to run only the classes checker, but have
+# no Warning level messages displayed, use "--disable=all --enable=classes
+# --disable=W".
+disable = [
+  'raw-checker-failed', 'bad-inline-option', 'locally-disabled', 'file-ignored',
+  'suppressed-message', 'useless-suppression', 'deprecated-pragma',
+  'use-symbolic-message-instead', 'fixme', 'missing-module-docstring',
+  'missing-class-docstring', 'missing-function-docstring',
+  'logging-format-interpolation', 'logging-fstring-interpolation',
+  'consider-using-f-string', 'too-few-public-methods',
+]
+ignore-paths = [
+  'build',
+  'cache',
+  'assets',
+  'data',
+  'refs',
+  'logs',
+  'repos',
+  'bazel-.*',
+  '.tox',
+  '.pytype',
+  '.*/__version__.py$',
+]
+
+[tool.pyflyby]
+align_imports = '0'
+from_spaces = 0
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py38,py39,py310,py311
+
+[testenv]
+passenv = TOXENV CI TRAVIS TRAVIS_* CODECOV_*
+# --no-deps is needed to avoid errors like:
+# https://github.com/pypa/pip/issues/9644#issuecomment-788108944
+install_command = python -I -m pip install --no-deps {opts} {packages}
+deps = 
+    -r req/base.txt
+    -r req/dev.txt
+skip_install = true
+commands = 
+    pytest --cov=. --cov-report=xml
+    # The pip package for codecov was deprecated:
+    # https://docs.codecov.com/docs/deprecated-uploader-migration-guide#python-uploader
+    # TODO: Use the new uploader once it's available on PyPI, or install it in
+    # docker.
+    # codecov -e CODECOV_TOKEN
+"""
+
+[tool.semantic_release]
+version_variables = ['i3wsgroups/__version__.py:__version__']

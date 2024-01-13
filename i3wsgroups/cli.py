@@ -254,7 +254,7 @@ def serve(i3_connection, server_addr):
             connection.sendall(msg.encode('utf-8'))
             continue
         except cli_util.ExitCalledError as e:
-            msg = e.message
+            msg = e.message or ''
             if e.status == 0 and not msg:
                 msg = e.parser.format_help()
             elif e.status != 0:
@@ -402,7 +402,7 @@ def main():
         if output:
             print(output)
     except i3_groups_controller.WorkspaceGroupsError as e:
-        sys.exit(e)
+        sys.exit(str(e))
 
 
 if __name__ == '__main__':

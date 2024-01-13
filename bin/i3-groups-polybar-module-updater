@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
-from i3ipc.aio import Connection
-from i3ipc import Event
+import asyncio
 import subprocess
 
-import asyncio
+from i3ipc import Event
+from i3ipc.aio import Connection
+
 
 def _update_polybar(*_):
     # As of 2021-10-15 and PR #2539 [1] running the hook action is deprecated.

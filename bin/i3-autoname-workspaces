@@ -10,7 +10,12 @@ import os.path
 import pprint
 
 import i3ipc
-from i3wsgroups import cli, controller, i3_proxy, logger, workspace_names
+
+from i3wsgroups import cli
+from i3wsgroups import controller
+from i3wsgroups import i3_proxy
+from i3wsgroups import logger
+from i3wsgroups import workspace_names
 
 init_logger = logger.init_logger
 logger = logger.logger

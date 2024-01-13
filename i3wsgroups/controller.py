@@ -5,7 +5,9 @@ from typing import List, Optional, Tuple
 
 import i3ipc
 
-from i3wsgroups import i3_proxy, icons, logger
+from i3wsgroups import i3_proxy
+from i3wsgroups import icons
+from i3wsgroups import logger
 from i3wsgroups import workspace_names as ws_names
 
 # from i3wsgroups.ws_names import *

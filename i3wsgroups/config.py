@@ -2,12 +2,9 @@ import os
 
 import toml
 
-DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__),
-                                   'default_config.toml')
-XDG_CONFIG_HOME = os.environ.get('XDG_CONFIG_HOME',
-                                 os.path.expandvars('$HOME/.config'))
-CONFIG_PATH = os.path.join(XDG_CONFIG_HOME, 'i3-workspace-groups',
-                           'config.toml')
+DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'default_config.toml')
+XDG_CONFIG_HOME = os.environ.get('XDG_CONFIG_HOME', os.path.expandvars('$HOME/.config'))
+CONFIG_PATH = os.path.join(XDG_CONFIG_HOME, 'i3-workspace-groups', 'config.toml')
 
 
 class ConfigError(Exception):

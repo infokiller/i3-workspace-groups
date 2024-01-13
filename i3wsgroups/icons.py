@@ -36,8 +36,7 @@ class IconsResolver:
         self.config = config
         self.rules = []
         for rule in self.config.get('rules', []):
-            self.rules.append(
-                IconRule(rule['property'], rule['match'], rule['icon']))
+            self.rules.append(IconRule(rule['property'], rule['match'], rule['icon']))
 
     def get_window_icon(self, window: i3ipc.Con) -> str:
         for rule in self.rules:
@@ -46,8 +45,8 @@ class IconsResolver:
                 return icon
         logger.info(
             'No icon specified for window with class: "%s", instance: '
-            '"%s", title: "%s", name: "%s"', window.window_class,
-            window.window_instance, window.window_title, window.name)
+            '"%s", title: "%s", name: "%s"', window.window_class, window.window_instance,
+            window.window_title, window.name)
         return self.config['default_icon']
 
     def get_workspace_icons(self, workspace: i3ipc.Con) -> str:

@@ -6,11 +6,10 @@ from i3wsgroups import logger
 
 logger = logger.logger
 
+
 class I3Proxy:
 
-    def __init__(self,
-                 i3_connection: i3ipc.Connection,
-                 dry_run: bool = True):
+    def __init__(self, i3_connection: i3ipc.Connection, dry_run: bool = True):
         self.i3_connection = i3_connection
         self.dry_run = dry_run
         # i3 tree is cached for performance. Timing the i3ipc get_tree function
@@ -28,10 +27,7 @@ class I3Proxy:
         return self.tree
 
     def get_monitor_index(self, monitor_name):
-        ordered_monitors = [
-            output for output in self.i3_connection.get_outputs()
-            if output.active
-        ]
+        ordered_monitors = [output for output in self.i3_connection.get_outputs() if output.active]
         # Sort monitors from top to bottom, and from left to right.
         ordered_monitors.sort(key=lambda m: (m.rect.y, m.rect.x))
         return [m.name for m in ordered_monitors].index(monitor_name)
@@ -42,16 +38,14 @@ class I3Proxy:
             con = con.parent
         return con.name
 
-    def get_monitor_workspaces(self, monitor_name: Optional[str] = None
-                              ) -> List[i3ipc.Con]:
+    def get_monitor_workspaces(self, monitor_name: Optional[str] = None) -> List[i3ipc.Con]:
         if monitor_name is None:
             monitor_name = self.get_focused_monitor_name()
         return self.get_monitor_to_workspaces()[monitor_name]
 
     def get_monitor_to_workspaces(self) -> Dict[str, List[i3ipc.Con]]:
         active_monitor_names = [
-            output.name for output in self.i3_connection.get_outputs()
-            if output.active
+            output.name for output in self.i3_connection.get_outputs() if output.active
         ]
         monitor_to_workspaces = {}
         # We could do this more efficiently by assuming that the outputs are the
@@ -74,8 +68,7 @@ class I3Proxy:
             if not reply.success:
                 logger.warning('i3 command error: %s', reply.error)
 
-    def focus_workspace(self, name: str,
-                        auto_back_and_forth: bool = True) -> None:
+    def focus_workspace(self, name: str, auto_back_and_forth: bool = True) -> None:
         options = ''
         if not auto_back_and_forth:
             options = '--no-auto-back-and-forth'
@@ -92,7 +85,6 @@ class I3Proxy:
             logger.info('Didn\'t find workspaces with mark: %s', mark)
             return None
         if len(workspaces) > 1:
-            logger.warning(
-                'Multiple workspaces marked with %s, using first '
-                'one', mark)
+            logger.warning('Multiple workspaces marked with %s, using first '
+                           'one', mark)
         return workspaces[0]

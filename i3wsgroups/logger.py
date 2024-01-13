@@ -1,10 +1,8 @@
 import logging
 import logging.handlers
 
-_LOG_FMT_STDERR = (
-    '%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s')
-_LOG_FMT_SYSLOG = (
-    '%(levelname)s [%(filename)s:%(lineno)d] %(message)s')
+_LOG_FMT_STDERR = ('%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s')
+_LOG_FMT_SYSLOG = ('%(levelname)s [%(filename)s:%(lineno)d] %(message)s')
 
 logger = logging.getLogger()
 

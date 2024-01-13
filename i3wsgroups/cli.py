@@ -7,8 +7,7 @@ from i3wsgroups import config
 
 class ExitCalledError(Exception):
 
-    def __init__(self, parser: argparse.ArgumentParser, status: int,
-                 message: str):
+    def __init__(self, parser: argparse.ArgumentParser, status: int, message: str):
         super().__init__(status, message)
         self.parser = parser
         self.status = status
@@ -35,39 +34,34 @@ def add_common_args(parser: argparse.ArgumentParser):
                         default=False,
                         help='If true, only log what changed would be done.')
     parser.add_argument('--log-level',
-                        choices=('debug', 'info', 'warning', 'error',
-                                 'critical'),
+                        choices=('debug', 'info', 'warning', 'error', 'critical'),
                         default='warning',
                         help='Logging level for stderr and syslog.')
 
 
 def add_workspace_naming_args(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        '--window-icons',
-        action='store_true',
-        default=None,
-        help='If true, add the icons of the open windows to the workspace '
-        'names when organizing or renaming workspaces.')
-    parser.add_argument(
-        '--window-icons-all-groups',
-        action='store_true',
-        default=None,
-        help='If true, add the icons of the open windows to workspaces in all '
-        'groups, and not just the active group. Also implies --window-icons.')
-    parser.add_argument(
-        '--renumber-workspaces',
-        action='store_true',
-        default=None,
-        help='If true, renumber workspaces in every group so that they are in '
-        'numerical order, similar to tmux\'s renumber-windows option.')
+    parser.add_argument('--window-icons',
+                        action='store_true',
+                        default=None,
+                        help='If true, add the icons of the open windows to the workspace '
+                        'names when organizing or renaming workspaces.')
+    parser.add_argument('--window-icons-all-groups',
+                        action='store_true',
+                        default=None,
+                        help='If true, add the icons of the open windows to workspaces in all '
+                        'groups, and not just the active group. Also implies --window-icons.')
+    parser.add_argument('--renumber-workspaces',
+                        action='store_true',
+                        default=None,
+                        help='If true, renumber workspaces in every group so that they are in '
+                        'numerical order, similar to tmux\'s renumber-windows option.')
 
 
 def get_config_with_overrides(args: argparse.Namespace):
     config_dict = config.get_config_with_defaults()
     if args.renumber_workspaces is not None:
         config_dict['renumber_workspaces'] = args.renumber_workspaces
-    if hasattr(args,
-               'use_next_available_number') and args.use_next_available_number:
+    if hasattr(args, 'use_next_available_number') and args.use_next_available_number:
         config_dict['workspace_moves']['use_next_available_number'] = (
             args.use_next_available_number)
     if args.window_icons is not None:

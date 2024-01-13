@@ -27,18 +27,16 @@ class WorkspaceAutonamer:
         self.dry_run = dry_run
         self.config = config
 
-    def create_controller(
-        self, i3_connection: i3ipc.Connection
-    ) -> controller.WorkspaceGroupsController:
-        return controller.WorkspaceGroupsController(
-            i3_proxy.I3Proxy(i3_connection, self.dry_run), self.config)
+    def create_controller(self,
+                          i3_connection: i3ipc.Connection) -> controller.WorkspaceGroupsController:
+        return controller.WorkspaceGroupsController(i3_proxy.I3Proxy(i3_connection, self.dry_run),
+                                                    self.config)
 
     def update_workspace_names(self, i3_connection: i3ipc.Connection) -> None:
         groups_controller = self.create_controller(i3_connection)
         group_to_workspaces = workspace_names.get_group_to_workspaces(
             groups_controller.i3_proxy.get_monitor_workspaces())
-        groups_controller.organize_workspace_groups(
-            list(group_to_workspaces.items()))
+        groups_controller.organize_workspace_groups(list(group_to_workspaces.items()))
 
     def window_event_handler(self, i3_connection: i3ipc.Connection,
                              event: i3ipc.WindowEvent) -> None:
@@ -46,8 +44,7 @@ class WorkspaceAutonamer:
         if event.change in ['new', 'close', 'move']:
             self.update_workspace_names(i3_connection)
 
-    def workspace_event_handler(self, i3_connection: i3ipc.Connection,
-                                event: i3ipc.WorkspaceEvent):
+    def workspace_event_handler(self, i3_connection: i3ipc.Connection, event: i3ipc.WorkspaceEvent):
         logger.debug('Got workspace event with change: %s', event.change)
         # We must update the workspace names on a focus event because the
         # workspace focus change may be due to navigating away from an empty
@@ -75,8 +72,7 @@ def main():
     i3_connection = i3ipc.Connection()
     autonamer.update_workspace_names(i3_connection)
     i3_connection.on(i3ipc.Event.WINDOW, autonamer.window_event_handler)
-    i3_connection.on(i3ipc.Event.WORKSPACE_FOCUS,
-                     autonamer.workspace_event_handler)
+    i3_connection.on(i3ipc.Event.WORKSPACE_FOCUS, autonamer.workspace_event_handler)
     i3_connection.main()
 
 

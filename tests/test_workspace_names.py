@@ -25,53 +25,41 @@ def test_global_number_to_local_number():
 
 def test_compute_local_numbers1():
     monitor_workspaces = [
-        test_util.create_workspace(
-            1, WorkspaceGroupingMetadata(global_number=1, local_number=1))
+        test_util.create_workspace(1, WorkspaceGroupingMetadata(global_number=1, local_number=1))
     ]
-    local_numbers = compute_local_numbers(monitor_workspaces,
-                                          monitor_workspaces, False)
+    local_numbers = compute_local_numbers(monitor_workspaces, monitor_workspaces, False)
     assert local_numbers == [1]
 
 
 def test_compute_local_numbers2():
     monitor_workspaces = [
-        test_util.create_workspace(
-            2, WorkspaceGroupingMetadata(global_number=1, local_number=2))
+        test_util.create_workspace(2, WorkspaceGroupingMetadata(global_number=1, local_number=2))
     ]
-    local_numbers = compute_local_numbers(monitor_workspaces,
-                                          monitor_workspaces, True)
+    local_numbers = compute_local_numbers(monitor_workspaces, monitor_workspaces, True)
     assert local_numbers == [1]
 
 
 def test_compute_local_numbers3():
     monitor_workspaces = [
-        test_util.create_workspace(
-            1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
-        test_util.create_workspace(
-            2, WorkspaceGroupingMetadata(global_number=2, local_number=2))
+        test_util.create_workspace(1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
+        test_util.create_workspace(2, WorkspaceGroupingMetadata(global_number=2, local_number=2))
     ]
     all_workspaces = monitor_workspaces + [
-        test_util.create_workspace(
-            3, WorkspaceGroupingMetadata(global_number=3, local_number=1))
+        test_util.create_workspace(3, WorkspaceGroupingMetadata(global_number=3, local_number=1))
     ]
-    local_numbers = compute_local_numbers(monitor_workspaces, all_workspaces,
-                                          True)
+    local_numbers = compute_local_numbers(monitor_workspaces, all_workspaces, True)
     assert local_numbers == [2, 3]
 
 
 def test_compute_local_numbers4():
     monitor_workspaces = [
-        test_util.create_workspace(
-            1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
-        test_util.create_workspace(
-            2, WorkspaceGroupingMetadata(global_number=2, local_number=2))
+        test_util.create_workspace(1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
+        test_util.create_workspace(2, WorkspaceGroupingMetadata(global_number=2, local_number=2))
     ]
     all_workspaces = monitor_workspaces + [
-        test_util.create_workspace(
-            3, WorkspaceGroupingMetadata(global_number=3, local_number=2))
+        test_util.create_workspace(3, WorkspaceGroupingMetadata(global_number=3, local_number=2))
     ]
-    local_numbers = compute_local_numbers(monitor_workspaces, all_workspaces,
-                                          False)
+    local_numbers = compute_local_numbers(monitor_workspaces, all_workspaces, False)
     assert local_numbers == [1, 3]
 
 
@@ -82,8 +70,8 @@ def test_compute_group_index_empty():
 def test_compute_group_index_simple():
     group_to_workspaces = {
         'a': [
-            test_util.create_workspace(
-                1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
+            test_util.create_workspace(1, WorkspaceGroupingMetadata(global_number=1,
+                                                                    local_number=1)),
         ],
     }
     assert get_group_index('a', group_to_workspaces) == 0
@@ -94,13 +82,13 @@ def test_compute_group_index_simple():
 def test_compute_group_index_gaps():
     group_to_workspaces = {
         'a': [
-            test_util.create_workspace(
-                1, WorkspaceGroupingMetadata(global_number=1, local_number=1)),
+            test_util.create_workspace(1, WorkspaceGroupingMetadata(global_number=1,
+                                                                    local_number=1)),
         ],
         'b': [
-            test_util.create_workspace(
-                2, WorkspaceGroupingMetadata(global_number=201,
-                                             local_number=1)),
+            test_util.create_workspace(2,
+                                       WorkspaceGroupingMetadata(global_number=201,
+                                                                 local_number=1)),
         ],
     }
     assert get_group_index('a', group_to_workspaces) == 0

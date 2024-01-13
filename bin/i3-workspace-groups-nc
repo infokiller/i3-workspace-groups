@@ -15,5 +15,6 @@ def main():
     output = sock.recv(100000)
     print(output.decode('utf-8'))
 
+
 if __name__ == '__main__':
     main()

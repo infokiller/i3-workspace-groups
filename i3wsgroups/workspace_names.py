@@ -55,8 +55,7 @@ GroupToWorkspaces = Dict[str, List[i3ipc.Con]]
 
 class WorkspaceDisplayMetadata:
 
-    def __init__(self, workspace_name: str, monitor_name: str,
-                 is_focused: bool):
+    def __init__(self, workspace_name: str, monitor_name: str, is_focused: bool):
         self.workspace_name: str = workspace_name
         self.monitor_name: str = monitor_name
         self.is_focused: bool = is_focused
@@ -106,8 +105,7 @@ def is_valid_group_name(name: str) -> bool:
     return SECTIONS_DELIM not in name
 
 
-def parse_global_number_section(global_number_section: Optional[str]
-                               ) -> Optional[int]:
+def parse_global_number_section(global_number_section: Optional[str]) -> Optional[int]:
     if not global_number_section:
         return None
     return int(maybe_remove_suffix_colons(global_number_section))
@@ -167,8 +165,7 @@ def get_used_local_numbers(workspaces: List[i3ipc.Con]) -> Set[int]:
     return used_local_numbers
 
 
-def get_lowest_free_local_numbers(num: int,
-                                  used_local_numbers: Set[int]) -> List[int]:
+def get_lowest_free_local_numbers(num: int, used_local_numbers: Set[int]) -> List[int]:
     local_numbers = []
     for local_number in range(1, _MAX_WORKSPACES_PER_GROUP):
         if len(local_numbers) == num:
@@ -180,19 +177,14 @@ def get_lowest_free_local_numbers(num: int,
     return local_numbers
 
 
-def compute_local_numbers(monitor_workspaces: List[i3ipc.Con],
-                          all_workspaces: List[i3ipc.Con],
+def compute_local_numbers(monitor_workspaces: List[i3ipc.Con], all_workspaces: List[i3ipc.Con],
                           renumber_workspaces: bool) -> List[int]:
     monitor_workspace_ids = {ws.id for ws in monitor_workspaces}
-    other_monitors_workspaces = [
-        ws for ws in all_workspaces if ws.id not in monitor_workspace_ids
-    ]
+    other_monitors_workspaces = [ws for ws in all_workspaces if ws.id not in monitor_workspace_ids]
     used_local_numbers = get_used_local_numbers(other_monitors_workspaces)
-    logger.debug('Local numbers used by group in other monitors: %s',
-                 used_local_numbers)
+    logger.debug('Local numbers used by group in other monitors: %s', used_local_numbers)
     if renumber_workspaces:
-        return get_lowest_free_local_numbers(len(monitor_workspaces),
-                                             used_local_numbers)
+        return get_lowest_free_local_numbers(len(monitor_workspaces), used_local_numbers)
     if used_local_numbers:
         last_used_local_number = max(used_local_numbers)
     else:
@@ -225,18 +217,16 @@ def create_name(ws_metadata: WorkspaceGroupingMetadata) -> str:
     return SECTIONS_DELIM.join(sections)
 
 
-def compute_global_number(monitor_index: int, group_index: int,
-                          local_number: int) -> int:
+def compute_global_number(monitor_index: int, group_index: int, local_number: int) -> int:
     assert local_number < _MAX_WORKSPACES_PER_GROUP
-    monitor_starting_number = monitor_index * (_MAX_GROUPS_PER_MONITOR *
-                                               _MAX_WORKSPACES_PER_GROUP)
+    monitor_starting_number = monitor_index * (_MAX_GROUPS_PER_MONITOR * _MAX_WORKSPACES_PER_GROUP)
     group_starting_number = _MAX_WORKSPACES_PER_GROUP * group_index
     return monitor_starting_number + group_starting_number + local_number
 
 
 def global_number_to_group_index(global_number: int) -> int:
-    return global_number % (_MAX_GROUPS_PER_MONITOR * _MAX_WORKSPACES_PER_GROUP
-                           ) // _MAX_WORKSPACES_PER_GROUP
+    return global_number % (_MAX_GROUPS_PER_MONITOR *
+                            _MAX_WORKSPACES_PER_GROUP) // _MAX_WORKSPACES_PER_GROUP
 
 
 def global_number_to_local_number(global_number: int) -> int:
@@ -277,8 +267,7 @@ def get_group_index(target_group: str, group_to_workspaces: GroupToWorkspaces):
         for workspace in workspaces:
             parsed_name = parse_name(workspace.name)
             if parsed_name.global_number is not None:
-                group_to_index[group] = global_number_to_group_index(
-                    parsed_name.global_number)
+                group_to_index[group] = global_number_to_group_index(parsed_name.global_number)
                 break
     if target_group in group_to_index:
         return group_to_index[target_group]

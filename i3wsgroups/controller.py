@@ -144,7 +144,7 @@ class WorkspaceGroupsController:
         focused_monitor_name = self.i3_proxy.get_focused_monitor_name()
         monitor_to_workspaces = self.i3_proxy.get_monitor_to_workspaces()
         for monitor, workspaces in monitor_to_workspaces.items():
-            group_exists = (target_group in ws_names.get_group_to_workspaces(workspaces))
+            group_exists = target_group in ws_names.get_group_to_workspaces(workspaces)
             if monitor == focused_monitor_name:
                 logger.debug('Switching active group in focused monitor "%s"', monitor)
             elif not focused_monitor_only and group_exists:

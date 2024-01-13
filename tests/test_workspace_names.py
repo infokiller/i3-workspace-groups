@@ -1,5 +1,11 @@
-from i3wsgroups.controller import *
-from i3wsgroups.workspace_names import *
+from __future__ import annotations
+
+from i3wsgroups.workspace_names import compute_global_number
+from i3wsgroups.workspace_names import compute_local_numbers
+from i3wsgroups.workspace_names import get_group_index
+from i3wsgroups.workspace_names import global_number_to_group_index
+from i3wsgroups.workspace_names import global_number_to_local_number
+from i3wsgroups.workspace_names import WorkspaceGroupingMetadata
 from tests import test_util
 
 

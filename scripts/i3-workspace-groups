@@ -284,7 +284,7 @@ def serve(i3_connection, server_addr):
         except cli.ExitCalledError as e:
             msg = e.message
             if e.status == 0 and not msg:
-                msg = parser.format_help()
+                msg = e.parser.format_help()
             elif e.status != 0:
                 msg = f'error: {msg}'
             logger.warning(msg)

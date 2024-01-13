@@ -7,8 +7,10 @@ from i3wsgroups import config
 
 class ExitCalledError(Exception):
 
-    def __init__(self, status: int, message: str):
+    def __init__(self, parser: argparse.ArgumentParser, status: int,
+                 message: str):
         super().__init__(status, message)
+        self.parser = parser
         self.status = status
         self.message = message
 
@@ -24,7 +26,7 @@ class ArgumentParserNoExit(argparse.ArgumentParser):
         super().__init__(*args, **kwargs)
 
     def exit(self, status=0, message=None):
-        raise ExitCalledError(status, message)
+        raise ExitCalledError(self, status, message)
 
 
 def add_common_args(parser: argparse.ArgumentParser):

@@ -26,6 +26,8 @@
 #  "1:mail"
 #  "1:mygroup:mail"
 #  "102:mygroup:mail:2"
+from __future__ import annotations
+
 import collections
 from typing import Dict, List, Optional, Set
 
@@ -145,21 +147,22 @@ def parse_name(workspace_name: str) -> WorkspaceGroupingMetadata:
 
 
 def get_local_workspace_number(workspace: i3ipc.Con) -> Optional[int]:
-    ws_metadata = parse_name(workspace.name)
+    ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
     local_number = ws_metadata.local_number
     if local_number is None and ws_metadata.global_number is not None:
         local_number = global_number_to_local_number(ws_metadata.global_number)
     return local_number
 
 
-def get_group(workspace: i3ipc.Con) -> str:
-    return parse_name(workspace.name).group
+def get_group(workspace: i3ipc.Con) -> Optional[str]:
+    return parse_name(workspace.name).group  # pyright: ignore[reportGeneralTypeIssues]
 
 
 def get_used_local_numbers(workspaces: List[i3ipc.Con]) -> Set[int]:
     used_local_numbers = set()
     for workspace in workspaces:
-        local_number = parse_name(workspace.name).local_number
+        local_number = parse_name(
+            workspace.name).local_number  # pyright: ignore[reportGeneralTypeIssues]
         if local_number is not None:
             used_local_numbers.add(local_number)
     return used_local_numbers
@@ -179,8 +182,13 @@ def get_lowest_free_local_numbers(num: int, used_local_numbers: Set[int]) -> Lis
 
 def compute_local_numbers(monitor_workspaces: List[i3ipc.Con], all_workspaces: List[i3ipc.Con],
                           renumber_workspaces: bool) -> List[int]:
-    monitor_workspace_ids = {ws.id for ws in monitor_workspaces}
-    other_monitors_workspaces = [ws for ws in all_workspaces if ws.id not in monitor_workspace_ids]
+    monitor_workspace_ids = {
+        ws.id for ws in monitor_workspaces  # pyright: ignore[reportGeneralTypeIssues]
+    }
+    other_monitors_workspaces = [
+        ws for ws in all_workspaces if ws.id  # pyright: ignore[reportGeneralTypeIssues]
+        not in monitor_workspace_ids
+    ]
     used_local_numbers = get_used_local_numbers(other_monitors_workspaces)
     logger.debug('Local numbers used by group in other monitors: %s', used_local_numbers)
     if renumber_workspaces:
@@ -191,7 +199,7 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con], all_workspaces: L
         last_used_local_number = 0
     local_numbers = []
     for workspace in monitor_workspaces:
-        ws_metadata = parse_name(workspace.name)
+        ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
         local_number = ws_metadata.local_number
         if local_number is None or (local_number in used_local_numbers):
             local_number = last_used_local_number + 1
@@ -236,9 +244,12 @@ def global_number_to_local_number(global_number: int) -> int:
 def get_group_to_workspaces(workspaces: List[i3ipc.Con]) -> GroupToWorkspaces:
     group_to_workspaces = collections.OrderedDict()
     for workspace in workspaces:
-        ws_metadata = parse_name(workspace.name)
+        ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
         group = ws_metadata.group
-        logger.debug('Workspace %s parsed as: %s', workspace.name, ws_metadata)
+        logger.debug(
+            'Workspace %s parsed as: %s',
+            workspace.name,  # pyright: ignore[reportGeneralTypeIssues]
+            ws_metadata)
         if group not in group_to_workspaces:
             group_to_workspaces[group] = []
         group_to_workspaces[group].append(workspace)
@@ -265,7 +276,7 @@ def get_group_index(target_group: str, group_to_workspaces: GroupToWorkspaces):
     group_to_index = {}
     for group, workspaces in group_to_workspaces.items():
         for workspace in workspaces:
-            parsed_name = parse_name(workspace.name)
+            parsed_name = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
             if parsed_name.global_number is not None:
                 group_to_index[group] = global_number_to_group_index(parsed_name.global_number)
                 break

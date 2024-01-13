@@ -82,14 +82,8 @@ include = ['i3wsgroups', 'tests', 'bin', 'tools']
 ignore = [
   # TODO: fix pyright errors in i3_proxy.py
   'i3wsgroups/i3_proxy.py',
-  # TODO: fix pyright errors in icons.py
-  'i3wsgroups/icons.py',
   # TODO: fix pyright errors in controller.py
   'i3wsgroups/controller.py',
-  # TODO: fix pyright errors in workspace_names.py
-  'i3wsgroups/workspace_names.py',
-  # TODO: fix pyright errors in cli.py
-  'i3wsgroups/cli.py',
 ]
 
 # https://beta.ruff.rs/docs/settings

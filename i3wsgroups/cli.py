@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import typing as t
 
 from i3wsgroups import config
 
 
 class ExitCalledError(Exception):
 
-    def __init__(self, parser: argparse.ArgumentParser, status: int, message: str):
+    def __init__(self, parser: argparse.ArgumentParser, status: int, message: t.Optional[str]):
         super().__init__(status, message)
         self.parser = parser
         self.status = status
@@ -24,7 +25,7 @@ class ArgumentParserNoExit(argparse.ArgumentParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def exit(self, status=0, message=None):
+    def exit(self, status=0, message: t.Optional[str] = None):
         raise ExitCalledError(self, status, message)
 
 

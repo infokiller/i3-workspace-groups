@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import re
 from typing import Optional
@@ -43,10 +45,9 @@ class IconsResolver:
             icon = rule.match(window)
             if icon is not None:
                 return icon
-        logger.info(
-            'No icon specified for window with class: "%s", instance: '
-            '"%s", title: "%s", name: "%s"', window.window_class, window.window_instance,
-            window.window_title, window.name)
+        logger.info('No icon specified for window with class: "%s", instance: '
+                    '"%s", title: "%s", name: "%s"', window.window_class, window.window_instance,
+                    window.window_title, window.name)  # pyright: ignore[reportGeneralTypeIssues]
         return self.config['default_icon']
 
     def get_workspace_icons(self, workspace: i3ipc.Con) -> str:

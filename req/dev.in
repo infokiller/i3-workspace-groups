@@ -4,10 +4,9 @@
 # [1] https://github.com/jazzband/pip-tools/issues/1092#issuecomment-1256423806
 # -c base.txt
 pip-tools~=7.3
-pylint~=2.14
-# pytype
-# pylint~=3.0
-# ruff
+pytype
+pylint~=3.0
+ruff
 yapf~=0.32
 isort~=5.10
 tox~=3.25
@@ -16,7 +15,7 @@ pytest-cov
 # pytest-asyncio
 # pytest-mock
 # pyinstrument~=4.1
-# validate-pyproject
-# setuptools-scm
+validate-pyproject
+setuptools-scm
 
 # vim: set ft=requirements :

@@ -14,19 +14,21 @@ pylint:
 pytype_py38:
   image: python:3.8
   script:
-    - python3 -m pip install pytype
     - pytype i3wsgroups
 
 pytype_py39:
   image: python:3.9
   script:
-    - python3 -m pip install pytype
     - pytype i3wsgroups
 
 pytype_py310:
   image: python:3.10
   script:
-    - python3 -m pip install pytype
+    - pytype i3wsgroups
+
+pytype_py311:
+  image: python:3.11
+  script:
     - pytype i3wsgroups
 
 test_py38:

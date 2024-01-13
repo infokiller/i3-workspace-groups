@@ -24,6 +24,21 @@ build-backend = 'setuptools.build_meta'
 
 [tool.setuptools]
 packages = ['i3wsgroups']
+script-files = [
+  'bin/i3-assign-workspace-to-group',
+  'bin/i3-autoname-workspaces',
+  'bin/i3-focus-on-workspace',
+  'bin/i3-groups-polybar-module',
+  'bin/i3-groups-polybar-module-updater',
+  'bin/i3-move-to-workspace',
+  'bin/i3-rename-workspace',
+  'bin/i3-select-workspace-group',
+  'bin/i3-switch-active-workspace-group',
+  'bin/i3-workspace-groups',
+  'bin/i3-workspace-groups-client',
+  'bin/i3-workspace-groups-nc',
+]
+
 
 [tool.setuptools_scm]
 write_to = 'i3wsgroups/__version__.py'

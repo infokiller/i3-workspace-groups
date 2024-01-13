@@ -2,7 +2,6 @@
 name = 'i3-workspace-groups'
 readme = 'README.md'
 dynamic = ['version', 'dependencies', 'optional-dependencies']
-# dynamic = ['dependencies']
 requires-python = '>=3.9'
 license = {file = 'LICENSE'}
 classifiers = [

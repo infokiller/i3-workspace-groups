@@ -33,7 +33,7 @@ class ActiveGroupContext:
 class FocusedGroupContext:
 
     @staticmethod
-    def get_group_name(tree: i3ipc.Con, _: GroupToWorkspaces) -> str:
+    def get_group_name(tree: i3ipc.Con, _: GroupToWorkspaces) -> Optional[str]:
         focused_workspace = tree.find_focused().workspace()
         return ws_names.get_group(focused_workspace)
 

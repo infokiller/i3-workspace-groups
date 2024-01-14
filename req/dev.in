@@ -4,7 +4,8 @@
 # [1] https://github.com/jazzband/pip-tools/issues/1092#issuecomment-1256423806
 # -c base.txt
 pip-tools~=7.3
-pytype
+# pytype is not available for Python 3.12
+# pytype
 pylint~=3.0
 ruff
 yapf~=0.32

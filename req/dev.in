@@ -8,6 +8,7 @@ pip-tools~=7.3
 # pytype
 pylint~=3.0
 ruff
+pyright
 yapf~=0.32
 isort~=5.10
 tox~=3.25

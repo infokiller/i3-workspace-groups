@@ -1,4 +1,4 @@
-image: python:3.10
+image: python:3.11
 
 before_script:
   - apt-get update -qq && apt-get install -y -qq python3-pip shellcheck
@@ -10,6 +10,15 @@ before_script:
 
 pylint:
   script: pylint -j 8 --recursive=y .
+
+ruff:
+  script: ruff check .
+
+yapf:
+  script: yapf -d -r -p .
+
+isort:
+  script: isort --check --diff .
 
 pytype_py38:
   image: python:3.8
@@ -46,6 +55,10 @@ test_py310:
 test_py311:
   image: python:3.11
   script: tox -e py311
+
+test_py312:
+  image: python:3.12
+  script: tox -e py312
 
 shellcheck:
   script:

@@ -183,7 +183,7 @@ from_spaces = 0
 [tool.tox]
 legacy_tox_ini = '''
 [tox]
-envlist = py38,py39,py310,py311
+envlist = py38,py39,py310,py311,py312
 
 [testenv]
 passenv = TOXENV CI TRAVIS TRAVIS_* CODECOV_*

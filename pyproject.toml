@@ -181,7 +181,7 @@ align_imports = '0'
 from_spaces = 0
 
 [tool.tox]
-legacy_tox_ini = """
+legacy_tox_ini = '''
 [tox]
 envlist = py38,py39,py310,py311
 
@@ -201,7 +201,7 @@ commands =
     # TODO: Use the new uploader once it's available on PyPI, or install it in
     # docker.
     # codecov -e CODECOV_TOKEN
-"""
+'''
 
 [tool.semantic_release]
 version_variables = ['i3wsgroups/__version__.py:__version__']

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import logging
 import os.path
@@ -11,7 +13,7 @@ import i3ipc
 from i3wsgroups import cli_util
 from i3wsgroups import controller as i3_groups_controller
 from i3wsgroups import i3_proxy
-from i3wsgroups import logger
+from i3wsgroups import log_util
 from i3wsgroups import workspace_names
 
 _LIST_WORKSPACES_FIELDS = workspace_names.WORKSPACE_NAME_SECTIONS + [
@@ -20,8 +22,8 @@ _LIST_WORKSPACES_FIELDS = workspace_names.WORKSPACE_NAME_SECTIONS + [
 _LIST_WORKSPACES_FIELDS_HELP = ('Comma separated list of fields to output. '
                                 f'Options: {", ".join(_LIST_WORKSPACES_FIELDS)}')
 
-init_logger = logger.init_logger
-logger = logger.logger
+init_logger = log_util.init_logger
+logger = log_util.logger
 
 
 def _add_group_args(parser: argparse.ArgumentParser) -> None:
@@ -395,7 +397,7 @@ def main():
             sys.stderr.write(f'{e.message}\n')
         sys.exit(e.status)
     init_logger(os.path.basename(__file__))
-    logger.setLevel(getattr(logging, args.log_level.upper(), None))
+    logger.setLevel(getattr(logging, args.log_level.upper(), 'WARNING'))
     i3_connection = i3ipc.Connection()
     try:
         output = run_command(i3_connection, args)

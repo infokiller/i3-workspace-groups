@@ -6,9 +6,7 @@ from typing import Optional
 
 import i3ipc
 
-from i3wsgroups import logger
-
-logger = logger.logger
+from i3wsgroups.log_util import logger
 
 
 class IconRule:

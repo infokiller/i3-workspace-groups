@@ -44,6 +44,26 @@ pytype_py311:
     - python3 -m pip install pytype
     - pytype i3wsgroups
 
+pyright_py39:
+  image: python:3.9
+  script:
+    - pyright
+
+pyright_py310:
+  image: python:3.10
+  script:
+    - pyright
+
+pyright_py311:
+  image: python:3.11
+  script:
+    - pyright
+
+pyright_py312:
+  image: python:3.12
+  script:
+    - pyright
+
 test_py38:
   image: python:3.8
   script: tox -e py38

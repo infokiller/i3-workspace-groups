@@ -3,6 +3,8 @@
 # Inspired by:
 # https://github.com/maximbaz/dotfiles/blob/master/bin/i3-autoname-workspaces
 
+from __future__ import annotations
+
 import argparse
 import logging
 import logging.handlers
@@ -10,15 +12,16 @@ import os.path
 import pprint
 
 import i3ipc
+import i3ipc.events
 
 from i3wsgroups import cli_util
 from i3wsgroups import controller
 from i3wsgroups import i3_proxy
-from i3wsgroups import logger
+from i3wsgroups import log_util
 from i3wsgroups import workspace_names
 
-init_logger = logger.init_logger
-logger = logger.logger
+init_logger = log_util.init_logger
+logger = log_util.logger
 
 
 class WorkspaceAutonamer:
@@ -39,12 +42,15 @@ class WorkspaceAutonamer:
         groups_controller.organize_workspace_groups(list(group_to_workspaces.items()))
 
     def window_event_handler(self, i3_connection: i3ipc.Connection,
-                             event: i3ipc.WindowEvent) -> None:
+                             event: i3ipc.events.IpcBaseEvent) -> None:
+        assert isinstance(event, i3ipc.WindowEvent)
         logger.debug('Got window event with change: %s', event.change)
         if event.change in ['new', 'close', 'move']:
             self.update_workspace_names(i3_connection)
 
-    def workspace_event_handler(self, i3_connection: i3ipc.Connection, event: i3ipc.WorkspaceEvent):
+    def workspace_event_handler(self, i3_connection: i3ipc.Connection,
+                                event: i3ipc.events.IpcBaseEvent):
+        assert isinstance(event, i3ipc.WorkspaceEvent)
         logger.debug('Got workspace event with change: %s', event.change)
         # We must update the workspace names on a focus event because the
         # workspace focus change may be due to navigating away from an empty
@@ -63,7 +69,7 @@ def main():
     cli_util.add_workspace_naming_args(parser)
     args = parser.parse_args()
     init_logger(os.path.basename(__file__))
-    logger.setLevel(getattr(logging, args.log_level.upper(), None))
+    logger.setLevel(getattr(logging, args.log_level.upper(), 'WARNING'))
 
     config = cli_util.get_config_with_overrides(args)
     logger.debug('Using merged config:\n%s', pprint.pformat(config))

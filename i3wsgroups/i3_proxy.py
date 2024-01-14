@@ -1,10 +1,10 @@
+from __future__ import annotations
+
 from typing import Dict, List, Optional
 
 import i3ipc
 
-from i3wsgroups import logger
-
-logger = logger.logger
+from i3wsgroups.log_util import logger
 
 
 class I3Proxy:

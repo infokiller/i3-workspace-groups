@@ -33,9 +33,7 @@ from typing import Dict, List, Optional, Set
 
 import i3ipc
 
-from i3wsgroups import logger
-
-logger = logger.logger
+from i3wsgroups.log_util import logger
 
 WORKSPACE_NAME_SECTIONS = [
     'global_number',

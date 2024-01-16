@@ -206,6 +206,7 @@ def _print_workspaces(controller, args):
     return '\n'.join('\t'.join(str(e) for e in row) for row in table)
 
 
+# pylint: disable-next=too-many-statements
 def serve(i3_connection, server_addr):
     # Add the imports here to avoid having a negative effect on clients not
     # using the server.

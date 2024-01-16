@@ -147,7 +147,8 @@ def _create_args_parser() -> cli_util.ArgumentParserNoExit:
     server_subparser = subparsers.add_parser('server')
     server_subparser.add_argument(
         '--server-addr',
-        default=os.path.expandvars('${XDG_RUNTIME_DIR}/i3-workspace-groups.sock'),
+        default=os.path.expandvars('${XDG_RUNTIME_DIR}/i3-workspace-groups-' +
+                                   os.environ['DISPLAY'].replace(':', '')),
         help='Path for the unix domain socket used by the server')
     # Deprecated commands, will be removed in a future release.
     subparsers.add_parser('workspace-back-and-forth',

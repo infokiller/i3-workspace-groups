@@ -3,7 +3,7 @@
 # See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 set -o errexit -o errtrace -o nounset -o pipefail
 
-SOCKET="${I3_WORKSPACE_GROUPS_SOCKET:-${XDG_RUNTIME_DIR}/i3-workspace-groups.sock}"
+SOCKET="${I3_WORKSPACE_GROUPS_SOCKET:-${XDG_RUNTIME_DIR}/i3-workspace-groups-${DISPLAY//:/}}"
 
 command_exists() {
   command -v -- "$1" &> /dev/null

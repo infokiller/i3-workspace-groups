@@ -7,14 +7,18 @@
 
 # pylint: disable=invalid-name
 
+from __future__ import annotations
+
 import os
 import socket
 import sys
 
 
 def main():
-    socket_path = os.environ.get('I3_WORKSPACE_GROUPS_SOCKET',
-                                 os.path.expandvars('${XDG_RUNTIME_DIR}/i3-workspace-groups.sock'))
+    socket_path = os.environ.get(
+        'I3_WORKSPACE_GROUPS_SOCKET',
+        os.path.expandvars('${XDG_RUNTIME_DIR}/i3-workspace-groups-' +
+                           os.environ['DISPLAY'].replace(':', '')))
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.connect(socket_path)
     sock.sendall('\n'.join(sys.argv[1:]).encode('utf-8'))

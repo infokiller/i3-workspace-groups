@@ -2,6 +2,7 @@
 
 ## 0.4.7 (pre-release)
 
+- Add client/server mode
 - Add `workspace-new` command to create a workspace with the first available
   number.
 - Add `move-to-new` command to move the focused container to a new workspace

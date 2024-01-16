@@ -263,7 +263,11 @@ def serve(i3_connection, server_addr):
             elif e.status != 0:
                 msg = f'error: {msg}'
             logger.warning(msg)
-            connection.sendall(msg.encode('utf-8'))
+            try:
+                connection.sendall(msg.encode('utf-8'))
+            except BrokenPipeError:
+                # The client may have disconnected, so ignore the error.
+                logger.warning('Failed sending error message to client')
             continue
         finally:
             # Clean up the connection

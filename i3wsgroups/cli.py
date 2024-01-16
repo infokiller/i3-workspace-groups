@@ -231,13 +231,11 @@ def serve(i3_connection, server_addr):
         logger.debug('Waiting for a connection')
         connection, addr = sock.accept()
         logger.debug(f'Connection from: {addr}')
-        # Receive the data in small chunks and retransmit it
         data = connection.recv(10000)
         if len(data) == 10000:
             logger.warning('Skipping unusually long command')
             continue
         try:
-            # Args are split by the null byte
             client_argv = [s.decode('utf-8') for s in data.split(b'\n')]
         except UnicodeError:
             logger.warning('Failed decoding command args as utf-8')

@@ -145,7 +145,7 @@ def parse_name(workspace_name: str) -> WorkspaceGroupingMetadata:
 
 
 def get_local_workspace_number(workspace: i3ipc.Con) -> Optional[int]:
-    ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
+    ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportAttributeAccessIssue]
     local_number = ws_metadata.local_number
     if local_number is None and ws_metadata.global_number is not None:
         local_number = global_number_to_local_number(ws_metadata.global_number)
@@ -153,14 +153,14 @@ def get_local_workspace_number(workspace: i3ipc.Con) -> Optional[int]:
 
 
 def get_group(workspace: i3ipc.Con) -> Optional[str]:
-    return parse_name(workspace.name).group  # pyright: ignore[reportGeneralTypeIssues]
+    return parse_name(workspace.name).group  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def get_used_local_numbers(workspaces: List[i3ipc.Con]) -> Set[int]:
     used_local_numbers = set()
     for workspace in workspaces:
         local_number = parse_name(
-            workspace.name).local_number  # pyright: ignore[reportGeneralTypeIssues]
+            workspace.name).local_number  # pyright: ignore[reportAttributeAccessIssue]
         if local_number is not None:
             used_local_numbers.add(local_number)
     return used_local_numbers
@@ -181,10 +181,10 @@ def get_lowest_free_local_numbers(num: int, used_local_numbers: Set[int]) -> Lis
 def compute_local_numbers(monitor_workspaces: List[i3ipc.Con], all_workspaces: List[i3ipc.Con],
                           renumber_workspaces: bool) -> List[int]:
     monitor_workspace_ids = {
-        ws.id for ws in monitor_workspaces  # pyright: ignore[reportGeneralTypeIssues]
+        ws.id for ws in monitor_workspaces  # pyright: ignore[reportAttributeAccessIssue]
     }
     other_monitors_workspaces = [
-        ws for ws in all_workspaces if ws.id  # pyright: ignore[reportGeneralTypeIssues]
+        ws for ws in all_workspaces if ws.id  # pyright: ignore[reportAttributeAccessIssue]
         not in monitor_workspace_ids
     ]
     used_local_numbers = get_used_local_numbers(other_monitors_workspaces)
@@ -197,7 +197,7 @@ def compute_local_numbers(monitor_workspaces: List[i3ipc.Con], all_workspaces: L
         last_used_local_number = 0
     local_numbers = []
     for workspace in monitor_workspaces:
-        ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
+        ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportAttributeAccessIssue]
         local_number = ws_metadata.local_number
         if local_number is None or (local_number in used_local_numbers):
             local_number = last_used_local_number + 1
@@ -242,11 +242,11 @@ def global_number_to_local_number(global_number: int) -> int:
 def get_group_to_workspaces(workspaces: List[i3ipc.Con]) -> GroupToWorkspaces:
     group_to_workspaces = collections.OrderedDict()
     for workspace in workspaces:
-        ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
+        ws_metadata = parse_name(workspace.name)  # pyright: ignore[reportAttributeAccessIssue]
         group = ws_metadata.group
         logger.debug(
             'Workspace %s parsed as: %s',
-            workspace.name,  # pyright: ignore[reportGeneralTypeIssues]
+            workspace.name,  # pyright: ignore[reportAttributeAccessIssue]
             ws_metadata)
         if group not in group_to_workspaces:
             group_to_workspaces[group] = []
@@ -274,7 +274,7 @@ def get_group_index(target_group: str, group_to_workspaces: GroupToWorkspaces):
     group_to_index = {}
     for group, workspaces in group_to_workspaces.items():
         for workspace in workspaces:
-            parsed_name = parse_name(workspace.name)  # pyright: ignore[reportGeneralTypeIssues]
+            parsed_name = parse_name(workspace.name)  # pyright: ignore[reportAttributeAccessIssue]
             if parsed_name.global_number is not None:
                 group_to_index[group] = global_number_to_group_index(parsed_name.global_number)
                 break

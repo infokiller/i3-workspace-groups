@@ -1,6 +1,8 @@
 # Changelog for i3-workspace-groups
 
-## 0.4.7 (pre-release)
+## 0.5.0 (pre-release)
+
+## 0.4.7
 
 - Add client/server mode
 - Add `workspace-new` command to create a workspace with the first available

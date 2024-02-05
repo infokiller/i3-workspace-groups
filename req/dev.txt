@@ -4,9 +4,9 @@
 #
 #    pip-compile --allow-unsafe --constraint=req/base.txt --extra=dev --generate-hashes --output-file=req/dev.txt --strip-extras pyproject.toml
 #
-astroid==3.0.2 \
-    --hash=sha256:4a61cf0a59097c7bb52689b0fd63717cd2a8a14dc9f1eee97b82d814881c8c91 \
-    --hash=sha256:d6e62862355f60e716164082d6b4b041d38e2a8cf1c7cd953ded5108bac8ff5c
+astroid==3.0.3 \
+    --hash=sha256:4148645659b08b70d72460ed1921158027a9e53ae8b7234149b1400eddacbb93 \
+    --hash=sha256:92fcf218b89f449cdf9f7b39a269f8d5d617b27be68434912e11e79203963a17
     # via pylint
 build==1.0.3 \
     --hash=sha256:538aab1b64f9828977f84bc63ae570b060a8ed1be419e7870b8b4fc5e6ea553b \

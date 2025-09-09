@@ -17,7 +17,7 @@ def _update_polybar(*_):
     subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'], check=False)
 
 
-async def main():
+async def main_async():
     i3 = await Connection(auto_reconnect=True).connect()
 
     _update_polybar()
@@ -29,6 +29,9 @@ async def main():
 
     await i3.main()
 
+def main():
+    asyncio.run(main())
+
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()

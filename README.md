@@ -51,7 +51,7 @@ their own "namespace", and switch between them.
 The scripts can be installed using pip:
 
 ```shell
-python3 -m pip install i3-workspace-groups
+pipx install i3-workspace-groups
 ```
 
 Then you should be able to run the command line tool
@@ -78,7 +78,7 @@ recommended to install one of the following tools to further improve speed:
 ### i3
 
 In order to use these tools effectively, commands need to be bound to
-keybindings. For example, my i3 config contains the following exerts:
+keybindings. For example, my i3 config contains the following excerpt:
 
 <!-- markdownlint-disable fenced-code-language -->
 
@@ -304,6 +304,6 @@ done < <(polybar --list-monitors | cut -d':' -f1)
 #### 2. Run a background script to update polybar's on i3 events
 
 Run the
-[i3-groups-polybar-module-updater](./bin/i3-groups-polybar-module-updater)
+[polybar_module_updater.py](./i3wsgroups/polybar_module_updater.py)
 script. This script is responsible for calling the hook to update polybar
 whenever a relevant i3 window event occurs.

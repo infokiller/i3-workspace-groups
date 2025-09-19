@@ -8,13 +8,7 @@ from i3ipc.aio import Connection
 
 
 def _update_polybar(*_):
-    # As of 2021-10-15 and PR #2539 [1] running the hook action is deprecated.
-    # We should switch to the commented out alternative, but we'll wait till
-    # this change is a bit older to reduce the risk that we break the setup of
-    # people that run older versions of polybar.
-    # [1] https://github.com/polybar/polybar/pull/2539
-    # subprocess.run(['polybar-msg', 'action', '#i3-mod.hook.0'], check=False)
-    subprocess.run(['polybar-msg', 'hook', 'i3-mod', '1'], check=False)
+    subprocess.run(['polybar-msg', 'action', '#i3-mod.hook.0'], check=False)
 
 
 async def main():

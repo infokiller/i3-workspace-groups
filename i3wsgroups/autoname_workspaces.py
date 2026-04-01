@@ -45,7 +45,7 @@ class WorkspaceAutonamer:
                              event: i3ipc.events.IpcBaseEvent) -> None:
         assert isinstance(event, i3ipc.WindowEvent)
         logger.debug('Got window event with change: %s', event.change)
-        if event.change in ['new', 'close', 'move']:
+        if event.change in ['new', 'close', 'move', 'title']:
             self.update_workspace_names(i3_connection)
 
     def workspace_event_handler(self, i3_connection: i3ipc.Connection,

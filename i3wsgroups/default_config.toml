@@ -39,111 +39,111 @@ try_fallback_rules = true
 #       
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'kitty|Termite|URxvtc?'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Chromium|Chrome'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Firefox'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'copyq'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Ranger'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Rofi'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Pqiv'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Pinta'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = '[Mm]pv'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = '[Vv]lc'
 icon = '嗢'
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = '[Ll]ibreoffice-writer'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = '[Ll]ibreoffice-calc'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Peek'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'ipython'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'python'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'jupyter-qtconsole'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Gvim'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'settings'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'slack'
 icon = '聆'
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Zathura'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Telegram'
 icon = ''
 
 [[icons.rules]]
-property = 'class'
+property = 'window_class|app_id'
 match = 'Pavucontrol'
 icon = '墳'

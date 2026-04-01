@@ -10,22 +10,26 @@ from i3wsgroups.log_util import logger
 
 
 class IconRule:
-
     def __init__(self, window_property, matcher, icon):
-        assert window_property in ['class', 'instance', 'title']
+        # config compatible
+        if window_property in ['class', 'instance', 'title']:
+            window_property = "window_" + window_property
+
+        # get from i3ipc.Con doc
+        assert window_property in ["app_id", "border", "current_border_with", "floating", "focused",
+                            "fullscreen_mode", "id", "layout", "name", "num", "orientation",
+                            "percent", "pid", "representation", "scratchpad_state", "sticky", "type",
+                            "urgent", "visible", "window", "window_class", "window_instance",
+                            "window_role", "window_title"]
+
         self.window_property = window_property
         self.matcher = re.compile(matcher)
         self.icon = icon
 
     def match(self, window: i3ipc.Con) -> Optional[str]:
-        if self.window_property == 'class':
-            property_value = window.window_class
-        elif self.window_property == 'instance':
-            property_value = window.window_instance
-        else:
-            property_value = window.window_title
+        property_value = getattr(window, self.window_property, None)
         # The value can be None for i3 placeholder windows and possibly others.
-        if property_value and self.matcher.match(property_value):
+        if property_value and self.matcher.match(str(property_value)):
             return self.icon
         return None
 
@@ -43,9 +47,20 @@ class IconsResolver:
             icon = rule.match(window)
             if icon is not None:
                 return icon
-        logger.info('No icon specified for window with class: "%s", instance: '
-                    '"%s", title: "%s", name: "%s"', window.window_class, window.window_instance,
-                    window.window_title, window.name)  # pyright: ignore[reportAttributeAccessIssue]
+
+        log_string=""
+        for window_property in ["app_id", "border", "current_border_with", "floating", "focused",
+                                "fullscreen_mode", "id", "layout", "name", "num", "orientation",
+                                "percent", "pid", "representation", "scratchpad_state", "sticky",
+                                "type", "urgent", "visible", "window", "window_class",
+                                "window_instance", "window_role", "window_title"]:
+            property_value = getattr(window, window_property, None)
+            if property_value:
+                log_string += f'"{window_property}": "{property_value}", '
+        if log_string.endswith(", "):
+            log_string = log_string.removesuffix(", ")
+
+        logger.info(f'No icon specified for window with {log_string}')
         return self.config['default_icon']
 
     def get_workspace_icons(self, workspace: i3ipc.Con) -> str:

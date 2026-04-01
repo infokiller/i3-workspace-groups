@@ -145,10 +145,12 @@ def _create_args_parser() -> cli_util.ArgumentParserNoExit:
         ' of failing.')
     assign_workspace_subparser.add_argument('group')
     server_subparser = subparsers.add_parser('server')
+    display=os.environ.get('DISPLAY', os.environ.get('WAYLAND_DISPLAY'))
+    assert(display is not None)
     server_subparser.add_argument(
         '--server-addr',
         default=os.path.expandvars('${XDG_RUNTIME_DIR}/i3-workspace-groups-' +
-                                   os.environ['DISPLAY'].replace(':', '')),
+                                   display.replace(':', '')),
         help='Path for the unix domain socket used by the server')
     # Deprecated commands, will be removed in a future release.
     subparsers.add_parser('workspace-back-and-forth',
